@@ -1,12 +1,16 @@
-# SCTE35-go: SCTE-35 Decoder/Encoder 
+# scte35-go: ANSI/SCTE 35 Decoder/Encoder 
 
-`scte35-go` is a Go module that supports creating, modifying, and analyzing 
+`scte35-go` is a Go library to supports creating, decorating, and analyzing 
 binary Digital Program Insertion Cueing Messages.
 
-This library is fully compliant and compatible with [SCTE-35 2020](./docs/SCTE-35_2020.pdf).
+This library is fully compliant and compatible with all versions of the 
+[ANSI/SCTE 35](https://www.scte.org/standards-development/library/standards-catalog/scte-35-2019/) 
+specification up to and including [ANSI/SCTE 35 2020](./docs/SCTE-35_2020.pdf).
 
 This project uses [Semantic Versioning](https://semver.org) and is published as
 a [Go Module](https://blog.golang.org/using-go-modules).
+
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/Comcast/scte35-go)](https://pkg.go.dev/github.com/Comcast/scte35-go)
 
 ## Getting Started
 
@@ -23,12 +27,12 @@ Additional examples can be found in [examples](./examples).
 
 #### Decode Signal
 
-Binary signals can be quickly and easily decoded from base-64 of hexadecimal
+Binary signals can be quickly and easily decoded from base-64 or hexadecimal
 strings.
 
 The results can be output as a:
-* String - emulating the [SCTE-35 specification](./docs/SCTE-35_2020.pdf) structure.
-* XML - compliant with the [schema](./docs/scte35.xsd)
+* String - emulating the table structure used in the [SCTE 35 specification](./docs/SCTE-35_2020.pdf).
+* XML - compliant with the [SCTE 35 XML Schema](./docs/scte35.xsd)
 * JSON - for integrating with JSON based tools such as [jq](https://stedolan.github.io/jq/)
 
 [decode.go](../examples/decode.go)
@@ -157,8 +161,8 @@ JSON:
 #### Encode Signal
 
 Encoding signals is equally simple. You can start from scratch and build a
-`scte35.SpliceInfoSection` or decode an existing signal and modify
-it to suit your needs.
+`scte35.SpliceInfoSection` or decode an existing signal and modify it to suit 
+your needs.
 
 [encode.go](./examples/encode.go)
 
@@ -210,7 +214,7 @@ func main() {
 	)
 
 	// encode it again
-	_, _ = fmt.Fprintf(os.Stdout, "Original:\n")
+	_, _ = fmt.Fprintf(os.Stdout, "\nModified:\n")
 	_, _ = fmt.Fprintf(os.Stdout, "base-64: %s\n", sis.Base64())
 	_, _ = fmt.Fprintf(os.Stdout, "hex    : %s\n", sis.Hex())
 }
@@ -222,14 +226,15 @@ $ go run ./examples/encode.go
 Original:
 base-64: /DAvAAAAAAAA///wBQb+cr0AUAAZAhdDVUVJSAAAjn+PCAg3ODUxMTQ1MjQCADhqB9E=
 hex    : fc302f000000000000fffff00506fe72bd005000190217435545494800008e7f8f08083738353131343532340200386a07d1
-Original:
+
+Modified:
 base-64: /DA7AAAAAAAA///wBQb+cr0AUAAlAhdDVUVJSAAAjn+PCAg3ODUxMTQ1MjQCAAEKQ1VFSQCfQUJDKqtwQlQ=
 hex    : fc303b000000000000fffff00506fe72bd005000250217435545494800008e7f8f08083738353131343532340200010a43554549009f4142432aab704254
 ```
 
 #### Decoding Non-Compliant Signals
 
-The scte35 decoder will always return a non-nil `SpliceInfoSection`, even when
+The SCTE 35 decoder will always return a non-nil `SpliceInfoSection`, even when
 an error occurs. This is done to help better identify the specific cause of the
 decoding failure.
 
@@ -305,8 +310,8 @@ splice_insert() {
 
 #### CRC_32 Validation
 
-The scte35 decoder performs `CRC_32` validation on decode. This error can be
-handled and ignored explicitly
+The SCTE 35 decoder performs automatic `CRC_32` validation. The returned error
+can be explicitly ignored if desired.
 
 ```go
 sis, err := scte35.DecodeBase64("/DA4AAAAAAAAAP/wFAUABDEAf+//mWEhzP4Azf5gAQAAAAATAhFDVUVJAAAAAX+/AQIwNAEAAKeYO3Q=")
