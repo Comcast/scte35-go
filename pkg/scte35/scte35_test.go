@@ -20,7 +20,7 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"encoding/xml"
-	"errors"
+	"fmt"
 	"io"
 	"os"
 	"testing"
@@ -402,7 +402,7 @@ func TestDecodeBase64(t *testing.T) {
 		{
 			name:   "Empty String",
 			binary: "",
-			err:    scte35.ErrBufferOverflow,
+			err:    fmt.Errorf("splice_info_section: %w", scte35.ErrBufferOverflow),
 		},
 		{
 			name:   "Invalid Base64 Encoding",
@@ -491,7 +491,7 @@ func TestDecodeBase64(t *testing.T) {
 		{
 			name:   "SpliceInsert Time Specified With Invalid Component Count",
 			binary: "FkC1lwP3uTQD0VvxHwVBEH89G6B7VjzaZ9eNuyUF9q8pYAIXsRM9ZpDCczBeDbytQhXkssQstGJVGcvjZ3tiIMULiA4BpRHlzLGFa0q6aVMtzk8ZRUeLcxtKibgVOKBBnkCbOQyhSflFiDkrAAIp+Fk+VRsByTSkPN3RvyK+lWcjHElhwa9hNFcAy4dm3DdeRXnrD3I2mISNc7DkgS0ReotPyp94FV77xMHT4D7SYL48XU20UM4bgg==",
-			err:    scte35.ErrBufferOverflow,
+			err:    fmt.Errorf("splice_insert: %w", scte35.ErrBufferOverflow),
 		},
 		{
 			name:   "Signal with non-CUEI descriptor",
@@ -534,46 +534,44 @@ func TestDecodeBase64(t *testing.T) {
 		{
 			name:   "Invalid CRC_32",
 			binary: "/DA4AAAAAAAAAP/wFAUABDEAf+//mWEhzP4Azf5gAQAAAAATAhFDVUVJAAAAAX+/AQIwNAEAAKeYO3Q=",
-			err:    scte35.ErrCRC32Invalid,
+			err:    fmt.Errorf("splice_info_section: %w", scte35.ErrCRC32Invalid),
 		},
 	}
 
 	for _, c := range cases {
-		// decode the binary
-		sis, err := scte35.DecodeBase64(c.binary)
-		if err != nil {
-			if c.err == nil {
-				assert.NoError(t, err, c.name)
-			} else {
-				assert.True(t, errors.Is(err, c.err), c.name)
+		t.Run(c.name, func(t *testing.T) {
+			// decode the binary
+			sis, err := scte35.DecodeBase64(c.binary)
+			require.Equal(t, c.err, err)
+			if err != nil {
+				return
 			}
-			continue
-		}
 
-		// test encode/decode XML
-		encodedXML := toXML(sis)
-		assert.Equal(t, toXML(&c.expected), encodedXML, c.name)
-		decodedXML := scte35.SpliceInfoSection{}
-		assert.NoError(t, xml.Unmarshal([]byte(encodedXML), &decodedXML), c.name)
+			// test encode/decode XML
+			encodedXML := toXML(sis)
+			assert.Equal(t, toXML(&c.expected), encodedXML)
+			decodedXML := scte35.SpliceInfoSection{}
+			assert.NoError(t, xml.Unmarshal([]byte(encodedXML), &decodedXML))
 
-		// legacy 35's produce an "updated" binary so will not match
-		if !c.legacy {
-			assert.Equal(t, c.binary, decodedXML.Base64(), c.name)
-		}
+			// legacy 35's produce an "updated" binary so will not match
+			if !c.legacy {
+				assert.Equal(t, c.binary, decodedXML.Base64())
+			}
 
-		// test encode/decode JSON
-		encodedJSON := toJSON(sis)
-		assert.Equal(t, toJSON(&c.expected), encodedJSON, c.name)
-		decodedJSON := scte35.SpliceInfoSection{}
-		require.NoError(t, json.Unmarshal([]byte(encodedJSON), &decodedJSON), c.name)
+			// test encode/decode JSON
+			encodedJSON := toJSON(sis)
+			assert.Equal(t, toJSON(&c.expected), encodedJSON)
+			decodedJSON := scte35.SpliceInfoSection{}
+			require.NoError(t, json.Unmarshal([]byte(encodedJSON), &decodedJSON))
 
-		// legacy 35's produce an "updated" binary so will not match
-		if !c.legacy {
-			assert.Equal(t, c.binary, decodedJSON.Base64(), c.name)
-		}
+			// legacy 35's produce an "updated" binary so will not match
+			if !c.legacy {
+				assert.Equal(t, c.binary, decodedJSON.Base64())
+			}
 
-		// uncomment this to verify the output as text
-		// scte35.Log.Printf("\n%s", sis.Details())
+			// uncomment this to verify the output as text
+			// scte35.Log.Printf("\n%s", sis.Details())
+		})
 	}
 }
 
@@ -647,28 +645,26 @@ func TestDecodeHex(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		// decode the binary
-		sis, err := scte35.DecodeHex(c.hex)
-		if err != nil {
-			if c.err == nil {
-				assert.NoError(t, err, c.name)
-			} else {
-				assert.True(t, errors.Is(err, c.err), c.name)
+		t.Run(c.name, func(t *testing.T) {
+			// decode the binary
+			sis, err := scte35.DecodeHex(c.hex)
+			require.Equal(t, c.err, err)
+			if err != nil {
+				return
 			}
-			continue
-		}
 
-		// test encode/decode XML
-		encodedXML := toXML(sis)
-		assert.Equal(t, toXML(&c.expected), encodedXML, c.name)
-		decodedXML := scte35.SpliceInfoSection{}
-		assert.NoError(t, xml.Unmarshal([]byte(encodedXML), &decodedXML), c.name)
+			// test encode/decode XML
+			encodedXML := toXML(sis)
+			assert.Equal(t, toXML(&c.expected), encodedXML)
+			decodedXML := scte35.SpliceInfoSection{}
+			assert.NoError(t, xml.Unmarshal([]byte(encodedXML), &decodedXML))
 
-		// test encode/decode JSON
-		encodedJSON := toJSON(sis)
-		assert.Equal(t, toJSON(&c.expected), encodedJSON, c.name)
-		decodedJSON := scte35.SpliceInfoSection{}
-		require.NoError(t, json.Unmarshal([]byte(encodedJSON), &decodedJSON), c.name)
+			// test encode/decode JSON
+			encodedJSON := toJSON(sis)
+			assert.Equal(t, toJSON(&c.expected), encodedJSON)
+			decodedJSON := scte35.SpliceInfoSection{}
+			require.NoError(t, json.Unmarshal([]byte(encodedJSON), &decodedJSON))
+		})
 	}
 }
 
