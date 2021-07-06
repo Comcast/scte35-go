@@ -40,6 +40,7 @@ type SpliceCommand interface {
 	decode(b []byte) error
 	encode() ([]byte, error)
 	length() int
+	table(prefix, indent string) string
 }
 
 // decodeSpliceCommand decodes the supplied byte array into the desired

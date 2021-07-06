@@ -49,11 +49,6 @@ func (cmd *BandwidthReservation) Type() uint32 {
 	return BandwidthReservationType
 }
 
-// String returns a table description of this splice_command.
-func (cmd *BandwidthReservation) String() string {
-	return "bandwidth_reservation() {}\n"
-}
-
 // decode a binary bandwidth_reservation.
 func (cmd *BandwidthReservation) decode(b []byte) error {
 	if len(b) > 0 {
@@ -70,4 +65,9 @@ func (cmd *BandwidthReservation) encode() ([]byte, error) {
 // commandLength returns the splice_command_length
 func (cmd *BandwidthReservation) length() int {
 	return 0
+}
+
+// table returns the tabular description of this splice_command.
+func (cmd *BandwidthReservation) table(prefix, _ string) string {
+	return prefix+"bandwidth_reservation() {}\n"
 }

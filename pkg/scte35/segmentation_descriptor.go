@@ -17,9 +17,9 @@
 package scte35
 
 import (
+	"bytes"
 	"encoding/xml"
 	"fmt"
-	"strings"
 
 	"github.com/bamiaux/iobit"
 )
@@ -293,77 +293,6 @@ func (sd *SegmentationDescriptor) Tag() uint32 {
 	return SegmentationDescriptorTag
 }
 
-// String returns the description of this descriptor.
-func (sd *SegmentationDescriptor) String() string {
-	var buf strings.Builder
-
-	buf.WriteString(fmt.Sprintf("avail_descriptor() {\n"))
-	buf.WriteString(fmt.Sprintf("    splice_descriptor_tag: %#02x\n", sd.Tag()))
-	buf.WriteString(fmt.Sprintf("    descriptor_length: %d bytes\n", sd.length()))
-	buf.WriteString(fmt.Sprintf("    identifier: %s\n", CUEIASCII))
-	buf.WriteString(fmt.Sprintf("    segmentation_event_id: %d\n", sd.SegmentationEventID))
-	buf.WriteString(fmt.Sprintf("    segmentation_event_cancel_indicator: %#v\n", sd.SegmentationEventCancelIndicator))
-	if !sd.SegmentationEventCancelIndicator {
-		buf.WriteString(fmt.Sprintf("    program_segmentation_flag: %#v\n", sd.programSegmentationFlag()))
-		buf.WriteString(fmt.Sprintf("    segmentation_duration_flag: %#v\n", sd.segmentationDurationFlag()))
-		buf.WriteString(fmt.Sprintf("    delivery_not_restricted_flag: %#v\n", sd.deliveryNotRestrictedFlag()))
-		if !sd.deliveryNotRestrictedFlag() {
-			buf.WriteString(fmt.Sprintf("    web_delivery_allowed_flag: %#v\n", sd.DeliveryRestrictions.WebDeliveryAllowedFlag))
-			buf.WriteString(fmt.Sprintf("    no_regional_blackout_flag: %#v\n", sd.DeliveryRestrictions.NoRegionalBlackoutFlag))
-			buf.WriteString(fmt.Sprintf("    archive_allowed_flag: %#v\n", sd.DeliveryRestrictions.ArchiveAllowedFlag))
-			buf.WriteString(fmt.Sprintf("    device_restrictions: %s\n", sd.DeliveryRestrictions.deviceRestrictionsName()))
-		}
-		if len(sd.Components) > 0 {
-			buf.WriteString(fmt.Sprintf("    component_count: %d\n", len(sd.Components)))
-			for i, c := range sd.Components {
-				buf.WriteString(fmt.Sprintf("    component[%d] {\n", i))
-				buf.WriteString(fmt.Sprintf("        component_tag %d\n", c.Tag))
-				buf.WriteString(fmt.Sprintf("        pts_offset %d ticks (%s)\n", c.PTSOffset, TicksToDuration(c.PTSOffset)))
-				buf.WriteString(fmt.Sprintf("    }\n"))
-			}
-		}
-		if sd.segmentationDurationFlag() {
-			buf.WriteString(fmt.Sprintf("    segmentation_duration: %d ticks (%s)\n", *sd.SegmentationDuration, TicksToDuration(*sd.SegmentationDuration)))
-		}
-
-		if len(sd.SegmentationUPIDs) > 0 {
-			if len(sd.SegmentationUPIDs) > 1 {
-				buf.WriteString(fmt.Sprintf("    segmentation_upid_type: %s\n", "MID()"))
-			}
-			buf.WriteString(fmt.Sprintf("    segmentation_upid_length: %d bytes\n", sd.segmentationUpidLength()))
-			for _, u := range sd.SegmentationUPIDs {
-				buf.WriteString(fmt.Sprintf("    segmentation_upid {\n"))
-				buf.WriteString(fmt.Sprintf("        segmentation_upid_type: %s (%#02x)\n", u.Name(), u.Type))
-				if u.Type == SegmentationUPIDTypeMPU {
-					buf.WriteString(fmt.Sprintf("        format_identifer: %s\n", u.formatIdentifierString()))
-				}
-				if u.Format == "text" {
-					buf.WriteString(fmt.Sprintf("        segmentation_upid: %s\n", u.Value))
-				} else {
-					buf.WriteString(fmt.Sprintf("        segmentation_upid: %#x\n", u.valueBytes()))
-				}
-				buf.WriteString(fmt.Sprintf("    }\n"))
-			}
-		} else {
-			buf.WriteString(fmt.Sprintf("    segmentation_upid_type: %s\n", "Not Used"))
-			buf.WriteString(fmt.Sprintf("    segmentation_upid_length: %d\n", sd.segmentationUpidLength()))
-		}
-	}
-
-	buf.WriteString(fmt.Sprintf("    segmentation_type_id: %s (%#02x)\n", sd.Name(), sd.SegmentationTypeID))
-	buf.WriteString(fmt.Sprintf("    segment_num: %d\n", sd.SegmentNum))
-	buf.WriteString(fmt.Sprintf("    segments_expected: %d\n", sd.SegmentsExpected))
-	if sd.SubSegmentNum != nil {
-		buf.WriteString(fmt.Sprintf("    sub_segment_num: %d\n", *sd.SubSegmentNum))
-	}
-	if sd.SubSegmentsExpected != nil {
-		buf.WriteString(fmt.Sprintf("    sub_segments_expected: %d\n", *sd.SubSegmentsExpected))
-	}
-	buf.WriteString(fmt.Sprintf("}\n"))
-
-	return buf.String()
-}
-
 // decode updates this splice_descriptor from binary.
 func (sd *SegmentationDescriptor) decode(b []byte) error {
 	r := iobit.NewReader(b)
@@ -572,6 +501,68 @@ func (sd *SegmentationDescriptor) length() int {
 	}
 
 	return length / 8
+}
+
+// table returns the tabular description of this SegmentationDescriptor.
+func (sd *SegmentationDescriptor) table(prefix, indent string) string {
+	var b bytes.Buffer
+	_, _ = fmt.Fprintf(&b, prefix+"avail_descriptor() {\n")
+	_, _ = fmt.Fprintf(&b, prefix+indent+"splice_descriptor_tag: %#02x\n", sd.Tag())
+	_, _ = fmt.Fprintf(&b, prefix+indent+"descriptor_length: %d bytes\n", sd.length())
+	_, _ = fmt.Fprintf(&b, prefix+indent+"identifier: %s\n", CUEIASCII)
+	_, _ = fmt.Fprintf(&b, prefix+indent+"segmentation_event_id: %d\n", sd.SegmentationEventID)
+	_, _ = fmt.Fprintf(&b, prefix+indent+"segmentation_event_cancel_indicator: %#v\n", sd.SegmentationEventCancelIndicator)
+	if !sd.SegmentationEventCancelIndicator {
+		_, _ = fmt.Fprintf(&b, prefix+indent+"program_segmentation_flag: %#v\n", sd.programSegmentationFlag())
+		_, _ = fmt.Fprintf(&b, prefix+indent+"segmentation_duration_flag: %#v\n", sd.segmentationDurationFlag())
+		_, _ = fmt.Fprintf(&b, prefix+indent+"delivery_not_restricted_flag: %#v\n", sd.deliveryNotRestrictedFlag())
+		if sd.DeliveryRestrictions != nil {
+			_, _ = fmt.Fprintf(&b, prefix+indent+"web_delivery_allowed_flag: %#v\n", sd.DeliveryRestrictions.WebDeliveryAllowedFlag)
+			_, _ = fmt.Fprintf(&b, prefix+indent+"no_regional_blackout_flag: %#v\n", sd.DeliveryRestrictions.NoRegionalBlackoutFlag)
+			_, _ = fmt.Fprintf(&b, prefix+indent+"archive_allowed_flag: %#v\n", sd.DeliveryRestrictions.ArchiveAllowedFlag)
+			_, _ = fmt.Fprintf(&b, prefix+indent+"device_restrictions: %s\n", sd.DeliveryRestrictions.deviceRestrictionsName())
+		}
+		if len(sd.Components) > 0 {
+			_, _ = fmt.Fprintf(&b, prefix+indent+"component_count: %d\n", len(sd.Components))
+			for i, c := range sd.Components {
+				_, _ = fmt.Fprintf(&b, prefix+indent+"component[%d] {\n", i)
+				_, _ = fmt.Fprintf(&b, prefix+indent+indent+"component_tag %d\n", c.Tag)
+				_, _ = fmt.Fprintf(&b, prefix+indent+indent+"pts_offset %d ticks (%s)\n", c.PTSOffset, TicksToDuration(c.PTSOffset))
+				_, _ = fmt.Fprintf(&b, prefix+indent+"}\n")
+			}
+		}
+		if sd.segmentationDurationFlag() {
+			_, _ = fmt.Fprintf(&b, prefix+indent+"segmentation_duration: %d ticks (%s)\n", *sd.SegmentationDuration, TicksToDuration(*sd.SegmentationDuration))
+		}
+
+		_, _ = fmt.Fprintf(&b, prefix+indent+"segmentation_upid_length: %d bytes\n", sd.segmentationUpidLength())
+		for i, u := range sd.SegmentationUPIDs {
+			_, _ = fmt.Fprintf(&b, prefix+indent+"segmentation_upid[%d] {\n", i)
+			_, _ = fmt.Fprintf(&b, prefix+indent+indent+"segmentation_upid_type: %s (%#02x)\n", u.Name(), u.Type)
+			if u.Type == SegmentationUPIDTypeMPU {
+				_, _ = fmt.Fprintf(&b, prefix+indent+indent+"format_identifier: %s\n", u.formatIdentifierString())
+			}
+			if u.Format == "text" {
+				_, _ = fmt.Fprintf(&b, prefix+indent+indent+"segmentation_upid: %s\n", u.Value)
+			} else {
+				_, _ = fmt.Fprintf(&b, prefix+indent+indent+"segmentation_upid: %#x\n", u.valueBytes())
+			}
+			_, _ = fmt.Fprintf(&b, prefix+indent+"}\n")
+		}
+	}
+
+	_, _ = fmt.Fprintf(&b, prefix+indent+"segmentation_type_id: %s (%#02x)\n", sd.Name(), sd.SegmentationTypeID)
+	_, _ = fmt.Fprintf(&b, prefix+indent+"segment_num: %d\n", sd.SegmentNum)
+	_, _ = fmt.Fprintf(&b, prefix+indent+"segments_expected: %d\n", sd.SegmentsExpected)
+	if sd.SubSegmentNum != nil {
+		_, _ = fmt.Fprintf(&b, prefix+indent+"sub_segment_num: %d\n", *sd.SubSegmentNum)
+	}
+	if sd.SubSegmentsExpected != nil {
+		_, _ = fmt.Fprintf(&b, prefix+indent+"sub_segments_expected: %d\n", *sd.SubSegmentsExpected)
+	}
+	_, _ = fmt.Fprintf(&b, prefix+"}\n")
+
+	return b.String()
 }
 
 // deliveryNotRestrictedFlag returns the delivery_not_restricted_flag.

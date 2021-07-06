@@ -17,10 +17,10 @@
 package scte35
 
 import (
+	"bytes"
 	"encoding/binary"
 	"encoding/xml"
 	"fmt"
-	"strings"
 
 	"github.com/bamiaux/iobit"
 )
@@ -54,18 +54,6 @@ func (cmd *PrivateCommand) Type() uint32 {
 	// ensure JSONType is set
 	cmd.JSONType = PrivateCommandType
 	return PrivateCommandType
-}
-
-// String returns the description of this private_command.
-func (cmd *PrivateCommand) String() string {
-	var buf strings.Builder
-
-	buf.WriteString(fmt.Sprintf("private_command() {\n"))
-	buf.WriteString(fmt.Sprintf("    identifier: %s", cmd.IdentifierString()))
-	buf.WriteString(fmt.Sprintf("    private_byte: %#0x", cmd.PrivateBytes))
-	buf.WriteString(fmt.Sprintf("}\n"))
-
-	return buf.String()
 }
 
 // decode a binary private_command.
@@ -103,4 +91,14 @@ func (cmd *PrivateCommand) length() int {
 	length := 32                        // identifier
 	length += len(cmd.PrivateBytes) * 8 // private_bytes
 	return length / 8
+}
+
+// table returns the tabular description of this PrivateCommand.
+func (cmd *PrivateCommand) table(prefix, indent string) string {
+	var b bytes.Buffer
+	_, _ = fmt.Fprintln(&b, prefix+"private_command() {\n")
+	_, _ = fmt.Fprintln(&b, prefix+indent+"identifier: %s\n", cmd.IdentifierString())
+	_, _ = fmt.Fprintln(&b, prefix+indent+"private_byte: %#0x\n", cmd.PrivateBytes)
+	_, _ = fmt.Fprintln(&b, prefix+"}\n")
+	return b.String()
 }

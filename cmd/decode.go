@@ -54,13 +54,13 @@ func decodeCommand() *cobra.Command {
 			// print details (sis is never nil)
 			switch format {
 			case "json":
-				b, _ := json.MarshalIndent(sis, "", "  ")
+				b, _ := json.MarshalIndent(sis, "", "\t")
 				_, _ = fmt.Fprintf(os.Stdout, "%s\n", b)
 			case "xml":
-				b, _ := xml.MarshalIndent(sis, "", "  ")
+				b, _ := xml.MarshalIndent(sis, "", "\t")
 				_, _ = fmt.Fprintf(os.Stdout, "%s\n", b)
 			default:
-				_, _ = fmt.Fprintf(os.Stdout, "%s\n", sis)
+				_, _ = fmt.Fprintf(os.Stdout, "%s\n", sis.Table("", "\t"))
 			}
 
 			// and any errors

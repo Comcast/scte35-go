@@ -29,7 +29,7 @@ func main() {
 	sis, _ := scte35.DecodeBase64("/DA8AAAAAAAAAP///wb+06ACpQAmAiRDVUVJAACcHX//AACky4AMEERJU0NZTVdGMDQ1MjAwMEgxAQEMm4c0")
 
 	// details
-	_, _ = fmt.Fprintf(os.Stdout, "\nDetails: \n%s\n", sis)
+	_, _ = fmt.Fprintf(os.Stdout, "\nTable: \n%s\n", sis.Table("", "  "))
 
 	// xml
 	b, _ := xml.MarshalIndent(sis, "", "  ")

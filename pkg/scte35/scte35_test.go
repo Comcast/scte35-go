@@ -538,6 +538,7 @@ func TestDecodeBase64(t *testing.T) {
 		},
 	}
 
+
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			// decode the binary

@@ -70,6 +70,7 @@ type SpliceDescriptor interface {
 	decode(b []byte) error
 	encode() ([]byte, error)
 	length() int // named to differentiate from splice_command
+	table(prefix, indent string) string
 }
 
 // SpliceDescriptors is a slice of SpliceDescriptor.

@@ -17,9 +17,9 @@
 package scte35
 
 import (
+	"bytes"
 	"encoding/xml"
 	"fmt"
-	"strings"
 
 	"github.com/bamiaux/iobit"
 )
@@ -50,20 +50,18 @@ func (sd *TimeDescriptor) Tag() uint32 {
 	return TimeDescriptorTag
 }
 
-// String returns a table description of this splice_descriptor.
-func (sd *TimeDescriptor) String() string {
-	var buf strings.Builder
-
-	buf.WriteString(fmt.Sprintf("time_descriptor() {\n"))
-	buf.WriteString(fmt.Sprintf("    splice_descriptor_tag: %#02x\n", TimeDescriptorTag))
-	buf.WriteString(fmt.Sprintf("    descriptor_length: %d bytes\n", sd.length()))
-	buf.WriteString(fmt.Sprintf("    identifier: %s\n", CUEIASCII))
-	buf.WriteString(fmt.Sprintf("    TAI_seconds: %d", sd.TAISeconds))
-	buf.WriteString(fmt.Sprintf("    TAI_ns: %d\n", sd.TAINS))
-	buf.WriteString(fmt.Sprintf("    UTC_offset: %d\n", sd.UTCOffset))
-	buf.WriteString(fmt.Sprintf("}\n"))
-
-	return buf.String()
+// table returns the tabular description of this TimeDescriptor.
+func (sd *TimeDescriptor) table(prefix, indent string) string {
+	var b bytes.Buffer
+	_, _ = fmt.Fprintf(&b, prefix+"time_descriptor() {\n")
+	_, _ = fmt.Fprintf(&b, prefix+indent+"splice_descriptor_tag: %#02x\n", TimeDescriptorTag)
+	_, _ = fmt.Fprintf(&b, prefix+indent+"descriptor_length: %d bytes\n", sd.length())
+	_, _ = fmt.Fprintf(&b, prefix+indent+"identifier: %s\n", CUEIASCII)
+	_, _ = fmt.Fprintf(&b, prefix+indent+"TAI_seconds: %d", sd.TAISeconds)
+	_, _ = fmt.Fprintf(&b, prefix+indent+"TAI_ns: %d\n", sd.TAINS)
+	_, _ = fmt.Fprintf(&b, prefix+indent+"UTC_offset: %d\n", sd.UTCOffset)
+	_, _ = fmt.Fprintf(&b, prefix+"}\n")
+	return b.String()
 }
 
 // decode updates this splice_descriptor from binary.
