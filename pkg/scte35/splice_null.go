@@ -36,11 +36,6 @@ type SpliceNull struct {
 	JSONType uint32   `xml:"-" json:"type"`
 }
 
-// String returns a description of this splice_null.
-func (cmd *SpliceNull) String() string {
-	return fmt.Sprintf("splice_null() {}\n")
-}
-
 // Type returns the splice_command_type.
 func (cmd *SpliceNull) Type() uint32 {
 	// ensure JSONType is set
@@ -65,4 +60,9 @@ func (cmd *SpliceNull) encode() ([]byte, error) {
 // commandLength returns the splice_command_length.
 func (cmd *SpliceNull) length() int {
 	return 0
+}
+
+// table returns the splice_null description in tabular format.
+func (cmd *SpliceNull) table(prefix, _ string) string {
+	return prefix+"splice_null() {}\n"
 }

@@ -17,9 +17,9 @@
 package scte35
 
 import (
+	"bytes"
 	"encoding/xml"
 	"fmt"
-	"strings"
 
 	"github.com/bamiaux/iobit"
 )
@@ -49,18 +49,16 @@ func (sd *AvailDescriptor) Tag() uint32 {
 	return AvailDescriptorTag
 }
 
-// String returns the description of this splice_descriptor.
-func (sd *AvailDescriptor) String() string {
-	var buf strings.Builder
-
-	buf.WriteString(fmt.Sprintf("avail_descriptor() {\n"))
-	buf.WriteString(fmt.Sprintf("    splice_descriptor_tag: %#02x\n", AvailDescriptorTag))
-	buf.WriteString(fmt.Sprintf("    descriptor_length: %d bytes\n", sd.length()))
-	buf.WriteString(fmt.Sprintf("    identifier: %s\n", CUEIASCII))
-	buf.WriteString(fmt.Sprintf("    provider_avail_id: %d\n", sd.ProviderAvailID))
-	buf.WriteString(fmt.Sprintf("}\n"))
-
-	return buf.String()
+// table returns the avail_descriptor details in tabular format.
+func (sd *AvailDescriptor) table(prefix, indent string) string {
+	var b bytes.Buffer
+	_, _ = fmt.Fprintf(&b, prefix+"avail_descriptor() {\n")
+	_, _ = fmt.Fprintf(&b, prefix+indent+"splice_descriptor_tag: %#02x\n", AvailDescriptorTag)
+	_, _ = fmt.Fprintf(&b, prefix+indent+"descriptor_length: %d bytes\n", sd.length())
+	_, _ = fmt.Fprintf(&b, prefix+indent+"identifier: %s\n", CUEIASCII)
+	_, _ = fmt.Fprintf(&b, prefix+indent+"provider_avail_id: %d\n", sd.ProviderAvailID)
+	_, _ = fmt.Fprintf(&b, prefix+"}\n")
+	return b.String()
 }
 
 // decode updates this splice_descriptor from binary.

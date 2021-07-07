@@ -31,5 +31,5 @@ func main() {
 	if errors.Is(err, scte35.ErrCRC32Invalid) {
 		_, _ = fmt.Fprintf(os.Stderr, "Warning: CRC32 check failed!\n")
 	}
-	_, _ = fmt.Fprintf(os.Stdout, "%s\n", sis)
+	_, _ = fmt.Fprintf(os.Stdout, "%s\n", sis.Table("", "\t"))
 }

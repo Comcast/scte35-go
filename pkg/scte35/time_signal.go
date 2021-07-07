@@ -17,9 +17,9 @@
 package scte35
 
 import (
+	"bytes"
 	"encoding/xml"
 	"fmt"
-	"strings"
 
 	"github.com/bamiaux/iobit"
 )
@@ -57,20 +57,6 @@ func (cmd *TimeSignal) Type() uint32 {
 	// ensure JSONType is set
 	cmd.JSONType = TimeSignalType
 	return TimeSignalType
-}
-
-// String returns the table details of this splice_descriptor.
-func (cmd *TimeSignal) String() string {
-	var buf strings.Builder
-
-	buf.WriteString(fmt.Sprintf("time_signal() {\n"))
-	buf.WriteString(fmt.Sprintf("    time_specified_flag: %v\n", cmd.timeSpecifiedFlag()))
-	if cmd.timeSpecifiedFlag() {
-		buf.WriteString(fmt.Sprintf("    pts_time: %d ticks (%s)\n", *cmd.SpliceTime.PTSTime, TicksToDuration(*cmd.SpliceTime.PTSTime)))
-	}
-	buf.WriteString("}\n")
-
-	return buf.String()
 }
 
 // decode a binary time_signal
@@ -119,6 +105,18 @@ func (cmd *TimeSignal) length() int {
 		length += 7 // reserved
 	}
 	return length / 8
+}
+
+// table returns the time_signal description in tabular format.
+func (cmd *TimeSignal) table(prefix, indent string) string {
+	var b bytes.Buffer
+	_, _ = fmt.Fprintf(&b, prefix+"time_signal() {\n")
+	_, _ = fmt.Fprintf(&b, prefix+indent+"time_specified_flag: %v\n", cmd.timeSpecifiedFlag())
+	if cmd.timeSpecifiedFlag() {
+		_, _ = fmt.Fprintf(&b, prefix+indent+"pts_time: %d ticks (%s)\n", *cmd.SpliceTime.PTSTime, TicksToDuration(*cmd.SpliceTime.PTSTime))
+	}
+	_, _ = fmt.Fprintf(&b, prefix+"}\n")
+	return b.String()
 }
 
 // timeSpecifiedFlag return the time_specified_flag.

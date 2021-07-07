@@ -17,9 +17,9 @@
 package scte35
 
 import (
+	"bytes"
 	"encoding/xml"
 	"fmt"
-	"strings"
 
 	"github.com/bamiaux/iobit"
 )
@@ -46,55 +46,68 @@ type SpliceInsert struct {
 	AvailsExpected             uint32                  `xml:"availsExpected,attr" json:"availsExpected,omitempty"`
 }
 
+// DurationFlag returns the duration_flag.
+func (cmd *SpliceInsert) DurationFlag() bool {
+	return cmd.BreakDuration != nil
+}
+
+// ProgramSpliceFlag returns the program_splice_flag.
+func (cmd *SpliceInsert) ProgramSpliceFlag() bool {
+	return cmd.Program != nil
+}
+
+// TimeSpecifiedFlag returns the time_specified_flag
+func (cmd *SpliceInsert) TimeSpecifiedFlag() bool {
+	return cmd.Program == nil && cmd.Program.SpliceTime.PTSTime != nil
+}
+
 // Type returns the splice_command_type.
 func (cmd *SpliceInsert) Type() uint32 {
 	cmd.JSONType = SpliceInsertType
 	return SpliceInsertType
 }
 
-// String returns the table description of this splice_insert.
-func (cmd *SpliceInsert) String() string {
-	var buf strings.Builder
-
-	buf.WriteString(fmt.Sprintf("splice_insert() {\n"))
-	buf.WriteString(fmt.Sprintf("    splice_event_id: %d\n", cmd.SpliceEventID))
-	buf.WriteString(fmt.Sprintf("    splice_event_cancel_indicator: %v\n", cmd.SpliceEventCancelIndicator))
+// table returns the tabular description of this splice_insert.
+func (cmd *SpliceInsert) table(prefix, indent string) string {
+	var b bytes.Buffer
+	_, _ = fmt.Fprintf(&b, prefix+"splice_insert() {\n")
+	_, _ = fmt.Fprintf(&b, prefix+indent+"splice_event_id: %d\n", cmd.SpliceEventID)
+	_, _ = fmt.Fprintf(&b, prefix+indent+"splice_event_cancel_indicator: %v\n", cmd.SpliceEventCancelIndicator)
 	if !cmd.SpliceEventCancelIndicator {
-		buf.WriteString(fmt.Sprintf("    out_of_network_indicator: %v\n", cmd.OutOfNetworkIndicator))
-		buf.WriteString(fmt.Sprintf("    program_splice_flag: %v\n", cmd.programSpliceFlag()))
-		buf.WriteString(fmt.Sprintf("    duration_flag: %v\n", cmd.durationFlag()))
-		buf.WriteString(fmt.Sprintf("    splice_immediate_flag: %v\n", cmd.SpliceImmediateFlag))
-		if cmd.programSpliceFlag() && !cmd.SpliceImmediateFlag {
-			buf.WriteString(fmt.Sprintf("    time_specified_flag: %v\n", cmd.timeSpecifiedFlag()))
-			if cmd.timeSpecifiedFlag() {
-				buf.WriteString(fmt.Sprintf("    pts_time: %d ticks (%s)\n", *cmd.Program.SpliceTime.PTSTime, TicksToDuration(*cmd.Program.SpliceTime.PTSTime)))
+		_, _ = fmt.Fprintf(&b, prefix+indent+"out_of_network_indicator: %v\n", cmd.OutOfNetworkIndicator)
+		_, _ = fmt.Fprintf(&b, prefix+indent+"program_splice_flag: %v\n", cmd.ProgramSpliceFlag())
+		_, _ = fmt.Fprintf(&b, prefix+indent+"duration_flag: %v\n", cmd.DurationFlag())
+		_, _ = fmt.Fprintf(&b, prefix+indent+"splice_immediate_flag: %v\n", cmd.SpliceImmediateFlag)
+		if cmd.ProgramSpliceFlag() && !cmd.SpliceImmediateFlag {
+			_, _ = fmt.Fprintf(&b, prefix+indent+"time_specified_flag: %v\n", cmd.TimeSpecifiedFlag())
+			if cmd.TimeSpecifiedFlag() {
+				_, _ = fmt.Fprintf(&b, prefix+indent+"pts_time: %d ticks (%s)\n", *cmd.Program.SpliceTime.PTSTime, TicksToDuration(*cmd.Program.SpliceTime.PTSTime))
 			}
 		}
-		if !cmd.programSpliceFlag() {
-			buf.WriteString(fmt.Sprintf("    component_count: %d\n", len(cmd.Components)))
-			for j, c := range cmd.Components {
-				buf.WriteString(fmt.Sprintf("    component[%d] {\n", j))
-				buf.WriteString(fmt.Sprintf("        component_tag: %d\n", c.Tag))
+		if !cmd.ProgramSpliceFlag() {
+			_, _ = fmt.Fprintf(&b, prefix+indent+"component_count: %d\n", len(cmd.Components))
+			for i, c := range cmd.Components {
+				_, _ = fmt.Fprintf(&b, prefix+indent+"component[%d] {\n", i)
+				_, _ = fmt.Fprintf(&b, prefix+indent+indent+"component_tag: %d\n", c.Tag)
 				if !cmd.SpliceImmediateFlag {
-					buf.WriteString(fmt.Sprintf("        time_specified_flag: %v\n", c.timeSpecifiedFlag()))
-					if c.timeSpecifiedFlag() {
-						buf.WriteString(fmt.Sprintf("        pts_time: %d ticks (%s)\n", *c.SpliceTime.PTSTime, TicksToDuration(*c.SpliceTime.PTSTime)))
+					_, _ = fmt.Fprintf(&b, prefix+indent+indent+"time_specified_flag: %v\n", c.TimeSpecifiedFlag())
+					if c.TimeSpecifiedFlag() {
+						_, _ = fmt.Fprintf(&b, prefix+indent+indent+"pts_time: %d ticks (%s)\n", *c.SpliceTime.PTSTime, TicksToDuration(*c.SpliceTime.PTSTime))
 					}
 				}
-				buf.WriteString(fmt.Sprintf("    }\n"))
+				_, _ = fmt.Fprintf(&b, prefix+indent+"}\n")
 			}
 		}
-		if cmd.durationFlag() {
-			buf.WriteString(fmt.Sprintf("    auto_return: %v\n", cmd.BreakDuration.AutoReturn))
-			buf.WriteString(fmt.Sprintf("    duration: %d ticks (%s)\n", cmd.BreakDuration.Duration, TicksToDuration(cmd.BreakDuration.Duration)))
+		if cmd.DurationFlag() {
+			_, _ = fmt.Fprintf(&b, prefix+indent+"auto_return: %v\n", cmd.BreakDuration.AutoReturn)
+			_, _ = fmt.Fprintf(&b, prefix+indent+"duration: %d ticks (%s)\n", cmd.BreakDuration.Duration, TicksToDuration(cmd.BreakDuration.Duration))
 		}
-		buf.WriteString(fmt.Sprintf("    unique_program_id: %d\n", cmd.UniqueProgramID))
-		buf.WriteString(fmt.Sprintf("    avail_num: %d\n", cmd.AvailNum))
-		buf.WriteString(fmt.Sprintf("    avails_expected: %d\n", cmd.AvailsExpected))
-		buf.WriteString(fmt.Sprintf("}\n"))
+		_, _ = fmt.Fprintf(&b, prefix+indent+"unique_program_id: %d\n", cmd.UniqueProgramID)
+		_, _ = fmt.Fprintf(&b, prefix+indent+"avail_num: %d\n", cmd.AvailNum)
+		_, _ = fmt.Fprintf(&b, prefix+indent+"avails_expected: %d\n", cmd.AvailsExpected)
 	}
-
-	return buf.String()
+	_, _ = fmt.Fprintf(&b, prefix+"}\n")
+	return b.String()
 }
 
 // decode a binary splice_insert.
@@ -170,11 +183,11 @@ func (cmd *SpliceInsert) encode() ([]byte, error) {
 	iow.PutUint32(7, Reserved)
 	if !cmd.SpliceEventCancelIndicator {
 		iow.PutBit(cmd.OutOfNetworkIndicator)
-		iow.PutBit(cmd.programSpliceFlag())
-		iow.PutBit(cmd.durationFlag())
+		iow.PutBit(cmd.ProgramSpliceFlag())
+		iow.PutBit(cmd.DurationFlag())
 		iow.PutBit(cmd.SpliceImmediateFlag)
 		iow.PutUint32(4, Reserved)
-		if cmd.programSpliceFlag() && !cmd.SpliceImmediateFlag {
+		if cmd.ProgramSpliceFlag() && !cmd.SpliceImmediateFlag {
 			if cmd.Program.timeSpecifiedFlag() {
 				iow.PutBit(true)
 				iow.PutUint32(6, Reserved)
@@ -184,12 +197,12 @@ func (cmd *SpliceInsert) encode() ([]byte, error) {
 				iow.PutUint32(7, Reserved)
 			}
 		}
-		if !cmd.programSpliceFlag() {
+		if !cmd.ProgramSpliceFlag() {
 			iow.PutUint32(8, uint32(len(cmd.Components)))
 			for _, c := range cmd.Components {
 				iow.PutUint32(8, c.Tag)
 				if !cmd.SpliceImmediateFlag {
-					if c.timeSpecifiedFlag() {
+					if c.TimeSpecifiedFlag() {
 						iow.PutBit(true)
 						iow.PutUint32(6, Reserved)
 						iow.PutUint64(33, *c.SpliceTime.PTSTime)
@@ -200,7 +213,7 @@ func (cmd *SpliceInsert) encode() ([]byte, error) {
 				}
 			}
 		}
-		if cmd.durationFlag() {
+		if cmd.DurationFlag() {
 			iow.PutBit(cmd.BreakDuration.AutoReturn)
 			iow.PutUint32(6, Reserved)
 			iow.PutUint64(33, cmd.BreakDuration.Duration)
@@ -229,7 +242,7 @@ func (cmd SpliceInsert) length() int {
 		length += 4 // reserved
 
 		// if program_splice_flag == 1 && splice_immediate_flag == 0
-		if cmd.programSpliceFlag() && !cmd.SpliceImmediateFlag {
+		if cmd.ProgramSpliceFlag() && !cmd.SpliceImmediateFlag {
 			length++ // time_specified_flag
 
 			// if time_specified_flag == 1
@@ -242,7 +255,7 @@ func (cmd SpliceInsert) length() int {
 		}
 
 		// if program_splice_flag == 0
-		if !cmd.programSpliceFlag() {
+		if !cmd.ProgramSpliceFlag() {
 			length += 8 // component_count
 
 			// for i = 0 to component_count
@@ -254,7 +267,7 @@ func (cmd SpliceInsert) length() int {
 					length++ // time_specified_flag
 
 					// if time_specified_flag == 1
-					if c.timeSpecifiedFlag() {
+					if c.TimeSpecifiedFlag() {
 						length += 6  // reserved
 						length += 33 // pts_time
 					} else {
@@ -265,7 +278,7 @@ func (cmd SpliceInsert) length() int {
 		}
 
 		// if duration_flag == 1
-		if cmd.durationFlag() {
+		if cmd.DurationFlag() {
 			length++     // auto_return
 			length += 6  // reserved
 			length += 33 // duration
@@ -279,29 +292,14 @@ func (cmd SpliceInsert) length() int {
 	return length / 8
 }
 
-// durationFlag returns the duration_flag.
-func (cmd *SpliceInsert) durationFlag() bool {
-	return cmd.BreakDuration != nil
-}
-
-// programSpliceFlag returns the program_splice_flag.
-func (cmd *SpliceInsert) programSpliceFlag() bool {
-	return cmd.Program != nil
-}
-
-// timeSpecifiedFlag returns the time_specified_flag
-func (cmd *SpliceInsert) timeSpecifiedFlag() bool {
-	return cmd.Program == nil && cmd.Program.SpliceTime.PTSTime != nil
-}
-
 // SpliceInsertComponent contains the Splice Point in Component Splice Mode.
 type SpliceInsertComponent struct {
 	Tag        uint32      `xml:"componentTag,attr" json:"componentTag,omitempty"`
 	SpliceTime *SpliceTime `xml:"http://www.scte.org/schemas/35 SpliceTime" json:"spliceTime,omitempty"`
 }
 
-// timeSpecifiedFlag returns the time_specified_flag.
-func (c *SpliceInsertComponent) timeSpecifiedFlag() bool {
+// TimeSpecifiedFlag returns the time_specified_flag.
+func (c *SpliceInsertComponent) TimeSpecifiedFlag() bool {
 	return c != nil && c.SpliceTime != nil && c.SpliceTime.PTSTime != nil
 }
 

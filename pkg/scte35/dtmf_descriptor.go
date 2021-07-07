@@ -17,9 +17,9 @@
 package scte35
 
 import (
+	"bytes"
 	"encoding/xml"
 	"fmt"
-	"strings"
 
 	"github.com/bamiaux/iobit"
 )
@@ -40,20 +40,18 @@ type DTMFDescriptor struct {
 	DTMFChars string   `xml:"chars,attr" json:"chars"`
 }
 
-// String returns the description of this splice_descriptor.
-func (sd *DTMFDescriptor) String() string {
-	var buf strings.Builder
-
-	buf.WriteString(fmt.Sprintf("dtmf_descriptor() {\n"))
-	buf.WriteString(fmt.Sprintf("    splice_descriptor_tag: %#02x\n", DTMFDescriptorTag))
-	buf.WriteString(fmt.Sprintf("    descriptor_length: %d bytes\n", sd.length()))
-	buf.WriteString(fmt.Sprintf("    identifier: %s\n", CUEIASCII))
-	buf.WriteString(fmt.Sprintf("    preroll: %.2f s\n", float32(sd.Preroll/10)))
-	buf.WriteString(fmt.Sprintf("    dtmf_count: %d chars\n", len(sd.DTMFChars)))
-	buf.WriteString(fmt.Sprintf("    dtmf_chars: %s\n", sd.DTMFChars))
-	buf.WriteString(fmt.Sprintf("}\n"))
-
-	return buf.String()
+// table returns the tabular description of this DTMFDescriptor.
+func (sd *DTMFDescriptor) table(prefix, indent string) string {
+	var b bytes.Buffer
+	_, _ = fmt.Fprintf(&b, fmt.Sprintf(prefix+"dtmf_descriptor() {\n"))
+	_, _ = fmt.Fprintf(&b, fmt.Sprintf(prefix+indent+"splice_descriptor_tag: %#02x\n", DTMFDescriptorTag))
+	_, _ = fmt.Fprintf(&b, fmt.Sprintf(prefix+indent+"descriptor_length: %d bytes\n", sd.length()))
+	_, _ = fmt.Fprintf(&b, fmt.Sprintf(prefix+indent+"identifier: %s\n", CUEIASCII))
+	_, _ = fmt.Fprintf(&b, fmt.Sprintf(prefix+indent+"preroll: %.2f s\n", float32(sd.Preroll/10)))
+	_, _ = fmt.Fprintf(&b, fmt.Sprintf(prefix+indent+"dtmf_count: %d chars\n", len(sd.DTMFChars)))
+	_, _ = fmt.Fprintf(&b, fmt.Sprintf(prefix+indent+"dtmf_chars: %s\n", sd.DTMFChars))
+	_, _ = fmt.Fprintf(&b, fmt.Sprintf(prefix+"}\n"))
+	return b.String()
 }
 
 // Tag returns the splice_descriptor_tag.

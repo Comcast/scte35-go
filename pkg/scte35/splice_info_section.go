@@ -17,13 +17,13 @@
 package scte35
 
 import (
+	"bytes"
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/bamiaux/iobit"
@@ -171,7 +171,7 @@ func (sis *SpliceInfoSection) Encode() ([]byte, error) {
 	iow.PutUint32(12, uint32(sis.sectionLength()))
 	iow.PutUint32(8, sis.ProtocolVersion)
 
-	iow.PutBit(sis.EncryptedPacket.EncryptionAlgorithm != EncryptionAlgorithmNone)
+	iow.PutBit(sis.EncryptedPacketFlag())
 	iow.PutUint32(6, sis.EncryptedPacket.EncryptionAlgorithm)
 	iow.PutUint64(33, sis.PTSAdjustment)
 	iow.PutUint32(8, sis.EncryptedPacket.CWIndex)
@@ -213,6 +213,11 @@ func (sis *SpliceInfoSection) Encode() ([]byte, error) {
 	return buf, err
 }
 
+// EncryptedPacketFlag returns the value of encrypted_packet_flag
+func (sis *SpliceInfoSection) EncryptedPacketFlag() bool {
+	return sis.EncryptedPacket.EncryptionAlgorithm != EncryptionAlgorithmNone
+}
+
 // Hex returns the SpliceInfoSection as a hexadecimal encoded string.
 func (sis *SpliceInfoSection) Hex() string {
 	b, err := sis.Encode()
@@ -237,38 +242,36 @@ func (sis *SpliceInfoSection) SAPTypeName() string {
 	}
 }
 
-// String returns the description of this SpliceInfoSection
-func (sis *SpliceInfoSection) String() string {
+// Table returns the tabular description of this SpliceInfoSection as described
+// in ANSI/SCTE 35 Table 5.
+func (sis *SpliceInfoSection) Table(prefix, indent string) string {
 	if sis == nil {
 		return ""
 	}
 
-	var buf strings.Builder
-
-	buf.WriteString(fmt.Sprintf("splice_info_section() {\n"))
-	buf.WriteString(fmt.Sprintf("    table_id: %#02x\n", TableID))
-	buf.WriteString(fmt.Sprintf("    section_syntax_indicator: %v\n", SectionSyntaxIndicator))
-	buf.WriteString(fmt.Sprintf("    private_indicator: %v\n", PrivateIndicator))
-	buf.WriteString(fmt.Sprintf("    sap_type: %s\n", sis.SAPTypeName()))
-	buf.WriteString(fmt.Sprintf("    section_length: %d bytes\n", sis.sectionLength()))
-	buf.WriteString(fmt.Sprintf("}\n"))
-	buf.WriteString(fmt.Sprintf("protocol_version: %d\n", sis.ProtocolVersion))
-	buf.WriteString(fmt.Sprintf("encrypted_packet: %v\n", sis.EncryptedPacket.EncryptionAlgorithm != EncryptionAlgorithmNone))
-	buf.WriteString(fmt.Sprintf("encryption_algorithm: %s\n", sis.EncryptedPacket.encryptionAlgorithmName()))
-	buf.WriteString(fmt.Sprintf("pts_adjustment: %d ticks (%s)\n", sis.PTSAdjustment, TicksToDuration(sis.PTSAdjustment)))
-	buf.WriteString(fmt.Sprintf("cw_index: %d\n", sis.EncryptedPacket.CWIndex))
-	buf.WriteString(fmt.Sprintf("tier: %d\n", sis.Tier))
+	var b bytes.Buffer
+	_, _ = fmt.Fprintf(&b, prefix+"splice_info_section() {\n")
+	_, _ = fmt.Fprintf(&b, prefix+indent+"table_id: %#02x\n", TableID)
+	_, _ = fmt.Fprintf(&b, prefix+indent+"section_syntax_indicator: %v\n", SectionSyntaxIndicator)
+	_, _ = fmt.Fprintf(&b, prefix+indent+"private_indicator: %v\n", PrivateIndicator)
+	_, _ = fmt.Fprintf(&b, prefix+indent+"sap_type: %s\n", sis.SAPTypeName())
+	_, _ = fmt.Fprintf(&b, prefix+indent+"section_length: %d bytes\n", sis.sectionLength())
+	_, _ = fmt.Fprintf(&b, prefix+"}\n")
+	_, _ = fmt.Fprintf(&b, prefix+"protocol_version: %d\n", sis.ProtocolVersion)
+	_, _ = fmt.Fprintf(&b, prefix+"encryption_algorithm: %s\n", sis.EncryptedPacket.encryptionAlgorithmName())
+	_, _ = fmt.Fprintf(&b, prefix+"pts_adjustment: %d ticks (%s)\n", sis.PTSAdjustment, TicksToDuration(sis.PTSAdjustment))
+	_, _ = fmt.Fprintf(&b, prefix+"cw_index: %d\n", sis.EncryptedPacket.CWIndex)
+	_, _ = fmt.Fprintf(&b, prefix+"tier: %d\n", sis.Tier)
 	if sis.SpliceCommand != nil {
-		buf.WriteString(fmt.Sprintf("splice_command_length: %d bytes\n", sis.SpliceCommand.length()))
-		buf.WriteString(fmt.Sprintf("splice_command_type: %#02x\n", sis.SpliceCommand.Type()))
-		buf.WriteString(fmt.Sprintf("%s", sis.SpliceCommand))
+		_, _ = fmt.Fprintf(&b, prefix+"splice_command_length: %d bytes\n", sis.SpliceCommand.length())
+		_, _ = fmt.Fprintf(&b, prefix+"splice_command_type: %#02x\n", sis.SpliceCommand.Type())
+		_, _ = fmt.Fprintf(&b, sis.SpliceCommand.table(prefix, indent))
 	}
-	buf.WriteString(fmt.Sprintf("descriptor_loop_length: %d bytes\n", sis.descriptorLoopLength()))
+	_, _ = fmt.Fprintf(&b, prefix+"descriptor_loop_length: %d bytes\n", sis.descriptorLoopLength())
 	for _, sd := range sis.SpliceDescriptors {
-		buf.WriteString(fmt.Sprintf("%s", sd))
+		_, _ = fmt.Fprintf(&b, sd.table(prefix, indent))
 	}
-
-	return buf.String()
+	return b.String()
 }
 
 // MarshalJSON encodes a SpliceInfoSection to JSON.

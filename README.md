@@ -31,7 +31,7 @@ Binary signals can be quickly and easily decoded from base-64 or hexadecimal
 strings.
 
 The results can be output as a:
-* String - emulating the table structure used in the [SCTE 35 specification](./docs/SCTE-35_2020.pdf).
+* String - emulating the table structure used in the [SCTE 35 specification](./docs/ANSI_SCTE-35-2020.pdf).
 * XML - compliant with the [SCTE 35 XML Schema](./docs/scte35.xsd)
 * JSON - for integrating with JSON based tools such as [jq](https://stedolan.github.io/jq/)
 
@@ -56,11 +56,11 @@ func main() {
 	_, _ = fmt.Fprintf(os.Stdout, "\nDetails: \n%s\n", sis)
 
 	// xml
-	b, _ := xml.MarshalIndent(sis, "", "  ")
+	b, _ := xml.MarshalIndent(sis, "", "\t")
 	_, _ = fmt.Fprintf(os.Stdout, "\nXML: \n%s\n", b)
 
 	// json
-	b, _ = json.MarshalIndent(sis, "", "  ")
+	b, _ = json.MarshalIndent(sis, "", "\t")
 	_, _ = fmt.Fprintf(os.Stdout, "\nJSON: \n%s\n", b)
 }
 ```

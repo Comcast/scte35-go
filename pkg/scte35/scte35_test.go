@@ -538,6 +538,7 @@ func TestDecodeBase64(t *testing.T) {
 		},
 	}
 
+
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			// decode the binary
@@ -687,12 +688,12 @@ func bytes(i uint64) []byte {
 }
 
 func toJSON(sis *scte35.SpliceInfoSection) string {
-	b, _ := json.MarshalIndent(sis, "", "  ")
+	b, _ := json.MarshalIndent(sis, "", "\t")
 	return string(b)
 }
 
 func toXML(sis *scte35.SpliceInfoSection) string {
-	b, _ := xml.MarshalIndent(sis, "", "  ")
+	b, _ := xml.MarshalIndent(sis, "", "\t")
 	return string(b)
 }
 

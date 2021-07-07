@@ -17,10 +17,10 @@
 package scte35
 
 import (
+	"bytes"
 	"encoding/binary"
 	"encoding/xml"
 	"fmt"
-	"strings"
 
 	"github.com/bamiaux/iobit"
 )
@@ -46,20 +46,6 @@ func (sd *PrivateDescriptor) Tag() uint32 {
 	// ensure JSONType is set
 	sd.JSONType = sd.PrivateTag
 	return sd.PrivateTag
-}
-
-// String returns the table description of this splice descriptor.
-func (sd *PrivateDescriptor) String() string {
-	var buf strings.Builder
-
-	buf.WriteString(fmt.Sprintf("private_descriptor() {\n"))
-	buf.WriteString(fmt.Sprintf("    splice_descriptor_tag: %#02x\n", sd.Tag()))
-	buf.WriteString(fmt.Sprintf("    descriptor_length: %d bytes\n", sd.length()))
-	buf.WriteString(fmt.Sprintf("    identifier: %s\n", sd.IdentifierString()))
-	buf.WriteString(fmt.Sprintf("    private_bytes: %#0x\n", sd.PrivateBytes))
-	buf.WriteString(fmt.Sprintf("}\n"))
-
-	return buf.String()
 }
 
 // decode updates this splice_descriptor from binary.
@@ -103,4 +89,16 @@ func (sd *PrivateDescriptor) length() int {
 	length := 32                       // identifier
 	length += len(sd.PrivateBytes) * 8 // private_bytes
 	return length / 8
+}
+
+// table returns the tabular description of this PrivateDescriptor.
+func (sd *PrivateDescriptor) table(prefix, indent string) string {
+	var b bytes.Buffer
+	_, _ = fmt.Fprintf(&b, fmt.Sprintf(prefix+"private_descriptor() {\n"))
+	_, _ = fmt.Fprintf(&b, fmt.Sprintf(prefix+indent+"splice_descriptor_tag: %#02x\n", sd.Tag()))
+	_, _ = fmt.Fprintf(&b, fmt.Sprintf(prefix+indent+"descriptor_length: %d bytes\n", sd.length()))
+	_, _ = fmt.Fprintf(&b, fmt.Sprintf(prefix+indent+"identifier: %s\n", sd.IdentifierString()))
+	_, _ = fmt.Fprintf(&b, fmt.Sprintf(prefix+indent+"private_bytes: %#0x\n", sd.PrivateBytes))
+	_, _ = fmt.Fprintf(&b, fmt.Sprintf(prefix+"}\n"))
+	return b.String()
 }
