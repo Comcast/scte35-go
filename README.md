@@ -56,11 +56,11 @@ func main() {
 	_, _ = fmt.Fprintf(os.Stdout, "\nDetails: \n%s\n", sis)
 
 	// xml
-	b, _ := xml.MarshalIndent(sis, "", "  ")
+	b, _ := xml.MarshalIndent(sis, "", "\t")
 	_, _ = fmt.Fprintf(os.Stdout, "\nXML: \n%s\n", b)
 
 	// json
-	b, _ = json.MarshalIndent(sis, "", "  ")
+	b, _ = json.MarshalIndent(sis, "", "\t")
 	_, _ = fmt.Fprintf(os.Stdout, "\nJSON: \n%s\n", b)
 }
 ```

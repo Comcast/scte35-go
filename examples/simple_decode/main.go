@@ -29,13 +29,13 @@ func main() {
 	sis, _ := scte35.DecodeBase64("/DA8AAAAAAAAAP///wb+06ACpQAmAiRDVUVJAACcHX//AACky4AMEERJU0NZTVdGMDQ1MjAwMEgxAQEMm4c0")
 
 	// details
-	_, _ = fmt.Fprintf(os.Stdout, "\nTable: \n%s\n", sis.Table("", "  "))
+	_, _ = fmt.Fprintf(os.Stdout, "\nTable: \n%s\n", sis.Table("", "\t"))
 
 	// xml
-	b, _ := xml.MarshalIndent(sis, "", "  ")
+	b, _ := xml.MarshalIndent(sis, "", "\t")
 	_, _ = fmt.Fprintf(os.Stdout, "\nXML: \n%s\n", b)
 
 	// json
-	b, _ = json.MarshalIndent(sis, "", "  ")
+	b, _ = json.MarshalIndent(sis, "", "\t")
 	_, _ = fmt.Fprintf(os.Stdout, "\nJSON: \n%s\n", b)
 }

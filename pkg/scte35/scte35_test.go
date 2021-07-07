@@ -688,12 +688,12 @@ func bytes(i uint64) []byte {
 }
 
 func toJSON(sis *scte35.SpliceInfoSection) string {
-	b, _ := json.MarshalIndent(sis, "", "  ")
+	b, _ := json.MarshalIndent(sis, "", "\t")
 	return string(b)
 }
 
 func toXML(sis *scte35.SpliceInfoSection) string {
-	b, _ := xml.MarshalIndent(sis, "", "  ")
+	b, _ := xml.MarshalIndent(sis, "", "\t")
 	return string(b)
 }
 

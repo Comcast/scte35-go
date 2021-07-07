@@ -28,5 +28,5 @@ func main() {
 	if err != nil {
 		_, _ = fmt.Fprintf(os.Stdout, "Error: %s\n", err)
 	}
-	_, _ = fmt.Fprintf(os.Stdout, "%s\n", sis.Table("", "  "))
+	_, _ = fmt.Fprintf(os.Stdout, "%s\n", sis.Table("", "\t"))
 }
