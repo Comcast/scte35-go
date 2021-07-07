@@ -171,7 +171,7 @@ func (sis *SpliceInfoSection) Encode() ([]byte, error) {
 	iow.PutUint32(12, uint32(sis.sectionLength()))
 	iow.PutUint32(8, sis.ProtocolVersion)
 
-	iow.PutBit(sis.EncryptedPacket.EncryptionAlgorithm != EncryptionAlgorithmNone)
+	iow.PutBit(sis.EncryptedPacketFlag())
 	iow.PutUint32(6, sis.EncryptedPacket.EncryptionAlgorithm)
 	iow.PutUint64(33, sis.PTSAdjustment)
 	iow.PutUint32(8, sis.EncryptedPacket.CWIndex)
@@ -211,6 +211,11 @@ func (sis *SpliceInfoSection) Encode() ([]byte, error) {
 
 	err := iow.Flush()
 	return buf, err
+}
+
+// EncryptedPacketFlag returns the value of encrypted_packet_flag
+func (sis *SpliceInfoSection) EncryptedPacketFlag() bool {
+	return sis.EncryptedPacket.EncryptionAlgorithm != EncryptionAlgorithmNone
 }
 
 // Hex returns the SpliceInfoSection as a hexadecimal encoded string.

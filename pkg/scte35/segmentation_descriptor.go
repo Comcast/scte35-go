@@ -293,6 +293,37 @@ func (sd *SegmentationDescriptor) Tag() uint32 {
 	return SegmentationDescriptorTag
 }
 
+// DeliveryNotRestrictedFlag returns the delivery_not_restricted_flag.
+func (sd *SegmentationDescriptor) DeliveryNotRestrictedFlag() bool {
+	return sd.DeliveryRestrictions == nil
+}
+
+// ProgramSegmentationFlag returns the program_segmentation_flag.
+func (sd *SegmentationDescriptor) ProgramSegmentationFlag() bool {
+	return len(sd.Components) == 0
+}
+
+// SegmentationDurationFlag returns the segmentation_duration_flag.
+func (sd *SegmentationDescriptor) SegmentationDurationFlag() bool {
+	return sd.SegmentationDuration != nil
+}
+
+// SegmentationUpidLength return the segmentation_upid_length
+func (sd *SegmentationDescriptor) SegmentationUpidLength() int {
+	length := 0
+	if len(sd.SegmentationUPIDs) == 1 {
+		length += len(sd.SegmentationUPIDs[0].valueBytes()) * 8 // segmentation_upid() (bytes -> bits)
+	} else if len(sd.SegmentationUPIDs) > 1 {
+		// for MID, include type & length with each contained upid
+		for _, upid := range sd.SegmentationUPIDs {
+			length += 8                          // segmentation_upid_type
+			length += 8                          // segmentation_upid_length
+			length += len(upid.valueBytes()) * 8 // segmentation_upid (bytes -> bits)
+		}
+	}
+	return length / 8
+}
+
 // decode updates this splice_descriptor from binary.
 func (sd *SegmentationDescriptor) decode(b []byte) error {
 	r := iobit.NewReader(b)
@@ -396,11 +427,11 @@ func (sd *SegmentationDescriptor) encode() ([]byte, error) {
 	iow.PutUint32(7, Reserved)
 
 	if !sd.SegmentationEventCancelIndicator {
-		iow.PutBit(sd.programSegmentationFlag())
-		iow.PutBit(sd.segmentationDurationFlag())
+		iow.PutBit(sd.ProgramSegmentationFlag())
+		iow.PutBit(sd.SegmentationDurationFlag())
 
-		iow.PutBit(sd.deliveryNotRestrictedFlag())
-		if !sd.deliveryNotRestrictedFlag() {
+		iow.PutBit(sd.DeliveryNotRestrictedFlag())
+		if sd.DeliveryRestrictions != nil {
 			iow.PutBit(sd.DeliveryRestrictions.WebDeliveryAllowedFlag)
 			iow.PutBit(sd.DeliveryRestrictions.NoRegionalBlackoutFlag)
 			iow.PutBit(sd.DeliveryRestrictions.ArchiveAllowedFlag)
@@ -409,7 +440,7 @@ func (sd *SegmentationDescriptor) encode() ([]byte, error) {
 			iow.PutUint32(5, Reserved)
 		}
 
-		if !sd.programSegmentationFlag() {
+		if !sd.ProgramSegmentationFlag() {
 			iow.PutUint32(8, uint32(len(sd.Components)))
 			for _, c := range sd.Components {
 				iow.PutUint32(8, c.Tag)
@@ -418,7 +449,7 @@ func (sd *SegmentationDescriptor) encode() ([]byte, error) {
 			}
 		}
 
-		if sd.segmentationDurationFlag() {
+		if sd.SegmentationDurationFlag() {
 			iow.PutUint64(40, *sd.SegmentationDuration)
 		}
 
@@ -432,7 +463,7 @@ func (sd *SegmentationDescriptor) encode() ([]byte, error) {
 			_, _ = iow.Write(vb)
 		} else {
 			iow.PutUint32(8, SegmentationUPIDTypeMID)
-			iow.PutUint32(8, uint32(sd.segmentationUpidLength()))
+			iow.PutUint32(8, uint32(sd.SegmentationUpidLength()))
 			for _, upid := range sd.SegmentationUPIDs {
 				vb := upid.valueBytes()
 				iow.PutUint32(8, upid.Type)
@@ -472,7 +503,7 @@ func (sd *SegmentationDescriptor) length() int {
 		length += 5 // delivery restriction flags or reserved
 
 		// if program_segmentation_flag == 0
-		if !sd.programSegmentationFlag() {
+		if !sd.ProgramSegmentationFlag() {
 			length += 8 // component_count
 
 			// for i=0 to component_count
@@ -482,12 +513,12 @@ func (sd *SegmentationDescriptor) length() int {
 				length += 33 // pts_offset
 			}
 		}
-		if sd.segmentationDurationFlag() {
+		if sd.SegmentationDurationFlag() {
 			length += 40 // segmentation_duration
 		}
 		length += 8                               // segmentation_upid_type
 		length += 8                               // segmentation_upid_length
-		length += sd.segmentationUpidLength() * 8 // segmentation_upid() (bytes -> bits)
+		length += sd.SegmentationUpidLength() * 8 // segmentation_upid() (bytes -> bits)
 		length += 8                               // segmentation_type_id
 		length += 8                               // segment_num
 		length += 8                               // segments_expected
@@ -513,9 +544,9 @@ func (sd *SegmentationDescriptor) table(prefix, indent string) string {
 	_, _ = fmt.Fprintf(&b, prefix+indent+"segmentation_event_id: %d\n", sd.SegmentationEventID)
 	_, _ = fmt.Fprintf(&b, prefix+indent+"segmentation_event_cancel_indicator: %#v\n", sd.SegmentationEventCancelIndicator)
 	if !sd.SegmentationEventCancelIndicator {
-		_, _ = fmt.Fprintf(&b, prefix+indent+"program_segmentation_flag: %#v\n", sd.programSegmentationFlag())
-		_, _ = fmt.Fprintf(&b, prefix+indent+"segmentation_duration_flag: %#v\n", sd.segmentationDurationFlag())
-		_, _ = fmt.Fprintf(&b, prefix+indent+"delivery_not_restricted_flag: %#v\n", sd.deliveryNotRestrictedFlag())
+		_, _ = fmt.Fprintf(&b, prefix+indent+"program_segmentation_flag: %#v\n", sd.ProgramSegmentationFlag())
+		_, _ = fmt.Fprintf(&b, prefix+indent+"segmentation_duration_flag: %#v\n", sd.SegmentationDurationFlag())
+		_, _ = fmt.Fprintf(&b, prefix+indent+"delivery_not_restricted_flag: %#v\n", sd.DeliveryNotRestrictedFlag())
 		if sd.DeliveryRestrictions != nil {
 			_, _ = fmt.Fprintf(&b, prefix+indent+"web_delivery_allowed_flag: %#v\n", sd.DeliveryRestrictions.WebDeliveryAllowedFlag)
 			_, _ = fmt.Fprintf(&b, prefix+indent+"no_regional_blackout_flag: %#v\n", sd.DeliveryRestrictions.NoRegionalBlackoutFlag)
@@ -531,11 +562,11 @@ func (sd *SegmentationDescriptor) table(prefix, indent string) string {
 				_, _ = fmt.Fprintf(&b, prefix+indent+"}\n")
 			}
 		}
-		if sd.segmentationDurationFlag() {
+		if sd.SegmentationDurationFlag() {
 			_, _ = fmt.Fprintf(&b, prefix+indent+"segmentation_duration: %d ticks (%s)\n", *sd.SegmentationDuration, TicksToDuration(*sd.SegmentationDuration))
 		}
 
-		_, _ = fmt.Fprintf(&b, prefix+indent+"segmentation_upid_length: %d bytes\n", sd.segmentationUpidLength())
+		_, _ = fmt.Fprintf(&b, prefix+indent+"segmentation_upid_length: %d bytes\n", sd.SegmentationUpidLength())
 		for i, u := range sd.SegmentationUPIDs {
 			_, _ = fmt.Fprintf(&b, prefix+indent+"segmentation_upid[%d] {\n", i)
 			_, _ = fmt.Fprintf(&b, prefix+indent+indent+"segmentation_upid_type: %s (%#02x)\n", u.Name(), u.Type)
@@ -563,37 +594,6 @@ func (sd *SegmentationDescriptor) table(prefix, indent string) string {
 	_, _ = fmt.Fprintf(&b, prefix+"}\n")
 
 	return b.String()
-}
-
-// deliveryNotRestrictedFlag returns the delivery_not_restricted_flag.
-func (sd *SegmentationDescriptor) deliveryNotRestrictedFlag() bool {
-	return sd.DeliveryRestrictions == nil
-}
-
-// programSegmentationFlag returns the program_segmentation_flag.
-func (sd *SegmentationDescriptor) programSegmentationFlag() bool {
-	return len(sd.Components) == 0
-}
-
-// segmentationDurationFlag returns the segmentation_duration_flag.
-func (sd *SegmentationDescriptor) segmentationDurationFlag() bool {
-	return sd.SegmentationDuration != nil
-}
-
-// segmentationUpidLength return the segmentation_upid_length
-func (sd *SegmentationDescriptor) segmentationUpidLength() int {
-	length := 0
-	if len(sd.SegmentationUPIDs) == 1 {
-		length += len(sd.SegmentationUPIDs[0].valueBytes()) * 8 // segmentation_upid() (bytes -> bits)
-	} else if len(sd.SegmentationUPIDs) > 1 {
-		// for MID, include type & length with each contained upid
-		for _, upid := range sd.SegmentationUPIDs {
-			length += 8                          // segmentation_upid_type
-			length += 8                          // segmentation_upid_length
-			length += len(upid.valueBytes()) * 8 // segmentation_upid (bytes -> bits)
-		}
-	}
-	return length / 8
 }
 
 // SegmentationDescriptorComponent describes the Component element contained
