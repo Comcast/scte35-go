@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [1.2.0] - 2021-07-07
+
+### Fixed
+
+* Fixed nil pointer in `SpliceInsert.TimeSpecifiedFlag`
+
+### Added
+
+* Added additional methods for computing `_flag` values.
+
 ## [1.1.0] - 2021-07-07
 
 ### Added

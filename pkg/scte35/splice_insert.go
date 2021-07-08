@@ -58,7 +58,7 @@ func (cmd *SpliceInsert) ProgramSpliceFlag() bool {
 
 // TimeSpecifiedFlag returns the time_specified_flag
 func (cmd *SpliceInsert) TimeSpecifiedFlag() bool {
-	return cmd.Program == nil && cmd.Program.SpliceTime.PTSTime != nil
+	return cmd != nil && cmd.Program != nil && cmd.Program.SpliceTime.TimeSpecifiedFlag()
 }
 
 // Type returns the splice_command_type.
@@ -188,7 +188,7 @@ func (cmd *SpliceInsert) encode() ([]byte, error) {
 		iow.PutBit(cmd.SpliceImmediateFlag)
 		iow.PutUint32(4, Reserved)
 		if cmd.ProgramSpliceFlag() && !cmd.SpliceImmediateFlag {
-			if cmd.Program.timeSpecifiedFlag() {
+			if cmd.Program.TimeSpecifiedFlag() {
 				iow.PutBit(true)
 				iow.PutUint32(6, Reserved)
 				iow.PutUint64(33, *cmd.Program.SpliceTime.PTSTime)
@@ -246,7 +246,7 @@ func (cmd SpliceInsert) length() int {
 			length++ // time_specified_flag
 
 			// if time_specified_flag == 1
-			if cmd.Program.timeSpecifiedFlag() {
+			if cmd.Program.TimeSpecifiedFlag() {
 				length += 6  // reserved
 				length += 33 // pts_time
 			} else {
@@ -317,7 +317,7 @@ type SpliceInsertProgram struct {
 	SpliceTime SpliceTime `xml:"http://www.scte.org/schemas/35 SpliceTime" json:"spliceTime"`
 }
 
-// timeSpecifiedFlag returns the time_specified_flag.
-func (p *SpliceInsertProgram) timeSpecifiedFlag() bool {
+// TimeSpecifiedFlag returns the time_specified_flag.
+func (p *SpliceInsertProgram) TimeSpecifiedFlag() bool {
 	return p != nil && p.SpliceTime.PTSTime != nil
 }

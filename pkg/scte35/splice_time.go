@@ -20,3 +20,8 @@ package scte35
 type SpliceTime struct {
 	PTSTime *uint64 `xml:"ptsTime,attr" json:"ptsTime,omitempty"`
 }
+
+// TimeSpecifiedFlag returns true if PTSTime is not nil.
+func (t *SpliceTime) TimeSpecifiedFlag() bool {
+	return t != nil && t.PTSTime != nil
+}

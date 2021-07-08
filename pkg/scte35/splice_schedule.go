@@ -105,10 +105,10 @@ func (cmd *SpliceSchedule) encode() ([]byte, error) {
 		iow.PutUint32(7, Reserved) // reserved
 		if !e.SpliceEventCancelIndicator {
 			iow.PutBit(e.OutOfNetworkIndicator)
-			iow.PutBit(e.programSpliceFlag())
-			iow.PutBit(e.durationFlag())
+			iow.PutBit(e.ProgramSpliceFlag())
+			iow.PutBit(e.DurationFlag())
 			iow.PutUint32(5, Reserved) // reserved
-			if e.programSpliceFlag() {
+			if e.ProgramSpliceFlag() {
 				iow.PutUint32(32, e.Program.UTCSpliceTime.GPSSeconds())
 			} else {
 				iow.PutUint32(8, uint32(len(e.Components)))
@@ -117,7 +117,7 @@ func (cmd *SpliceSchedule) encode() ([]byte, error) {
 					iow.PutUint32(32, c.UTCSpliceTime.GPSSeconds())
 				}
 			}
-			if e.durationFlag() {
+			if e.DurationFlag() {
 				iow.PutBit(e.BreakDuration.AutoReturn)
 				iow.PutUint32(6, Reserved)
 				iow.PutUint64(33, e.BreakDuration.Duration)
@@ -150,7 +150,7 @@ func (cmd SpliceSchedule) length() int {
 			length++    // duration_flag
 			length += 5 // reserved
 
-			if e.programSpliceFlag() {
+			if e.ProgramSpliceFlag() {
 				// program_splice_flag == 1
 				length += 32 // utc_splice_time
 			} else {
@@ -163,7 +163,7 @@ func (cmd SpliceSchedule) length() int {
 			}
 
 			// if duration_flag == 1
-			if e.durationFlag() {
+			if e.DurationFlag() {
 				length++     // auto_return
 				length += 6  // reserved
 				length += 33 // duration
@@ -189,9 +189,9 @@ func (cmd *SpliceSchedule) table(prefix, indent string) string {
 		_, _ = fmt.Fprintln(&b, prefix+indent+indent+"splice_event_cancel_indicator: %v\n", e.SpliceEventCancelIndicator)
 		if !e.SpliceEventCancelIndicator {
 			_, _ = fmt.Fprintln(&b, prefix+indent+indent+"out_of_network_indicator: %v\n", e.OutOfNetworkIndicator)
-			_, _ = fmt.Fprintln(&b, prefix+indent+indent+"program_splice_flag: %v\n", e.programSpliceFlag())
-			_, _ = fmt.Fprintln(&b, prefix+indent+indent+"duration_flag: %v", e.durationFlag())
-			if e.programSpliceFlag() {
+			_, _ = fmt.Fprintln(&b, prefix+indent+indent+"program_splice_flag: %v\n", e.ProgramSpliceFlag())
+			_, _ = fmt.Fprintln(&b, prefix+indent+indent+"duration_flag: %v", e.DurationFlag())
+			if e.ProgramSpliceFlag() {
 				_, _ = fmt.Fprintln(&b, prefix+indent+indent+"utc_splice_time: %s\n", e.Program.UTCSpliceTime.Format(time.RFC3339))
 			} else {
 				_, _ = fmt.Fprintln(&b, prefix+indent+indent+"component_count: %d\n", len(e.Components))
@@ -202,7 +202,7 @@ func (cmd *SpliceSchedule) table(prefix, indent string) string {
 					_, _ = fmt.Fprintln(&b, prefix+indent+indent+"}\n")
 				}
 			}
-			if e.durationFlag() {
+			if e.DurationFlag() {
 				_, _ = fmt.Fprintln(&b, prefix+indent+indent+"auto_return: %v\n", e.BreakDuration.AutoReturn)
 				_, _ = fmt.Fprintln(&b, prefix+indent+indent+"duration: %d ticks (%s)\n", e.BreakDuration.Duration, TicksToDuration(e.BreakDuration.Duration))
 			}
@@ -229,13 +229,13 @@ type Event struct {
 	AvailsExpected             uint32           `xml:"availsExpected,attr" json:"availsExpected,omitempty"`
 }
 
-// durationFlag returns the duration_flag.
-func (e *Event) durationFlag() bool {
+// DurationFlag returns the duration_flag.
+func (e *Event) DurationFlag() bool {
 	return e != nil && e.BreakDuration != nil
 }
 
-// programSpliceFlag returns the program_splice_flag.
-func (e *Event) programSpliceFlag() bool {
+// ProgramSpliceFlag returns the program_splice_flag.
+func (e *Event) ProgramSpliceFlag() bool {
 	return e != nil && e.Program != nil
 }
 
