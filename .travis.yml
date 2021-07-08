@@ -1,7 +1,0 @@
-language: go
-go:
-- 1.16.x
-- main
-
-script:
-- go test -v --race ./...
