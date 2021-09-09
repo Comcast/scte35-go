@@ -19,7 +19,7 @@ Get the module:
 
 ```shell
 $ go get github.com/Comcast/scte35-go
-go get: added github.com/Comcast/scte35-go v1.0.0
+go get: added github.com/Comcast/scte35-go v1.2.1
 ```
 
 ## Code Examples

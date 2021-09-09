@@ -402,7 +402,7 @@ func TestDecodeBase64(t *testing.T) {
 		{
 			name:   "Empty String",
 			binary: "",
-			err:    fmt.Errorf("splice_info_section: %w", scte35.ErrBufferOverflow),
+			err:    scte35.ErrBufferOverflow,
 		},
 		{
 			name:   "Invalid Base64 Encoding",
@@ -536,8 +536,22 @@ func TestDecodeBase64(t *testing.T) {
 			binary: "/DA4AAAAAAAAAP/wFAUABDEAf+//mWEhzP4Azf5gAQAAAAATAhFDVUVJAAAAAX+/AQIwNAEAAKeYO3Q=",
 			err:    fmt.Errorf("splice_info_section: %w", scte35.ErrCRC32Invalid),
 		},
+		{
+			name:   "Alignment Stuffing without Encryption",
+			binary: "/DAeAAAAAAAAAP///wViAA/nf18ACQAAAAAskJv+YPtE",
+			expected: scte35.SpliceInfoSection{
+				SpliceCommand: &scte35.SpliceInsert{
+					SpliceEventID:       1644171239,
+					Program:             &scte35.SpliceInsertProgram{},
+					SpliceImmediateFlag: true,
+					UniqueProgramID:     9,
+				},
+				Tier:    4095,
+				SAPType: 3,
+			},
+			legacy: true, // binary wont match because of stuffing
+		},
 	}
-
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {

@@ -122,6 +122,12 @@ func (sis *SpliceInfoSection) Decode(b []byte) (err error) {
 	if encryptedPacket {
 		sis.alignmentStuffing = int(r.LeftBits()) - 64
 		sis.ecrc32 = r.Bytes(4)
+	} else {
+		sis.alignmentStuffing = int(r.LeftBits()-32) / 8
+		if sis.alignmentStuffing < 0 {
+			return ErrBufferOverflow
+		}
+		r.Skip(uint(sis.alignmentStuffing * 8))
 	}
 	sis.crc32 = r.Bytes(4)
 
@@ -201,8 +207,8 @@ func (sis *SpliceInfoSection) Encode() ([]byte, error) {
 	}
 
 	// Encoding encrypted signals is untested.
+	iow.PutUint64(uint(sis.alignmentStuffing), 0) // alignment_stuffing
 	if sis.EncryptedPacket.EncryptionAlgorithm != EncryptionAlgorithmNone {
-		iow.PutUint64(uint(sis.alignmentStuffing), 0)          // alignment_stuffing
 		iow.PutUint32(32, calculateCRC32(buf[:iow.Index()/8])) // E_CRC_32
 	}
 
