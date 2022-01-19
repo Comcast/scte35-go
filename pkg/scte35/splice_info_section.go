@@ -206,8 +206,12 @@ func (sis *SpliceInfoSection) Encode() ([]byte, error) {
 		}
 	}
 
+	// alignment_stuffing
+	for i := 0; i < sis.alignmentStuffing; i++ {
+		iow.PutByte(0)
+	}
+
 	// Encoding encrypted signals is untested.
-	iow.PutUint64(uint(sis.alignmentStuffing), 0) // alignment_stuffing
 	if sis.EncryptedPacket.EncryptionAlgorithm != EncryptionAlgorithmNone {
 		iow.PutUint32(32, calculateCRC32(buf[:iow.Index()/8])) // E_CRC_32
 	}
