@@ -764,7 +764,7 @@ func TestEncodeWithAlignmentStuffing(t *testing.T) {
 			for _, change := range changelog {
 				switch change.Path[0] {
 				// we have to ignore differences in these non-exported
-				// members, because we cannot set them or Decode does not.
+				// members, because we cannot set them.
 				case "alignmentStuffing", "ecrc32", "crc32":
 				default:
 					t.Logf("%#v", change)
