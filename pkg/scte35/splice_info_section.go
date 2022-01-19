@@ -363,12 +363,12 @@ func (sis *SpliceInfoSection) sectionLength() int {
 	}
 	length += 16                             // descriptor_loop_length (bytes remaining value)
 	length += sis.descriptorLoopLength() * 8 // bytes -> bits
+	length += sis.alignmentStuffing * 8      // bytes -> bits
 	// we dont officially support encrypted signals so this section is untested.
 	// It's implemented here as a base-line if/when we decide to support
 	// encryption (ie, use at your own risk)
 	if sis.EncryptedPacket.EncryptionAlgorithm != EncryptionAlgorithmNone {
 		length += 32 // ECRC_32
-		length += sis.alignmentStuffing * 8
 	}
 
 	length += 32 // CRC_32
