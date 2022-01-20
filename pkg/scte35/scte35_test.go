@@ -26,7 +26,6 @@ import (
 	"testing"
 
 	"github.com/Comcast/scte35-go/pkg/scte35"
-	"github.com/r3labs/diff/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -403,7 +402,7 @@ func TestDecodeBase64(t *testing.T) {
 		{
 			name:   "Empty String",
 			binary: "",
-			err:    scte35.ErrBufferOverflow,
+			err:    fmt.Errorf("splice_info_section: %w", scte35.ErrBufferOverflow),
 		},
 		{
 			name:   "Invalid Base64 Encoding",
@@ -686,97 +685,24 @@ func TestDecodeHex(t *testing.T) {
 
 func TestEncodeWithAlignmentStuffing(t *testing.T) {
 	cases := []struct {
-		name    string
-		binary  string
-		decoded scte35.SpliceInfoSection
+		name   string
+		binary string
 	}{
 		{
 			name:   "SpliceInsert Program Out Point with 3 bytes alignment stuffing",
 			binary: "/DA0AABS2+YAAACgFAUALJGCf+/+MSwPcX4AUmXAAAAAAAAMAQpDVUVJRp8xMjEq3pnIPCi6lw==",
-			decoded: scte35.SpliceInfoSection{
-				EncryptedPacket: scte35.EncryptedPacket{EncryptionAlgorithm: scte35.EncryptionAlgorithmNone, CWIndex: 0},
-				SpliceCommand: &scte35.SpliceInsert{
-					BreakDuration: &scte35.BreakDuration{
-						Duration: 5400000,
-					},
-					SpliceEventID:         2920834,
-					OutOfNetworkIndicator: true,
-					Program: &scte35.SpliceInsertProgram{
-						SpliceTime: scte35.SpliceTime{
-							PTSTime: uint64ptr(824971121),
-						},
-					},
-				},
-				SpliceDescriptors: []scte35.SpliceDescriptor{
-					&scte35.DTMFDescriptor{
-						Preroll:   70,
-						DTMFChars: "121*",
-					},
-				},
-				SAPType:       3,
-				Tier:          10,
-				PTSAdjustment: 1390142976,
-			},
 		},
 		{
 			name:   "SpliceInsert Program In Point with 3 bytes alignment stuffing",
 			binary: "/DAvAABS2+YAAACgDwUALJGEf0/+MX7z3AAAAAAADAEKQ1VFSQCfMTIxI6SMuQkzWQI=",
-			decoded: scte35.SpliceInfoSection{
-				EncryptedPacket: scte35.EncryptedPacket{EncryptionAlgorithm: scte35.EncryptionAlgorithmNone, CWIndex: 0},
-				SpliceCommand: &scte35.SpliceInsert{
-					SpliceEventID: 2920836,
-					Program: &scte35.SpliceInsertProgram{
-						SpliceTime: scte35.SpliceTime{
-							PTSTime: uint64ptr(830403548),
-						},
-					},
-				},
-				SpliceDescriptors: []scte35.SpliceDescriptor{
-					&scte35.DTMFDescriptor{
-						Preroll:   0,
-						DTMFChars: "121#",
-					},
-				},
-				SAPType:       3,
-				Tier:          10,
-				PTSAdjustment: 1390142976,
-			},
 		},
 	}
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			sis, err := scte35.DecodeBase64(c.binary)
-			assert.NoError(t, err)
-			if err != nil {
-				return
-			}
-			assert.NotNil(t, sis)
-			if sis == nil {
-				return
-			}
-			changelog, err := diff.Diff(&c.decoded, sis)
-			assert.NoError(t, err)
-			if err != nil {
-				return
-			}
-			equal := true
-			for _, change := range changelog {
-				switch change.Path[0] {
-				// we have to ignore differences in these non-exported
-				// members, because we cannot set them.
-				case "alignmentStuffing", "ecrc32", "crc32":
-				default:
-					t.Logf("%#v", change)
-					equal = false
-				}
-			}
-			assert.True(t, equal, "DecodeBase64 returned an unexpected *scte35.SpliceInfoSection")
-			if !equal {
-				return
-			}
-			_, err = sis.Encode()
-			assert.NoError(t, err, "Verifying Encode works with alignment stuffing")
+			require.NoError(t, err)
+			require.Equal(t, c.binary, sis.Base64())
 		})
 	}
 }

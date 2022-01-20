@@ -63,7 +63,7 @@ type SpliceInfoSection struct {
 	PTSAdjustment     uint64            `xml:"ptsAdjustment,attr"`
 	ProtocolVersion   uint32            `xml:"protocolVersion,attr"`
 	Tier              uint32            `xml:"tier,attr"`
-	alignmentStuffing int               // alignment_stuffing length
+	alignmentStuffing []byte            // alignment_stuffing
 	ecrc32            []byte            // decoded e_crc_32
 	crc32             []byte            // decoded crc_32
 }
@@ -120,14 +120,16 @@ func (sis *SpliceInfoSection) Decode(b []byte) (err error) {
 	}
 
 	if encryptedPacket {
-		sis.alignmentStuffing = int(r.LeftBits()) - 64
+		stuffedBytes := (int(r.LeftBits()) - 64) / 8
+		if stuffedBytes > 0 {
+			sis.alignmentStuffing = r.Bytes(stuffedBytes)
+		}
 		sis.ecrc32 = r.Bytes(4)
 	} else {
-		sis.alignmentStuffing = int(r.LeftBits()-32) / 8
-		if sis.alignmentStuffing < 0 {
-			return ErrBufferOverflow
+		stuffedBytes := (int(r.LeftBits()) - 32) / 8
+		if stuffedBytes > 0 {
+			sis.alignmentStuffing = r.Bytes(stuffedBytes)
 		}
-		r.Skip(uint(sis.alignmentStuffing * 8))
 	}
 	sis.crc32 = r.Bytes(4)
 
@@ -207,9 +209,7 @@ func (sis *SpliceInfoSection) Encode() ([]byte, error) {
 	}
 
 	// alignment_stuffing
-	for i := 0; i < sis.alignmentStuffing; i++ {
-		iow.PutByte(0)
-	}
+	_, _ = iow.Write(sis.alignmentStuffing)
 
 	// Encoding encrypted signals is untested.
 	if sis.EncryptedPacket.EncryptionAlgorithm != EncryptionAlgorithmNone {
@@ -367,8 +367,8 @@ func (sis *SpliceInfoSection) sectionLength() int {
 	}
 	length += 16                             // descriptor_loop_length (bytes remaining value)
 	length += sis.descriptorLoopLength() * 8 // bytes -> bits
-	length += sis.alignmentStuffing * 8      // bytes -> bits
-	// we dont officially support encrypted signals so this section is untested.
+	length += len(sis.alignmentStuffing) * 8 // bytes -> bits
+	// we don't officially support encrypted signals so this section is untested.
 	// It's implemented here as a base-line if/when we decide to support
 	// encryption (ie, use at your own risk)
 	if sis.EncryptedPacket.EncryptionAlgorithm != EncryptionAlgorithmNone {
