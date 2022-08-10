@@ -28,5 +28,7 @@ func SCTE35() *cobra.Command {
 
 	c.AddCommand(decodeCommand())
 	c.AddCommand(encodeCommand())
+	c.AddCommand(encodeFileCommand())
 	return c
 }
+
