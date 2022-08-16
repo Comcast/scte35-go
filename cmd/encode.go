@@ -17,11 +17,12 @@
 package cmd
 
 import (
+	"bufio"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
+	"io"
 	"os"
-	"strings"
 
 	"github.com/Comcast/scte35-go/pkg/scte35"
 	"github.com/spf13/cobra"
@@ -30,28 +31,33 @@ import (
 // encodeCommand returns the command for `scte35 encode`
 func encodeCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "encode",
-		Short: "Encode a splice_info_section to binary",
+		Use:   "encode < filename",
+		Short: "Encode a splice_info_section to binary being provided from stdin",
 		Args: func(cmd *cobra.Command, args []string) error {
-			if len(args) != 1 {
-				return fmt.Errorf("requires a splice_info_section")
-			}
-			if !strings.HasPrefix(args[0], "<") && !strings.HasPrefix(args[0], "{") {
-				return fmt.Errorf("splice_info_section must be in XML or JSON format")
+			if len(args) != 0 {
+				return fmt.Errorf("additional command line arguments are not needed")
 			}
 			return nil
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			bin := args[0]
+			reader := bufio.NewReader(os.Stdin)
+			var output []rune
+
+			for {
+				input, _, err := reader.ReadRune()
+				if err != nil && err == io.EOF {
+					break
+				}
+				output = append(output, input)
+			}
 
 			var sis *scte35.SpliceInfoSection
 			var err error
-
 			// decode payload
-			if strings.HasPrefix(bin, "<") {
-				err = xml.Unmarshal([]byte(bin), &sis)
+			if output[0] == '<' {
+				err = xml.Unmarshal([]byte(string(output)), &sis)
 			} else {
-				err = json.Unmarshal([]byte(bin), &sis)
+				err = json.Unmarshal([]byte(string(output)), &sis)
 			}
 
 			// print encoded signal
