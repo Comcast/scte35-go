@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
-	"io"
 	"os"
 
 	"github.com/Comcast/scte35-go/pkg/scte35"
@@ -40,34 +39,42 @@ func encodeCommand() *cobra.Command {
 			return nil
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			reader := bufio.NewReader(os.Stdin)
-			var output []rune
-
-			for {
-				input, _, err := reader.ReadRune()
-				if err != nil && err == io.EOF {
-					break
-				}
-				output = append(output, input)
-			}
-
-			var sis *scte35.SpliceInfoSection
 			var err error
-			// decode payload
-			if output[0] == '<' {
-				err = xml.Unmarshal([]byte(string(output)), &sis)
-			} else {
-				err = json.Unmarshal([]byte(string(output)), &sis)
+			var input string
+			var sis *scte35.SpliceInfoSection
+
+			scanner := bufio.NewScanner(os.Stdin)
+			for scanner.Scan() {
+				input = input + scanner.Text()
 			}
-
-			// print encoded signal
-			_, _ = fmt.Fprintf(os.Stdout, "Base64: %s\n", sis.Base64())
-			_, _ = fmt.Fprintf(os.Stdout, "Hex   : %s\n", sis.Hex())
-
-			// and any errors
+			err = scanner.Err()
 			if err != nil {
 				_, _ = fmt.Fprintf(os.Stderr, "Error: %s\n", err)
+				return
 			}
+
+			if len(input) == 0 {
+				_, _ = fmt.Fprintf(os.Stderr, "Error: empty input\n")
+				return
+			}
+
+			if input[0] == '<' {
+				err = xml.Unmarshal([]byte(input), &sis)
+			} else if input[0] == '{' {
+				err = json.Unmarshal([]byte(input), &sis)
+			} else {
+				err = fmt.Errorf("unrecognized input")
+			}
+
+			if err == nil {
+				// print encoded signal
+				_, _ = fmt.Fprintf(os.Stdout, "Base64: %s\n", sis.Base64())
+				_, _ = fmt.Fprintf(os.Stdout, "Hex   : %s\n", sis.Hex())
+			} else {
+				// print error
+				_, _ = fmt.Fprintf(os.Stderr, "Error: %s\n", err)
+			}
+
 		},
 	}
 	return cmd
