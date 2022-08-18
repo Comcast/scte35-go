@@ -22,6 +22,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/Comcast/scte35-go/pkg/scte35"
 	"github.com/spf13/cobra"
@@ -53,17 +54,12 @@ func encodeCommand() *cobra.Command {
 				return
 			}
 
-			if len(input) == 0 {
-				_, _ = fmt.Fprintf(os.Stderr, "Error: empty input\n")
-				return
-			}
-
-			if input[0] == '<' {
+			if strings.HasPrefix(strings.TrimSpace(input), "<") {
 				err = xml.Unmarshal([]byte(input), &sis)
-			} else if input[0] == '{' {
+			} else if strings.HasPrefix(strings.TrimSpace(input), "{") {
 				err = json.Unmarshal([]byte(input), &sis)
 			} else {
-				err = fmt.Errorf("unrecognized input")
+				err = fmt.Errorf("unrecognized or empty input")
 			}
 
 			if err == nil {
