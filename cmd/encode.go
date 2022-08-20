@@ -31,11 +31,11 @@ import (
 // encodeCommand returns the command for `scte35 encode`
 func encodeCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "encode < filename",
-		Short: "Encode a splice_info_section to binary being provided from stdin",
+		Use:   "encode < filename or encode {\"protocolVersion\"... ",
+		Short: "Encode a splice_info_section to binary being provided from stdin or as a parameter",
 		Args: func(cmd *cobra.Command, args []string) error {
-			if len(args) != 0 {
-				return fmt.Errorf("additional command line arguments are not needed")
+			if len(args) > 1 {
+				return fmt.Errorf("invalid number of parameter provided")
 			}
 			return nil
 		},
@@ -44,14 +44,18 @@ func encodeCommand() *cobra.Command {
 			var input string
 			var sis *scte35.SpliceInfoSection
 
-			scanner := bufio.NewScanner(os.Stdin)
-			for scanner.Scan() {
-				input = input + scanner.Text()
-			}
-			err = scanner.Err()
-			if err != nil {
-				_, _ = fmt.Fprintf(os.Stderr, "Error: %s\n", err)
-				return
+			if len(args) == 1 {
+				input = args[0]
+			} else {
+				scanner := bufio.NewScanner(os.Stdin)
+				for scanner.Scan() {
+					input = input + scanner.Text()
+				}
+				err = scanner.Err()
+				if err != nil {
+					_, _ = fmt.Fprintf(os.Stderr, "Error: %s\n", err)
+					return
+				}
 			}
 
 			if strings.HasPrefix(strings.TrimSpace(input), "<") {
