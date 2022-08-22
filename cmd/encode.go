@@ -17,6 +17,7 @@
 package cmd
 
 import (
+	"bufio"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
@@ -30,38 +31,50 @@ import (
 // encodeCommand returns the command for `scte35 encode`
 func encodeCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "encode",
-		Short: "Encode a splice_info_section to binary",
+		Use:   "encode < filename or encode {\"protocolVersion\"... ",
+		Short: "Encode a splice_info_section to binary being provided from stdin or as a parameter",
 		Args: func(cmd *cobra.Command, args []string) error {
-			if len(args) != 1 {
-				return fmt.Errorf("requires a splice_info_section")
-			}
-			if !strings.HasPrefix(args[0], "<") && !strings.HasPrefix(args[0], "{") {
-				return fmt.Errorf("splice_info_section must be in XML or JSON format")
+			if len(args) > 1 {
+				return fmt.Errorf("invalid number of parameter provided")
 			}
 			return nil
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			bin := args[0]
-
-			var sis *scte35.SpliceInfoSection
 			var err error
+			var input string
+			var sis *scte35.SpliceInfoSection
 
-			// decode payload
-			if strings.HasPrefix(bin, "<") {
-				err = xml.Unmarshal([]byte(bin), &sis)
+			if len(args) == 1 {
+				input = args[0]
 			} else {
-				err = json.Unmarshal([]byte(bin), &sis)
+				scanner := bufio.NewScanner(os.Stdin)
+				for scanner.Scan() {
+					input = input + scanner.Text()
+				}
+				err = scanner.Err()
+				if err != nil {
+					_, _ = fmt.Fprintf(os.Stderr, "Error: %s\n", err)
+					return
+				}
 			}
 
-			// print encoded signal
-			_, _ = fmt.Fprintf(os.Stdout, "Base64: %s\n", sis.Base64())
-			_, _ = fmt.Fprintf(os.Stdout, "Hex   : %s\n", sis.Hex())
+			if strings.HasPrefix(strings.TrimSpace(input), "<") {
+				err = xml.Unmarshal([]byte(input), &sis)
+			} else if strings.HasPrefix(strings.TrimSpace(input), "{") {
+				err = json.Unmarshal([]byte(input), &sis)
+			} else {
+				err = fmt.Errorf("unrecognized or empty input")
+			}
 
-			// and any errors
-			if err != nil {
+			if err == nil {
+				// print encoded signal
+				_, _ = fmt.Fprintf(os.Stdout, "Base64: %s\n", sis.Base64())
+				_, _ = fmt.Fprintf(os.Stdout, "Hex   : %s\n", sis.Hex())
+			} else {
+				// print error
 				_, _ = fmt.Fprintf(os.Stderr, "Error: %s\n", err)
 			}
+
 		},
 	}
 	return cmd
