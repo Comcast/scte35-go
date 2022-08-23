@@ -2,6 +2,9 @@ package scte35
 
 import (
 	"bytes"
+	"encoding/json"
+	"fmt"
+	"os"
 )
 
 // pktSz is the size of an MPEG-TS packet in bytes.
@@ -364,8 +367,8 @@ func (stream *Stream) parseScte35(pay []byte, pid uint16) {
 	}
 }
 
-func (stream *Stream) mkSis(pid uint16) *scte35.SpliceInfoSection {
-	sis := &scte35.SpliceInfoSection{}
+func (stream *Stream) mkSis(pid uint16) *SpliceInfoSection {
+	sis := &SpliceInfoSection{}
 	p := stream.pid2Prgm[pid]
 	prgm := &p
 	var packet PacketData
