@@ -1,49 +1,49 @@
 package scte35
 
-//Pids holds collections of pids by type for scte35.Stream.
-type Pids struct {
-	PmtPids    []uint16
-	PcrPids    []uint16
-	Scte35Pids []uint16
+// PIDs holds collections of PIDs by type for scte35.Stream.
+type PIDs struct {
+	PMTPIDs    []uint16
+	PCRPIDs    []uint16
+	SCTE35PIDs []uint16
 }
 
-func (pids *Pids) isPmtPid(pid uint16) bool {
-	return isIn16(pids.PmtPids, pid)
+func (p *PIDs) isPMTPID(pid uint16) bool {
+	return isIn16(p.PMTPIDs, pid)
 }
 
-func (pids *Pids) addPmtPid(pid uint16) {
-	if !pids.isPmtPid(pid) {
-		pids.PmtPids = append(pids.PmtPids, pid)
+func (p *PIDs) addPMTPID(pid uint16) {
+	if !p.isPMTPID(pid) {
+		p.PMTPIDs = append(p.PMTPIDs, pid)
 	}
 }
 
-func (pids *Pids) isPcrPid(pid uint16) bool {
-	return isIn16(pids.PcrPids, pid)
+func (p *PIDs) isPCRPID(pid uint16) bool {
+	return isIn16(p.PCRPIDs, pid)
 }
 
-func (pids *Pids) addPcrPid(pid uint16) {
-	if !pids.isPcrPid(pid) {
-		pids.PcrPids = append(pids.PcrPids, pid)
+func (p *PIDs) addPCRPID(pid uint16) {
+	if !p.isPCRPID(pid) {
+		p.PCRPIDs = append(p.PCRPIDs, pid)
 	}
 }
 
-func (pids *Pids) isScte35Pid(pid uint16) bool {
-	return isIn16(pids.Scte35Pids, pid)
+func (p *PIDs) isSCTE35PID(pid uint16) bool {
+	return isIn16(p.SCTE35PIDs, pid)
 }
 
-func (pids *Pids) addScte35Pid(pid uint16) {
-	if !(pids.isScte35Pid(pid)) {
-		pids.Scte35Pids = append(pids.Scte35Pids, pid)
+func (p *PIDs) addSCTE35PID(pid uint16) {
+	if !(p.isSCTE35PID(pid)) {
+		p.SCTE35PIDs = append(p.SCTE35PIDs, pid)
 	}
 }
-func (pids *Pids) delScte35Pid(pid uint16) {
+func (p *PIDs) delSCTE35PID(pid uint16) {
 	n := 0
-	for _, val := range pids.Scte35Pids {
+	for _, val := range p.SCTE35PIDs {
 		if val != pid {
-			pids.Scte35Pids[n] = val
+			p.SCTE35PIDs[n] = val
 			n++
 		}
 	}
 
-	pids.Scte35Pids = pids.Scte35Pids[:n]
+	p.SCTE35PIDs = p.SCTE35PIDs[:n]
 }
