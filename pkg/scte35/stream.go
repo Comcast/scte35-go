@@ -32,10 +32,10 @@ const (
 
 type PacketData struct {
 	PacketNumber int     `json:",omitempty"`
-	Pid          uint16  `json:",omitempty"`
+	PID          uint16  `json:",omitempty"`
 	Program      uint16  `json:",omitempty"`
-	Pcr          float64 `json:",omitempty"`
-	Pts          float64 `json:",omitempty"`
+	PCR          float64 `json:",omitempty"`
+	PTS          float64 `json:",omitempty"`
 }
 
 // Stream for parsing MPEGTS for SCTE-35
@@ -288,10 +288,10 @@ func (st *Stream) makeSpliceInfoSection(pid uint16) *SpliceInfoSection {
 	p := st.pidToProgram[pid]
 	prgm := &p
 	var packet PacketData
-	packet.Pid = pid
+	packet.PID = pid
 	packet.Program = *prgm
-	packet.Pcr = st.makePCR(*prgm)
-	packet.Pts = st.makePTS(*prgm)
+	packet.PCR = st.makePCR(*prgm)
+	packet.PTS = st.makePTS(*prgm)
 	packet.PacketNumber = st.pktNum
 	pkt, _ := json.MarshalIndent(packet, "", "\t")
 	_, _ = fmt.Fprintf(os.Stdout, "\nPacket Data: \n%s\n", pkt)
