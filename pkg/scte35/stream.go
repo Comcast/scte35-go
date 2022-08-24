@@ -47,7 +47,7 @@ type Stream struct {
 	programToPTS map[uint16]uint64 //lookup table for program to pts
 	partial      map[uint16][]byte // partial manages tables spread across multiple packets by pid
 	last         map[uint16][]byte // last compares current packet payload to last packet payload by pid
-	Pids
+	PIDs
 }
 
 func (st *Stream) mkMaps() {
@@ -63,7 +63,7 @@ func (st *Stream) Decode(fname string) {
 	st.mkMaps()
 	st.pktNum = 0
 	file, err := os.Open(fname)
-	chk(err)
+	check(err)
 	defer file.Close()
 	buffer := make([]byte, readSize)
 	for {
@@ -92,7 +92,7 @@ func (st *Stream) makePTS(prgm uint16) float64 {
 	return make90K(pts)
 }
 
-func (st *Stream) parsePusi(pkt []byte) bool {
+func (st *Stream) parsePUSI(pkt []byte) bool {
 	if (pkt[1]>>6)&1 == 1 {
 		if pkt[6]&1 == 1 {
 			return true
@@ -102,7 +102,7 @@ func (st *Stream) parsePusi(pkt []byte) bool {
 }
 
 func (st *Stream) parsePTS(pkt []byte, pid uint16) {
-	if st.parsePusi(pkt) {
+	if st.parsePUSI(pkt) {
 		prgm, ok := st.pidToProgram[pid]
 		if ok {
 			pts := (uint64(pkt[13]) >> 1 & 7) << 30
@@ -130,7 +130,7 @@ func (st *Stream) parsePCR(pkt []byte, pid uint16) {
 	}
 }
 
-// parsePay packet payload starts after header and afc (if present)
+// parsePayload packet payload starts after header and afc (if present)
 func (st *Stream) parsePayload(pkt []byte) []byte {
 	head := 4
 	hasafc := (pkt[3] >> 5) & 1
@@ -144,13 +144,13 @@ func (st *Stream) parsePayload(pkt []byte) []byte {
 	return pkt[head:]
 }
 
-// chkPartial appends the current packet payload to partial table by pid.
-func (st *Stream) chkPartial(pay []byte, pid uint16, sep []byte) []byte {
+// checkPartial appends the current packet payload to partial table by pid.
+func (st *Stream) checkPartial(pay []byte, pid uint16, sep []byte) []byte {
 	val, ok := st.partial[pid]
 	if ok {
 		pay = append(val, pay...)
 	}
-	return splitByIdx(pay, sep)
+	return splitByIndex(pay, sep)
 }
 
 // sameAsLast compares the current packet to the last packet by pid.
@@ -175,71 +175,71 @@ func (st *Stream) sectionDone(pay []byte, pid uint16, seclen uint16) bool {
 	return true
 }
 
-// parse is the parser method for Stream
+// parse parses an MPEGTS packet based on the pid.
 func (st *Stream) parse(pkt []byte) {
-	p := parsePid(pkt[1], pkt[2])
+	p := parsePID(pkt[1], pkt[2])
 	pid := &p
 	pl := st.parsePayload(pkt)
 	pay := &pl
 
 	if *pid == 0 {
-		st.parsePat(*pay, *pid)
+		st.parsePAT(*pay, *pid)
 	}
-	if st.isPmtPid(*pid) {
-		st.parsePmt(*pay, *pid)
+	if st.isPMTPID(*pid) {
+		st.parsePMT(*pay, *pid)
 	}
-	if st.isPcrPid(*pid) {
+	if st.isPCRPID(*pid) {
 		st.parsePCR(pkt, *pid)
 	} else {
 		st.parsePTS(pkt, *pid)
 	}
-	if st.isScte35Pid(*pid) {
+	if st.isSCTE35PID(*pid) {
 		st.parseScte35(*pay, *pid)
 	}
 }
 
-func (st *Stream) parsePat(pay []byte, pid uint16) {
+func (st *Stream) parsePAT(pay []byte, pid uint16) {
 	if st.sameAsLast(pay, pid) {
 		return
 	}
-	pay = st.chkPartial(pay, pid, []byte("\x00\x00"))
+	pay = st.checkPartial(pay, pid, []byte("\x00\x00"))
 	if len(pay) < 1 {
 		return
 	}
-	seclen := parseLen(pay[2], pay[3])
+	seclen := parseLength(pay[2], pay[3])
 	if st.sectionDone(pay, pid, seclen) {
 		seclen -= 5 // pay bytes 4,5,6,7,8
 		idx := uint16(9)
 		end := idx + seclen - 4 //  4 bytes for crc
 		chunksize := uint16(4)
 		for idx < end {
-			prgm := parsePrgm(pay[idx], pay[idx+1])
+			prgm := parseProgram(pay[idx], pay[idx+1])
 			if prgm > 0 {
 				if !isIn16(st.programs, prgm) {
 					st.programs = append(st.programs, prgm)
 				}
-				pmtpid := parsePid(pay[idx+2], pay[idx+3])
-				st.addPmtPid(pmtpid)
+				pmtpid := parsePID(pay[idx+2], pay[idx+3])
+				st.addPMTPID(pmtpid)
 			}
 			idx += chunksize
 		}
 	}
 }
 
-func (st *Stream) parsePmt(pay []byte, pid uint16) {
+func (st *Stream) parsePMT(pay []byte, pid uint16) {
 	if st.sameAsLast(pay, pid) {
 		return
 	}
-	pay = st.chkPartial(pay, pid, []byte("\x02"))
+	pay = st.checkPartial(pay, pid, []byte("\x02"))
 	if len(pay) < 1 {
 		return
 	}
-	secinfolen := parseLen(pay[1], pay[2])
+	secinfolen := parseLength(pay[1], pay[2])
 	if st.sectionDone(pay, pid, secinfolen) {
-		prgm := parsePrgm(pay[3], pay[4])
-		pcrpid := parsePid(pay[8], pay[9])
-		st.addPcrPid(pcrpid)
-		proginfolen := parseLen(pay[10], pay[11])
+		prgm := parseProgram(pay[3], pay[4])
+		pcrpid := parsePID(pay[8], pay[9])
+		st.addPCRPID(pcrpid)
+		proginfolen := parseLength(pay[10], pay[11])
 		idx := uint16(12)
 		idx += proginfolen
 		silen := secinfolen - 9
@@ -253,37 +253,37 @@ func (st *Stream) parseStreams(silen uint16, pay []byte, idx uint16, prgm uint16
 	endidx := (idx + silen) - chunksize
 	for idx < endidx {
 		streamtype := pay[idx]
-		elpid := parsePid(pay[idx+1], pay[idx+2])
-		eilen := parseLen(pay[idx+3], pay[idx+4])
+		elpid := parsePID(pay[idx+1], pay[idx+2])
+		eilen := parseLength(pay[idx+3], pay[idx+4])
 		idx += chunksize
 		idx += eilen
 		st.pidToProgram[elpid] = prgm
-		st.vrfyStreamType(elpid, streamtype)
+		st.verifyStreamType(elpid, streamtype)
 	}
 }
 
-func (st *Stream) vrfyStreamType(pid uint16, streamtype uint8) {
+func (st *Stream) verifyStreamType(pid uint16, streamtype uint8) {
 	if streamtype == 6 || streamtype == 134 {
-		st.addScte35Pid(pid)
+		st.addSCTE35PID(pid)
 	}
 }
 
 func (st *Stream) parseScte35(pay []byte, pid uint16) {
-	pay = st.chkPartial(pay, pid, []byte("\xfc0"))
+	pay = st.checkPartial(pay, pid, []byte("\xfc0"))
 	if len(pay) == 0 {
-		st.Pids.delScte35Pid(pid)
+		st.PIDs.delSCTE35PID(pid)
 		return
 	}
-	seclen := parseLen(pay[1], pay[2])
+	seclen := parseLength(pay[1], pay[2])
 	if st.sectionDone(pay, pid, seclen) {
-		sis := st.makeSis(pid)
+		sis := st.makeSpliceInfoSection(pid)
 		sis.Decode(pay)
 		b, _ := json.MarshalIndent(sis, "", "\t")
 		_, _ = fmt.Fprintf(os.Stdout, "\nSplice Info Section: \n%s\n", b)
 	}
 }
 
-func (st *Stream) makeSis(pid uint16) *SpliceInfoSection {
+func (st *Stream) makeSpliceInfoSection(pid uint16) *SpliceInfoSection {
 	sis := &SpliceInfoSection{}
 	p := st.pidToProgram[pid]
 	prgm := &p
@@ -323,19 +323,19 @@ func make90K(raw uint64) float64 {
 	return float64(uint64(nk*1000000)) / 1000000
 }
 
-func parseLen(byte1 byte, byte2 byte) uint16 {
+func parseLength(byte1 byte, byte2 byte) uint16 {
 	return uint16(byte1&0xf)<<8 | uint16(byte2)
 }
 
-func parsePid(byte1 byte, byte2 byte) uint16 {
+func parsePID(byte1 byte, byte2 byte) uint16 {
 	return uint16(byte1&0x1f)<<8 | uint16(byte2)
 }
 
-func parsePrgm(byte1 byte, byte2 byte) uint16 {
+func parseProgram(byte1 byte, byte2 byte) uint16 {
 	return uint16(byte1)<<8 | uint16(byte2)
 }
 
-func splitByIdx(payload, sep []byte) []byte {
+func splitByIndex(payload, sep []byte) []byte {
 	idx := bytes.Index(payload, sep)
 	if idx == -1 {
 		return []byte("")
@@ -343,8 +343,8 @@ func splitByIdx(payload, sep []byte) []byte {
 	return payload[idx:]
 }
 
-// chk generic catchall error checking
-func chk(e error) {
+// check generic catchall error checking
+func check(e error) {
 	if e != nil {
 		fmt.Println(e)
 
