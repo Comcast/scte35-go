@@ -23,64 +23,13 @@ import (
 	"os"
 )
 
-// pktSz is the size of an MPEG-TS packet in bytes.
-const pktSz = 188
+const (
+    // pktSz is the size of an MPEG-TS packet in bytes.
+    pktSz = 188
 
-// bufSz is the size of a read when parsing files.
-const bufSz = 13000 * pktSz
-
-// isIn16 is a test for slice membership
-func isIn16(slice []uint16, val uint16) bool {
-	for _, item := range slice {
-		if item == val {
-			return true
-		}
-	}
-	return false
-}
-
-// isIn8 is a test for slice membership
-func isIn8(slice []uint8, val uint8) bool {
-	for _, item := range slice {
-		if item == val {
-			return true
-		}
-	}
-	return false
-}
-
-func mk90k(raw uint64) float64 {
-	nk := float64(raw) / 90000.0
-	return float64(uint64(nk*1000000)) / 1000000
-}
-
-func parseLen(byte1 byte, byte2 byte) uint16 {
-	return uint16(byte1&0xf)<<8 | uint16(byte2)
-}
-
-func parsePid(byte1 byte, byte2 byte) uint16 {
-	return uint16(byte1&0x1f)<<8 | uint16(byte2)
-}
-
-func parsePrgm(byte1 byte, byte2 byte) uint16 {
-	return uint16(byte1)<<8 | uint16(byte2)
-}
-
-func splitByIdx(payload, sep []byte) []byte {
-	idx := bytes.Index(payload, sep)
-	if idx == -1 {
-		return []byte("")
-	}
-	return payload[idx:]
-}
-
-//chk generic catchall error checking
-func chk(e error) {
-	if e != nil {
-		fmt.Println(e)
-
-	}
-}
+    // bufSz is the size of a read when parsing files.
+    bufSz = 13000 * pktSz
+)
 
 type PacketData struct {
 	PacketNumber int     `json:",omitempty"`
@@ -88,54 +37,6 @@ type PacketData struct {
 	Program      uint16  `json:",omitempty"`
 	Pcr          float64 `json:",omitempty"`
 	Pts          float64 `json:",omitempty"`
-}
-
-//Pids holds collections of pids by type for threefive.Stream.
-type Pids struct {
-	PmtPids    []uint16
-	PcrPids    []uint16
-	Scte35Pids []uint16
-}
-
-func (pids *Pids) isPmtPid(pid uint16) bool {
-	return isIn16(pids.PmtPids, pid)
-}
-
-func (pids *Pids) addPmtPid(pid uint16) {
-	if !pids.isPmtPid(pid) {
-		pids.PmtPids = append(pids.PmtPids, pid)
-	}
-}
-
-func (pids *Pids) isPcrPid(pid uint16) bool {
-	return isIn16(pids.PcrPids, pid)
-}
-
-func (pids *Pids) addPcrPid(pid uint16) {
-	if !pids.isPcrPid(pid) {
-		pids.PcrPids = append(pids.PcrPids, pid)
-	}
-}
-
-func (pids *Pids) isScte35Pid(pid uint16) bool {
-	return isIn16(pids.Scte35Pids, pid)
-}
-
-func (pids *Pids) addScte35Pid(pid uint16) {
-	if !(pids.isScte35Pid(pid)) {
-		pids.Scte35Pids = append(pids.Scte35Pids, pid)
-	}
-}
-func (pids *Pids) delScte35Pid(pid uint16) {
-	n := 0
-	for _, val := range pids.Scte35Pids {
-		if val != pid {
-			pids.Scte35Pids[n] = val
-			n++
-		}
-	}
-
-	pids.Scte35Pids = pids.Scte35Pids[:n]
 }
 
 //Stream for parsing MPEGTS for SCTE-35
@@ -399,3 +300,55 @@ func (stream *Stream) mkSis(pid uint16) *SpliceInfoSection {
 }
 
 
+// isIn16 is a test for slice membership
+func isIn16(slice []uint16, val uint16) bool {
+	for _, item := range slice {
+		if item == val {
+			return true
+		}
+	}
+	return false
+}
+
+// isIn8 is a test for slice membership
+func isIn8(slice []uint8, val uint8) bool {
+	for _, item := range slice {
+		if item == val {
+			return true
+		}
+	}
+	return false
+}
+
+func mk90k(raw uint64) float64 {
+	nk := float64(raw) / 90000.0
+	return float64(uint64(nk*1000000)) / 1000000
+}
+
+func parseLen(byte1 byte, byte2 byte) uint16 {
+	return uint16(byte1&0xf)<<8 | uint16(byte2)
+}
+
+func parsePid(byte1 byte, byte2 byte) uint16 {
+	return uint16(byte1&0x1f)<<8 | uint16(byte2)
+}
+
+func parsePrgm(byte1 byte, byte2 byte) uint16 {
+	return uint16(byte1)<<8 | uint16(byte2)
+}
+
+func splitByIdx(payload, sep []byte) []byte {
+	idx := bytes.Index(payload, sep)
+	if idx == -1 {
+		return []byte("")
+	}
+	return payload[idx:]
+}
+
+//chk generic catchall error checking
+func chk(e error) {
+	if e != nil {
+		fmt.Println(e)
+
+	}
+}
