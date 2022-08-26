@@ -47,6 +47,7 @@ type Stream struct {
 	programToPTS map[uint16]uint64 //lookup table for program to pts
 	partial      map[uint16][]byte // partial manages tables spread across multiple packets by pid
 	last         map[uint16][]byte // last compares current packet payload to last packet payload by pid
+	Cues	     [] SpliceInfoSection
 	PIDs
 }
 
@@ -80,6 +81,7 @@ func (st *Stream) Decode(fname string) {
 			st.parse(*pkt)
 		}
 	}
+	
 }
 
 func (st *Stream) makePCR(prgm uint16) float64 {
@@ -277,9 +279,14 @@ func (st *Stream) parseScte35(pay []byte, pid uint16) {
 	seclen := parseLength(pay[1], pay[2])
 	if st.sectionDone(pay, pid, seclen) {
 		sis := st.makeSpliceInfoSection(pid)
-		sis.Decode(pay)
-		b, _ := json.MarshalIndent(sis, "", "\t")
-		_, _ = fmt.Fprintf(os.Stdout, "\nSplice Info Section: \n%s\n", b)
+		err := sis.Decode(pay)
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			b, _ := json.MarshalIndent(sis, "", "\t")
+			fmt.Printf("Splice Info Section: \n%s\n", b)
+			st.Cues = append(st.Cues, sis)
+		}
 	}
 }
 
@@ -294,7 +301,7 @@ func (st *Stream) makeSpliceInfoSection(pid uint16) *SpliceInfoSection {
 	packet.PTS = st.makePTS(*prgm)
 	packet.PacketNumber = st.pktNum
 	pkt, _ := json.MarshalIndent(packet, "", "\t")
-	_, _ = fmt.Fprintf(os.Stdout, "\nPacket Data: \n%s\n", pkt)
+	fmt.Printf("Packet Data: \n%s\n", pkt)
 	return sis
 }
 
