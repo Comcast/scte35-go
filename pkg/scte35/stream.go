@@ -280,14 +280,11 @@ func (st *Stream) parseScte35(pay []byte, pid uint16) {
 	seclen := parseLength(pay[1], pay[2])
 	if st.sectionDone(pay, pid, seclen) {
 		sis := st.makeSpliceInfoSection(pid)
-		err := sis.Decode(pay)
-		if err != nil {
-			fmt.Println(err)
-		} else {
-			b, _ := json.MarshalIndent(sis, "", "\t")
-			fmt.Printf("Splice Info Section: \n%s\n", b)
-			st.Cues = append(st.Cues, sis)
-		}
+		sis.Decode(pay)
+		b, _ := json.MarshalIndent(sis, "", "\t")
+		fmt.Printf("Splice Info Section: \n%s\n", b)
+		st.Cues = append(st.Cues, sis)
+		
 	}
 }
 
