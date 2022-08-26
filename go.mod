@@ -1,4 +1,4 @@
-module github.com/Comcast/scte35-go
+module github.com/futzu/scte35-go
 
 go 1.16
 
