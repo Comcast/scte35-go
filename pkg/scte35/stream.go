@@ -47,8 +47,9 @@ type Stream struct {
 	programToPTS map[uint16]uint64 //lookup table for program to pts
 	partial      map[uint16][]byte // partial manages tables spread across multiple packets by pid
 	last         map[uint16][]byte // last compares current packet payload to last packet payload by pid
-	Cues	     [] SpliceInfoSection
+	Cues	     []SpliceInfoSection
 	PIDs
+	
 }
 
 func (st *Stream) mkMaps() {
