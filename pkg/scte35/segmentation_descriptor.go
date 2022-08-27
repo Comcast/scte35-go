@@ -28,138 +28,12 @@ const (
 	// SegmentationDescriptorTag is the splice_descriptor_tag for
 	// segmentation_descriptor
 	SegmentationDescriptorTag = 0x02
-
-	// SegmentationTypeNotIndicated is the segmentation_type_id for Not Indicated.
-	SegmentationTypeNotIndicated = 0x00
-	// SegmentationTypeContentIdentification is the segmentation_type_id for
-	// Content Identification.
-	SegmentationTypeContentIdentification = 0x01
-	// SegmentationTypeProgramStart is the segmentation_type_id for Program Start.
-	SegmentationTypeProgramStart = 0x10
-	// SegmentationTypeProgramEnd is the segmentation_type_id for Program End.
-	SegmentationTypeProgramEnd = 0x11
-	// SegmentationTypeProgramEarlyTermination is the segmentation_type_id for
-	// Program Early Termination.
-	SegmentationTypeProgramEarlyTermination = 0x12
-	// SegmentationTypeProgramBreakaway is the segmentation_type_id for
-	// Program Breakaway.
-	SegmentationTypeProgramBreakaway = 0x13
-	// SegmentationTypeProgramResumption is the segmentation_type_id for Program
-	// Resumption.
-	SegmentationTypeProgramResumption = 0x14
-	// SegmentationTypeProgramRunoverPlanned is the segmentation_type_id for
-	// Program Runover Planned.
-	SegmentationTypeProgramRunoverPlanned = 0x15
-	// SegmentationTypeProgramRunoverUnplanned is the segmentation_type_id for
-	// Program Runover Unplanned.
-	SegmentationTypeProgramRunoverUnplanned = 0x16
-	// SegmentationTypeProgramOverlapStart is the segmentation_type_id for Program
-	// Overlap Start.
-	SegmentationTypeProgramOverlapStart = 0x17
-	// SegmentationTypeProgramBlackoutOverride is the segmentation_type_id for
-	// Program Blackout Override.
-	SegmentationTypeProgramBlackoutOverride = 0x18
-	// SegmentationTypeProgramStartInProgress is the segmentation_type_id for
-	// Program Start - In Progress.
-	SegmentationTypeProgramStartInProgress = 0x19
-	// SegmentationTypeChapterStart is the segmentation_type_id for Chapter Start.
-	SegmentationTypeChapterStart = 0x20
-	// SegmentationTypeChapterEnd is the segmentation_type_id for Chapter End.
-	SegmentationTypeChapterEnd = 0x21
-	// SegmentationTypeBreakStart is the segmentation_type_id for Break Start.
-	// Added in ANSI/SCTE 2017.
-	SegmentationTypeBreakStart = 0x22
-	// SegmentationTypeBreakEnd is the segmentation_type_id for Break End.
-	// Added in ANSI/SCTE 2017.
-	SegmentationTypeBreakEnd = 0x23
-	// SegmentationTypeOpeningCreditStart is the segmentation_type_id for
-	// Opening Credit Start. Added in ANSI/SCTE 2020.
-	SegmentationTypeOpeningCreditStart = 0x24
-	// SegmentationTypeOpeningCreditEnd is the segmentation_type_id for
-	// Opening Credit End. Added in ANSI/SCTE 2020.
-	SegmentationTypeOpeningCreditEnd = 0x25
-	// SegmentationTypeClosingCreditStart is the segmentation_type_id for
-	// Closing Credit Start. Added in ANSI/SCTE 2020.
-	SegmentationTypeClosingCreditStart = 0x26
-	// SegmentationTypeClosingCreditEnd is the segmentation_type_id for
-	// Closing Credit End. Added in ANSI/SCTE 2020.
-	SegmentationTypeClosingCreditEnd = 0x27
-	// SegmentationTypeProviderAdStart is the segmentation_type_id for Provider
-	// Ad Start.
-	SegmentationTypeProviderAdStart = 0x30
-	// SegmentationTypeProviderAdEnd is the segmentation_type_id for Provider Ad
-	// End.
-	SegmentationTypeProviderAdEnd = 0x31
-	// SegmentationTypeDistributorAdStart is the segmentation_type_id for
-	// Distributor Ad Start.
-	SegmentationTypeDistributorAdStart = 0x32
-	// SegmentationTypeDistributorAdEnd is the segmentation_type_id for
-	// Distributor Ad End.
-	SegmentationTypeDistributorAdEnd = 0x33
-	// SegmentationTypeProviderPOStart is the segmentation_type_id for Provider
 	// PO Start.
 	SegmentationTypeProviderPOStart = 0x34
-	// SegmentationTypeProviderPOEnd is the segmentation_type_id for Provider PO
-	// End.
-	SegmentationTypeProviderPOEnd = 0x35
-	// SegmentationTypeDistributorPOStart is the segmentation_type_id for
 	// Distributor PO Start.
 	SegmentationTypeDistributorPOStart = 0x36
 	// SegmentationTypeDistributorPOEnd is the segmentation_type_id for
-	// Distributor PO End.
-	SegmentationTypeDistributorPOEnd = 0x37
-	// SegmentationTypeProviderOverlayPOStart is the segmentation_type_id for
-	// Provider Overlay Placement Opportunity Start.
-	SegmentationTypeProviderOverlayPOStart = 0x38
-	// SegmentationTypeProviderOverlayPOEnd is the segmentation_type_id for
-	// Provider Overlay Placement Opportunity End.
-	SegmentationTypeProviderOverlayPOEnd = 0x39
-	// SegmentationTypeDistributorOverlayPOStart is the segmentation_type_id for
-	// Distributor Overlay Placement Opportunity Start.
-	SegmentationTypeDistributorOverlayPOStart = 0x3a
-	// SegmentationTypeDistributorOverlayPOEnd is the segmentation_type_id for
-	// Distributor Overlay Placement Opportunity End.
-	SegmentationTypeDistributorOverlayPOEnd = 0x3b
-	// SegmentationTypeProviderPromoStart is the segmentation_type_id for
-	// Provider Promo Start. Added in ANSI/SCTE 2020.
-	SegmentationTypeProviderPromoStart = 0x3c
-	// SegmentationTypeProviderPromoEnd is the segmentation_type_id for
-	// Provider Promo End. Added in ANSI/SCTE 2020.
-	SegmentationTypeProviderPromoEnd = 0x3d
-	// SegmentationTypeDistributorPromoStart is the segmentation_type_id for
-	// Distributor Promo Start. Added in ANSI/SCTE 2020.
-	SegmentationTypeDistributorPromoStart = 0x3e
-	// SegmentationTypeDistributorPromoEnd is the segmentation_type_id for
-	// Distributor Promo End. Added in ANSI/SCTE 2020.
-	SegmentationTypeDistributorPromoEnd = 0x3f
-	// SegmentationTypeUnscheduledEventStart is the segmentation_type_id for
-	// Unscheduled Event Start.
-	SegmentationTypeUnscheduledEventStart = 0x40
-	// SegmentationTypeUnscheduledEventEnd is the segmentation_type_id for
-	// Unscheduled Event End.
-	SegmentationTypeUnscheduledEventEnd = 0x41
-	// SegmentationTypeAltConOppStart is the segmentation_type_id for
-	// Alternate Content Opportunity Start. Added in ANSI/SCTE 2020.
-	SegmentationTypeAltConOppStart = 0x42
-	// SegmentationTypeAltConOppEnd is the segmentation_type_id for
-	// Alternate Content Opportunity End. Added in ANSI/SCTE 2020.
-	SegmentationTypeAltConOppEnd = 0x43
-	// SegmentationTypeProviderAdBlockStart is the segmentation_type_id for
-	// Provider Ad Block Start. Added in ANSI/SCTE 2020.
-	SegmentationTypeProviderAdBlockStart = 0x44
-	// SegmentationTypeProviderAdBlockEnd is the segmentation_type_id for
-	// Provider Ad Block End. Added in ANSI/SCTE 2020.
-	SegmentationTypeProviderAdBlockEnd = 0x45
-	// SegmentationTypeDistributorAdBlockStart is the segmentation_type_id for
-	// Distributor Ad Block Start. Added in ANSI/SCTE 2020.
-	SegmentationTypeDistributorAdBlockStart = 0x46
-	// SegmentationTypeDistributorAdBlockEnd is the segmentation_type_id for
-	// Distributor Ad Block End. Added in ANSI/SCTE 2020.
-	SegmentationTypeDistributorAdBlockEnd = 0x47
-	// SegmentationTypeNetworkStart is the segmentation_type_id for Network Start.
-	SegmentationTypeNetworkStart = 0x50
-	// SegmentationTypeNetworkEnd is the segmentation_type_id for Network End.
-	SegmentationTypeNetworkEnd = 0x51
+
 )
 
 // SegmentationDescriptor is an implementation of a splice_descriptor(). It
@@ -188,102 +62,50 @@ type SegmentationDescriptor struct {
 
 // Name returns the human readable string for the segmentation_type_id.
 func (sd *SegmentationDescriptor) Name() string {
-	switch sd.SegmentationTypeID {
-	case SegmentationTypeNotIndicated:
-		return "Not Indicated"
-	case SegmentationTypeContentIdentification:
-		return "Content Identification"
-	case SegmentationTypeProgramStart:
-		return "Program Start"
-	case SegmentationTypeProgramEnd:
-		return "Program End"
-	case SegmentationTypeProgramEarlyTermination:
-		return "Program Early Termination"
-	case SegmentationTypeProgramBreakaway:
-		return "Program Breakaway"
-	case SegmentationTypeProgramResumption:
-		return "Program Resumption"
-	case SegmentationTypeProgramRunoverPlanned:
-		return "Program Runover Planned"
-	case SegmentationTypeProgramRunoverUnplanned:
-		return "Program Runover Unplanned"
-	case SegmentationTypeProgramOverlapStart:
-		return "Program Overlap Start"
-	case SegmentationTypeProgramBlackoutOverride:
-		return "Program Blackout Override"
-	case SegmentationTypeProgramStartInProgress:
-		return "Program Start - In Progress"
-	case SegmentationTypeChapterStart:
-		return "Chapter Start"
-	case SegmentationTypeChapterEnd:
-		return "Chapter End"
-	case SegmentationTypeBreakStart:
-		return "Break Start"
-	case SegmentationTypeBreakEnd:
-		return "Break End"
-	case SegmentationTypeOpeningCreditStart:
-		return "Opening Credit Start"
-	case SegmentationTypeOpeningCreditEnd:
-		return "Opening Credit End"
-	case SegmentationTypeClosingCreditStart:
-		return "Closing Credit Start"
-	case SegmentationTypeClosingCreditEnd:
-		return "Closing Credit End"
-	case SegmentationTypeProviderAdStart:
-		return "Provider Advertisement Start"
-	case SegmentationTypeProviderAdEnd:
-		return "Provider Advertisement End"
-	case SegmentationTypeDistributorAdStart:
-		return "Distributor Advertisement Start"
-	case SegmentationTypeDistributorAdEnd:
-		return "Distributor Advertisement End"
-	case SegmentationTypeProviderPOStart:
-		return "Provider Placement Opportunity Start"
-	case SegmentationTypeProviderPOEnd:
-		return "Provider Placement Opportunity End"
-	case SegmentationTypeDistributorPOStart:
-		return "Distributor Placement Opportunity Start"
-	case SegmentationTypeDistributorPOEnd:
-		return "Distributor Placement Opportunity End"
-	case SegmentationTypeProviderOverlayPOStart:
-		return "Provider Overlay Placement Opportunity Start"
-	case SegmentationTypeProviderOverlayPOEnd:
-		return "Provider Overlay Placement Opportunity End"
-	case SegmentationTypeDistributorOverlayPOStart:
-		return "Distributor Overlay Placement Opportunity Start"
-	case SegmentationTypeDistributorOverlayPOEnd:
-		return "Distributor Overlay Placement Opportunity End"
-	case SegmentationTypeProviderPromoStart:
-		return "Provider Promo Start"
-	case SegmentationTypeProviderPromoEnd:
-		return "Provider Promo End"
-	case SegmentationTypeDistributorPromoStart:
-		return "Distributor Promo Start"
-	case SegmentationTypeDistributorPromoEnd:
-		return "Distributor Promo End"
-	case SegmentationTypeUnscheduledEventStart:
-		return "Unscheduled Event Start"
-	case SegmentationTypeUnscheduledEventEnd:
-		return "Unscheduled Event End"
-	case SegmentationTypeAltConOppStart:
-		return "Alternate Content Opportunity Start"
-	case SegmentationTypeAltConOppEnd:
-		return "Alternate Content Opportunity End"
-	case SegmentationTypeProviderAdBlockStart:
-		return "Provider Ad Block Start"
-	case SegmentationTypeProviderAdBlockEnd:
-		return "Provider Ad Block End"
-	case SegmentationTypeDistributorAdBlockStart:
-		return "Distributor Ad Block Start"
-	case SegmentationTypeDistributorAdBlockEnd:
-		return "Distributor Ad Block End"
-	case SegmentationTypeNetworkStart:
-		return "Network Start"
-	case SegmentationTypeNetworkEnd:
-		return "Network End"
-	default:
-		return "Unknown"
+
+	var table22 = map[uint32]string{
+		0x00: "Not Indicated",
+		0x01: "Content Identification",
+		0x10: "Program Start",
+		0x11: "Program End",
+		0x12: "Program Early Termination",
+		0x13: "Program Breakaway",
+		0x14: "Program Resumption",
+		0x15: "Program Runover Planned",
+		0x16: "Program RunoverUnplanned",
+		0x17: "Program Overlap Start",
+		0x18: "Program Blackout Override",
+		0x19: "Program Start ??? In Progress",
+		0x20: "Chapter Start",
+		0x21: "Chapter End",
+		0x22: "Break Start",
+		0x23: "Break End",
+		0x24: "Opening Credit Start",
+		0x25: "Opening Credit End",
+		0x26: "Closing Credit Start",
+		0x27: "Closing Credit End",
+		0x30: "Provider Advertisement Start",
+		0x31: "Provider Advertisement End",
+		0x32: "Distributor Advertisement Start",
+		0x33: "Distributor Advertisement End",
+		0x34: "Provider Placement Opportunity Start",
+		0x35: "Provider Placement Opportunity End",
+		0x36: "Distributor Placement Opportunity Start",
+		0x37: "Distributor Placement Opportunity End",
+		0x38: "Provider Overlay Placement Opportunity Start",
+		0x39: "Provider Overlay Placement Opportunity End",
+		0x3A: "Distributor Overlay Placement Opportunity Start",
+		0x3B: "Distributor Overlay Placement Opportunity End",
+		0x40: "Unscheduled Event Start",
+		0x41: "Unscheduled Event End",
+		0x50: "Network Start",
+		0x51: "Network End",
 	}
+	mesg, ok := table22[sd.SegmentationTypeID]
+	if ok {
+		return mesg
+	}
+	return "Unknown"
 }
 
 // Tag returns the splice_descriptor_tag.
