@@ -62,10 +62,10 @@ func TestStreamSCTE35(t *testing.T) {
 				got, _ := json.Marshal(cue)
 				out, _ := AreEqualJSON(c.want, got)
 				if !out {
-					t.Errorf("Wanted:\n %s\nGot: %s", c.want, got)
+					t.Errorf("\n%s\nWanted:\n %s\nGot:\n%s",c.name, c.want, got)
 				}
 			} else {
-				t.Errorf("No Cues in Stream %s", c.arg)
+				t.Errorf("\nNo Cues in Stream %s", c.arg)
 			}
 		})
 	}
@@ -97,10 +97,10 @@ func TestPacketData(t *testing.T) {
 			if len(strm.Cues) > 0 {
 				got := strm.Cues[0].PacketData
 				if got != c.want {
-					t.Errorf("Wanted:\n %v\nGot: %v", c.want, got)
+					t.Errorf("\n%s\nWanted:\n %v\nGot:\n%v",c.name, c.want, got)
 				}
 			} else {
-				t.Errorf("No Cues in Stream %s", c.arg)
+				t.Errorf("\nNo Cues in Stream %s", c.arg)
 			}
 		})
 	}
