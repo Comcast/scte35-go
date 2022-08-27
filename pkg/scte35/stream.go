@@ -45,6 +45,7 @@ type Cue struct {
 
 // Stream for parsing MPEGTS for SCTE-35
 type Stream struct {
+	Silent       bool
 	pktNum       int // packet count.
 	programs     []uint16
 	pidToProgram map[uint16]uint16 //lookup table for pid to program
@@ -52,12 +53,11 @@ type Stream struct {
 	programToPTS map[uint16]uint64 //lookup table for program to pts
 	partial      map[uint16][]byte // partial manages tables spread across multiple packets by pid
 	last         map[uint16][]byte // last compares current packet payload to last packet payload by pid
-	Cues         []Cue
+	Cues         []*Cue
 	PIDs
-	Silent bool
 }
 
-func (strm *Stream) mkMaps() {
+func (strm *Stream) makeMaps() {
 	strm.pidToProgram = make(map[uint16]uint16)
 	strm.last = make(map[uint16][]byte)
 	strm.partial = make(map[uint16][]byte)
@@ -67,7 +67,7 @@ func (strm *Stream) mkMaps() {
 
 // Decode fname (a file name) for SCTE-35
 func (strm *Stream) Decode(fname string) {
-	strm.mkMaps()
+	strm.makeMaps()
 	strm.pktNum = 0
 	file, err := os.Open(fname)
 	check(err)
@@ -90,16 +90,19 @@ func (strm *Stream) Decode(fname string) {
 
 }
 
+// read PCR ticks by program and set to 90k
 func (strm *Stream) makePCR(prgm uint16) float64 {
 	pcrb := strm.programToPCR[prgm]
 	return make90K(pcrb)
 }
 
+// read PTS ticks by program and set to 90k
 func (strm *Stream) makePTS(prgm uint16) float64 {
 	pts := strm.programToPTS[prgm]
 	return make90K(pts)
 }
 
+// parse packet for PUSI flag
 func (strm *Stream) parsePUSI(pkt []byte) bool {
 	if (pkt[1]>>6)&1 == 1 {
 		if pkt[6]&1 == 1 {
@@ -109,6 +112,7 @@ func (strm *Stream) parsePUSI(pkt []byte) bool {
 	return false
 }
 
+//parse PTS from packet and save
 func (strm *Stream) parsePTS(pkt []byte, pid uint16) {
 	if strm.parsePUSI(pkt) {
 		prgm, ok := strm.pidToProgram[pid]
@@ -123,7 +127,7 @@ func (strm *Stream) parsePTS(pkt []byte, pid uint16) {
 	}
 }
 
-//
+// parse PCR from packet and save
 func (strm *Stream) parsePCR(pkt []byte, pid uint16) {
 	if (pkt[3]>>5)&1 == 1 {
 		if (pkt[5]>>4)&1 == 1 {
@@ -206,6 +210,7 @@ func (strm *Stream) parse(pkt []byte) {
 	}
 }
 
+// parse PAT
 func (strm *Stream) parsePAT(pay []byte, pid uint16) {
 	if strm.sameAsLast(pay, pid) {
 		return
@@ -234,6 +239,7 @@ func (strm *Stream) parsePAT(pay []byte, pid uint16) {
 	}
 }
 
+// parse PMT
 func (strm *Stream) parsePMT(pay []byte, pid uint16) {
 	if strm.sameAsLast(pay, pid) {
 		return
@@ -256,6 +262,7 @@ func (strm *Stream) parsePMT(pay []byte, pid uint16) {
 	}
 }
 
+// parse streams in a program
 func (strm *Stream) parseStreams(silen uint16, pay []byte, idx uint16, prgm uint16) {
 	chunksize := uint16(5)
 	endidx := (idx + silen) - chunksize
@@ -270,12 +277,14 @@ func (strm *Stream) parseStreams(silen uint16, pay []byte, idx uint16, prgm uint
 	}
 }
 
+// verify SCTE35 stream type
 func (strm *Stream) verifyStreamType(pid uint16, streamtype uint8) {
 	if streamtype == 6 || streamtype == 134 {
 		strm.addSCTE35PID(pid)
 	}
 }
 
+// parse SCTE35 Table
 func (strm *Stream) parseScte35(pay []byte, pid uint16) {
 	pay = strm.checkPartial(pay, pid, []byte("\xfc0"))
 	if len(pay) == 0 {
@@ -295,13 +304,11 @@ func (strm *Stream) parseScte35(pay []byte, pid uint16) {
 	}
 }
 
-func (strm *Stream) makeCue(pid uint16) Cue {
-	//sis := SpliceInfoSection{}
+// Make a SCTE35 Cue and include packet data.
+func (strm *Stream) makeCue(pid uint16) *Cue {
 	p := strm.pidToProgram[pid]
 	prgm := &p
-	var cue Cue
-	//cue.SpliceInfoSection = sis
-	//var packet PacketData
+	cue := &Cue{}
 	cue.PacketData.PID = pid
 	cue.PacketData.Program = *prgm
 	cue.PacketData.PCR = strm.makePCR(*prgm)
@@ -330,23 +337,28 @@ func isIn8(slice []uint8, val uint8) bool {
 	return false
 }
 
+// make ticks into 90k timestamps
 func make90K(raw uint64) float64 {
 	nk := float64(raw) / 90000.0
 	return float64(uint64(nk*1000000)) / 1000000
 }
 
+// parse mpegts section lengths and such
 func parseLength(byte1 byte, byte2 byte) uint16 {
 	return uint16(byte1&0xf)<<8 | uint16(byte2)
 }
 
+// parse PID using two bytes
 func parsePID(byte1 byte, byte2 byte) uint16 {
 	return uint16(byte1&0x1f)<<8 | uint16(byte2)
 }
 
+// parse program using two bytes
 func parseProgram(byte1 byte, byte2 byte) uint16 {
 	return uint16(byte1)<<8 | uint16(byte2)
 }
 
+// split payload
 func splitByIndex(payload, sep []byte) []byte {
 	idx := bytes.Index(payload, sep)
 	if idx == -1 {
