@@ -28,13 +28,10 @@ const (
 	// SegmentationDescriptorTag is the splice_descriptor_tag for
 	// segmentation_descriptor
 	SegmentationDescriptorTag = 0x02
-	// PO Start.
-	SegmentationTypeProviderPOStart = 0x34
-	// Distributor PO Start.
-	SegmentationTypeDistributorPOStart = 0x36
-	// SegmentationTypeDistributorPOEnd is the segmentation_type_id for
-
 )
+
+// SegmentTypeIDs that get sub segments
+var SubSegmentTypeIDs = []uint8{0x34, 0x36, 0x38, 0x3a}
 
 // SegmentationDescriptor is an implementation of a splice_descriptor(). It
 // provides an optional extension to the time_signal() and splice_insert()
@@ -218,7 +215,7 @@ func (sd *SegmentationDescriptor) decode(b []byte) error {
 
 		// these fields are new in 2016 so we need a secondary check whether they were actually included
 		// in the binary payload
-		if sd.SegmentationTypeID == SegmentationTypeProviderPOStart || sd.SegmentationTypeID == SegmentationTypeDistributorPOStart {
+		if isIn8(SubSegmentTypeIDs, uint8(sd.SegmentationTypeID)) {
 			if r.LeftBits() == 16 {
 				n := r.Uint32(8)
 				e := r.Uint32(8)
