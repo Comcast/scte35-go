@@ -39,7 +39,7 @@ type PacketData struct {
 }
 
 type Cue struct {
-	Message *SpliceInfoSection
+	SpliceInfoSection
 	PacketData
 }
 
@@ -271,7 +271,7 @@ func (st *Stream) parseStreams(silen uint16, pay []byte, idx uint16, prgm uint16
 }
 
 func (st *Stream) verifyStreamType(pid uint16, streamtype uint8) {
-	if streamtype == 134 {
+	if streamtype == 6 || streamtype == 134 {
 		st.addSCTE35PID(pid)
 	}
 }
@@ -284,22 +284,24 @@ func (st *Stream) parseScte35(pay []byte, pid uint16) {
 	}
 	seclen := parseLength(pay[1], pay[2])
 	if st.sectionDone(pay, pid, seclen) {
-		cue := st.makeSpliceInfoSection(pid)
-		cue.Message.Decode(pay)
+		cue := st.makeCue(pid)
+		cue.SpliceInfoSection.Decode(pay)
 		if !(st.Silent) {
 			b, _ := json.MarshalIndent(cue, "", "\t")
 			fmt.Printf("Cue: \n%s\n", b)
 		}
 		st.Cues = append(st.Cues, cue)
+
 	}
 }
 
-func (st *Stream) makeSpliceInfoSection(pid uint16) Cue {
-	sis := &SpliceInfoSection{}
+func (st *Stream) makeCue(pid uint16) Cue {
+	//sis := SpliceInfoSection{}
 	p := st.pidToProgram[pid]
 	prgm := &p
 	var cue Cue
-	cue.Message = sis
+	//cue.SpliceInfoSection = sis
+	//var packet PacketData
 	cue.PacketData.PID = pid
 	cue.PacketData.Program = *prgm
 	cue.PacketData.PCR = st.makePCR(*prgm)
