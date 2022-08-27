@@ -38,6 +38,11 @@ type PacketData struct {
 	PTS          float64 `json:",omitempty"`
 }
 
+type Cue struct {
+	Message *SpliceInfoSection
+	PacketData
+}
+
 // Stream for parsing MPEGTS for SCTE-35
 type Stream struct {
 	pktNum       int // packet count.
@@ -47,9 +52,9 @@ type Stream struct {
 	programToPTS map[uint16]uint64 //lookup table for program to pts
 	partial      map[uint16][]byte // partial manages tables spread across multiple packets by pid
 	last         map[uint16][]byte // last compares current packet payload to last packet payload by pid
-	Cues	     []*SpliceInfoSection
+	Cues         []Cue
 	PIDs
-	
+	Silent bool
 }
 
 func (st *Stream) mkMaps() {
@@ -82,7 +87,7 @@ func (st *Stream) Decode(fname string) {
 			st.parse(*pkt)
 		}
 	}
-	
+
 }
 
 func (st *Stream) makePCR(prgm uint16) float64 {
@@ -266,7 +271,7 @@ func (st *Stream) parseStreams(silen uint16, pay []byte, idx uint16, prgm uint16
 }
 
 func (st *Stream) verifyStreamType(pid uint16, streamtype uint8) {
-	if streamtype == 6 || streamtype == 134 {
+	if streamtype == 134 {
 		st.addSCTE35PID(pid)
 	}
 }
@@ -279,28 +284,28 @@ func (st *Stream) parseScte35(pay []byte, pid uint16) {
 	}
 	seclen := parseLength(pay[1], pay[2])
 	if st.sectionDone(pay, pid, seclen) {
-		sis := st.makeSpliceInfoSection(pid)
-		sis.Decode(pay)
-		b, _ := json.MarshalIndent(sis, "", "\t")
-		fmt.Printf("Splice Info Section: \n%s\n", b)
-		st.Cues = append(st.Cues, sis)
-		
+		cue := st.makeSpliceInfoSection(pid)
+		cue.Message.Decode(pay)
+		if !(st.Silent) {
+			b, _ := json.MarshalIndent(cue, "", "\t")
+			fmt.Printf("Cue: \n%s\n", b)
+		}
+		st.Cues = append(st.Cues, cue)
 	}
 }
 
-func (st *Stream) makeSpliceInfoSection(pid uint16) *SpliceInfoSection {
+func (st *Stream) makeSpliceInfoSection(pid uint16) Cue {
 	sis := &SpliceInfoSection{}
 	p := st.pidToProgram[pid]
 	prgm := &p
-	var packet PacketData
-	packet.PID = pid
-	packet.Program = *prgm
-	packet.PCR = st.makePCR(*prgm)
-	packet.PTS = st.makePTS(*prgm)
-	packet.PacketNumber = st.pktNum
-	pkt, _ := json.MarshalIndent(packet, "", "\t")
-	fmt.Printf("Packet Data: \n%s\n", pkt)
-	return sis
+	var cue Cue
+	cue.Message = sis
+	cue.PacketData.PID = pid
+	cue.PacketData.Program = *prgm
+	cue.PacketData.PCR = st.makePCR(*prgm)
+	cue.PacketData.PTS = st.makePTS(*prgm)
+	cue.PacketData.PacketNumber = st.pktNum
+	return cue
 }
 
 // isIn16 is a test for slice membership
