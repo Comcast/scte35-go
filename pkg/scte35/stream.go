@@ -296,8 +296,11 @@ func (strm *Stream) parseScte35(pay []byte, pid uint16) {
 		cue := strm.makeCue(pid)
 		cue.SpliceInfoSection.Decode(pay)
 		if !(strm.Silent) {
-			b, _ := json.MarshalIndent(cue, "", "\t")
-			fmt.Printf("Cue: \n%s\n", b)
+			a, _ := json.MarshalIndent(cue.SpliceInfoSection, "", "    ")
+			fmt.Printf("Splice Info Section: \n%s\n", a)
+
+			b, _ := json.MarshalIndent(cue.PacketData, "", "    ")
+			fmt.Printf("Packet Data: \n%s\n", b)
 		}
 		strm.Cues = append(strm.Cues, cue)
 
@@ -309,14 +312,9 @@ func (strm *Stream) makeCue(pid uint16) *Cue {
 	p := strm.pidToProgram[pid]
 	prgm := &p
 	cue := &Cue{}
-	cue.PacketData.PID = pid
-	cue.PacketData.Program = *prgm
-	cue.PacketData.PCR = strm.makePCR(*prgm)
-	cue.PacketData.PTS = strm.makePTS(*prgm)
-	cue.PacketData.PacketNumber = strm.pktNum
+	cue.PacketData = PacketData{PID: pid, Program: *prgm, PCR: strm.makePCR(*prgm), PTS: strm.makePTS(*prgm), PacketNumber: strm.pktNum}
 	return cue
 }
-
 
 // make ticks into 90k timestamps
 func make90K(raw uint64) float64 {
