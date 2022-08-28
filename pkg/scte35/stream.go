@@ -353,3 +353,23 @@ func check(e error) {
 
 	}
 }
+
+// isIn8 is a test for slice membership
+func isIn8(slice []uint8, val uint8) bool {
+	for _, item := range slice {
+		if item == val {
+			return true
+		}
+	}
+	return false
+}
+
+// isIn16 is a test for slice membership
+func isIn16(slice []uint16, val uint16) bool {
+	for _, item := range slice {
+		if item == val {
+			return true
+		}
+	}
+	return false
+}
