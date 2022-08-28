@@ -202,8 +202,8 @@ func (strm *Stream) parse(pkt []byte) {
 	}
 	if strm.isPCRPID(*pid) {
 		strm.parsePCR(pkt, *pid)
-	} else {
-		strm.parsePTS(pkt, *pid)
+	}
+	strm.parsePTS(pkt, *pid)
 	}
 	if strm.isSCTE35PID(*pid) {
 		strm.parseScte35(*pay, *pid)
