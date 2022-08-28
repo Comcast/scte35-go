@@ -79,7 +79,7 @@ func TestPacketData(t *testing.T) {
 	}{
 		{
 			name: "Stream Packet Data Test:  test/test1.ts",
-			want: PacketData{PacketNumber: 2283, PID: 515, Program: 51, PCR: 38199.918911, PTS: 38199.872111},
+			want: PacketData{PacketNumber: 2283, PID: 515, Program: 51, PCR: 38199.918911, PTS: 38200.756444},
 			arg:  "test/test1.ts"},
 		{
 			name: "Stream Packet Data Test:  test/test2.ts",
