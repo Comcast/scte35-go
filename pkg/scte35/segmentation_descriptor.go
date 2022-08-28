@@ -28,6 +28,7 @@ const (
 	// SegmentationDescriptorTag is the splice_descriptor_tag for
 	// segmentation_descriptor
 	SegmentationDescriptorTag = 0x02
+
 	// SegmentationTypeNotIndicated is the segmentation_type_id for Not Indicated.
 	SegmentationTypeNotIndicated = 0x00
 	// SegmentationTypeContentIdentification is the segmentation_type_id for
@@ -161,12 +162,6 @@ const (
 	SegmentationTypeNetworkEnd = 0x51
 )
 
-// SegmentTypeIDs that get sub segments
-var SubSegmentTypeIDs = []uint8{SegmentationTypeProviderPOStart, 
-				SegmentationTypeDistributorPOStart , 
-				SegmentationTypeProviderOverlayPOStart, 
-				SegmentationTypeDistributorOverlayPOStart}
-
 // SegmentationDescriptor is an implementation of a splice_descriptor(). It
 // provides an optional extension to the time_signal() and splice_insert()
 // commands that allows for segmentation messages to be sent in a time/video
@@ -193,50 +188,102 @@ type SegmentationDescriptor struct {
 
 // Name returns the human readable string for the segmentation_type_id.
 func (sd *SegmentationDescriptor) Name() string {
-
-	var table22 = map[uint8]string{
-		0x00: "Not Indicated",
-		0x01: "Content Identification",
-		0x10: "Program Start",
-		0x11: "Program End",
-		0x12: "Program Early Termination",
-		0x13: "Program Breakaway",
-		0x14: "Program Resumption",
-		0x15: "Program Runover Planned",
-		0x16: "Program RunoverUnplanned",
-		0x17: "Program Overlap Start",
-		0x18: "Program Blackout Override",
-		0x19: "Program Start ??? In Progress",
-		0x20: "Chapter Start",
-		0x21: "Chapter End",
-		0x22: "Break Start",
-		0x23: "Break End",
-		0x24: "Opening Credit Start",
-		0x25: "Opening Credit End",
-		0x26: "Closing Credit Start",
-		0x27: "Closing Credit End",
-		0x30: "Provider Advertisement Start",
-		0x31: "Provider Advertisement End",
-		0x32: "Distributor Advertisement Start",
-		0x33: "Distributor Advertisement End",
-		0x34: "Provider Placement Opportunity Start",
-		0x35: "Provider Placement Opportunity End",
-		0x36: "Distributor Placement Opportunity Start",
-		0x37: "Distributor Placement Opportunity End",
-		0x38: "Provider Overlay Placement Opportunity Start",
-		0x39: "Provider Overlay Placement Opportunity End",
-		0x3A: "Distributor Overlay Placement Opportunity Start",
-		0x3B: "Distributor Overlay Placement Opportunity End",
-		0x40: "Unscheduled Event Start",
-		0x41: "Unscheduled Event End",
-		0x50: "Network Start",
-		0x51: "Network End",
+	switch sd.SegmentationTypeID {
+	case SegmentationTypeNotIndicated:
+		return "Not Indicated"
+	case SegmentationTypeContentIdentification:
+		return "Content Identification"
+	case SegmentationTypeProgramStart:
+		return "Program Start"
+	case SegmentationTypeProgramEnd:
+		return "Program End"
+	case SegmentationTypeProgramEarlyTermination:
+		return "Program Early Termination"
+	case SegmentationTypeProgramBreakaway:
+		return "Program Breakaway"
+	case SegmentationTypeProgramResumption:
+		return "Program Resumption"
+	case SegmentationTypeProgramRunoverPlanned:
+		return "Program Runover Planned"
+	case SegmentationTypeProgramRunoverUnplanned:
+		return "Program Runover Unplanned"
+	case SegmentationTypeProgramOverlapStart:
+		return "Program Overlap Start"
+	case SegmentationTypeProgramBlackoutOverride:
+		return "Program Blackout Override"
+	case SegmentationTypeProgramStartInProgress:
+		return "Program Start - In Progress"
+	case SegmentationTypeChapterStart:
+		return "Chapter Start"
+	case SegmentationTypeChapterEnd:
+		return "Chapter End"
+	case SegmentationTypeBreakStart:
+		return "Break Start"
+	case SegmentationTypeBreakEnd:
+		return "Break End"
+	case SegmentationTypeOpeningCreditStart:
+		return "Opening Credit Start"
+	case SegmentationTypeOpeningCreditEnd:
+		return "Opening Credit End"
+	case SegmentationTypeClosingCreditStart:
+		return "Closing Credit Start"
+	case SegmentationTypeClosingCreditEnd:
+		return "Closing Credit End"
+	case SegmentationTypeProviderAdStart:
+		return "Provider Advertisement Start"
+	case SegmentationTypeProviderAdEnd:
+		return "Provider Advertisement End"
+	case SegmentationTypeDistributorAdStart:
+		return "Distributor Advertisement Start"
+	case SegmentationTypeDistributorAdEnd:
+		return "Distributor Advertisement End"
+	case SegmentationTypeProviderPOStart:
+		return "Provider Placement Opportunity Start"
+	case SegmentationTypeProviderPOEnd:
+		return "Provider Placement Opportunity End"
+	case SegmentationTypeDistributorPOStart:
+		return "Distributor Placement Opportunity Start"
+	case SegmentationTypeDistributorPOEnd:
+		return "Distributor Placement Opportunity End"
+	case SegmentationTypeProviderOverlayPOStart:
+		return "Provider Overlay Placement Opportunity Start"
+	case SegmentationTypeProviderOverlayPOEnd:
+		return "Provider Overlay Placement Opportunity End"
+	case SegmentationTypeDistributorOverlayPOStart:
+		return "Distributor Overlay Placement Opportunity Start"
+	case SegmentationTypeDistributorOverlayPOEnd:
+		return "Distributor Overlay Placement Opportunity End"
+	case SegmentationTypeProviderPromoStart:
+		return "Provider Promo Start"
+	case SegmentationTypeProviderPromoEnd:
+		return "Provider Promo End"
+	case SegmentationTypeDistributorPromoStart:
+		return "Distributor Promo Start"
+	case SegmentationTypeDistributorPromoEnd:
+		return "Distributor Promo End"
+	case SegmentationTypeUnscheduledEventStart:
+		return "Unscheduled Event Start"
+	case SegmentationTypeUnscheduledEventEnd:
+		return "Unscheduled Event End"
+	case SegmentationTypeAltConOppStart:
+		return "Alternate Content Opportunity Start"
+	case SegmentationTypeAltConOppEnd:
+		return "Alternate Content Opportunity End"
+	case SegmentationTypeProviderAdBlockStart:
+		return "Provider Ad Block Start"
+	case SegmentationTypeProviderAdBlockEnd:
+		return "Provider Ad Block End"
+	case SegmentationTypeDistributorAdBlockStart:
+		return "Distributor Ad Block Start"
+	case SegmentationTypeDistributorAdBlockEnd:
+		return "Distributor Ad Block End"
+	case SegmentationTypeNetworkStart:
+		return "Network Start"
+	case SegmentationTypeNetworkEnd:
+		return "Network End"
+	default:
+		return "Unknown"
 	}
-	mesg, ok := table22[uint8(sd.SegmentationTypeID)]
-	if ok {
-		return mesg
-	}
-	return "Unknown"
 }
 
 // Tag returns the splice_descriptor_tag.
@@ -349,7 +396,7 @@ func (sd *SegmentationDescriptor) decode(b []byte) error {
 
 		// these fields are new in 2016 so we need a secondary check whether they were actually included
 		// in the binary payload
-		if isIn8(SubSegmentTypeIDs, uint8(sd.SegmentationTypeID)) {
+		if sd.SegmentationTypeID == SegmentationTypeProviderPOStart || sd.SegmentationTypeID == SegmentationTypeDistributorPOStart {
 			if r.LeftBits() == 16 {
 				n := r.Uint32(8)
 				e := r.Uint32(8)
