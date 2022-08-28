@@ -102,30 +102,28 @@ func (strm *Stream) makePTS(prgm uint16) float64 {
 	return make90K(pts)
 }
 
-// parse packet for PUSI flag
-func (strm *Stream) parsePUSI(pkt []byte) bool {
-	if (pkt[1]>>6)&1 == 1 {
-		if pkt[6]&1 == 1 {
-			return true
-		}
-	}
-	return false
+func (strm *Stream) parsePusi(pkt []byte) bool {
+	return (pkt[1] & 0x40 == 0x40) 	
 }
-
-//parse PTS from packet and save
-func (strm *Stream) parsePTS(pkt []byte, pid uint16) {
-	if strm.parsePUSI(pkt) {
+		
+func (strm *Stream) ptsFlag(pay []byte) bool {
+	return (pay[7] & 0x80 == 0x80)
+}
+		
+func (strm *Stream) parsePTS(pay []byte, pid uint16) {
+	if strm.ptsFlag(pay) {
 		prgm, ok := strm.pidToProgram[pid]
 		if ok {
-			pts := (uint64(pkt[13]) >> 1 & 7) << 30
-			pts |= uint64(pkt[14]) << 22
-			pts |= (uint64(pkt[15]) >> 1) << 15
-			pts |= uint64(pkt[16]) << 7
-			pts |= uint64(pkt[17]) >> 1
+			pts := (uint64(pay[9]) >> 1 & 7) << 30
+			pts |= uint64(pay[10]) << 22
+			pts |= (uint64(pay[11]) >> 1) << 15
+			pts |= uint64(pay[12]) << 7
+			pts |= uint64(pay[13]) >> 1
 			strm.programToPTS[prgm] = pts
 		}
 	}
 }
+
 
 // parse PCR from packet and save
 func (strm *Stream) parsePCR(pkt []byte, pid uint16) {
@@ -203,7 +201,9 @@ func (strm *Stream) parse(pkt []byte) {
 	if strm.isPCRPID(*pid) {
 		strm.parsePCR(pkt, *pid)
 	}
-	strm.parsePTS(pkt, *pid)
+	if strm.parsePusi(pkt){
+		strm.parsePTS(*pay, *pid)
+	}
 	if strm.isSCTE35PID(*pid) {
 		strm.parseScte35(*pay, *pid)
 	}
