@@ -83,12 +83,12 @@ func TestPacketData(t *testing.T) {
 			arg:  "test/test1.ts"},
 		{
 			name: "Stream Packet Data Test:  test/test2.ts",
-			want: PacketData{PacketNumber: 573, PID: 258, Program: 1, PCR: 595.9, PTS: 95443.717677},
+			want: PacketData{PacketNumber: 573, PID: 258, Program: 1, PCR: 595.9, PTS: 596.684688},
 			arg:  "test/test2.ts"},
 
 		{
 			name: "Stream Packet Data Test:  test/test3.ts",
-			want: PacketData{PacketNumber: 1672, PID: 309, Program: 1, PCR: 89975.5132, PTS: 89975.521522},
+			want: PacketData{PacketNumber: 1672, PID: 309, Program: 1, PCR: 89975.5132, PTS: 89978.421666},
 			arg:  "test/test3.ts"},
 	}
 	for _, c := range cases {
