@@ -162,7 +162,10 @@ const (
 )
 
 // SegmentTypeIDs that get sub segments
-var SubSegmentTypeIDs = []uint8{0x34, 0x36, 0x38, 0x3a}
+var SubSegmentTypeIDs = []uint8{SegmentationTypeProviderPOStart, 
+				SegmentationTypeDistributorPOStart , 
+				SegmentationTypeProviderOverlayPOStart, 
+				SegmentationTypeDistributorOverlayPOStart}
 
 // SegmentationDescriptor is an implementation of a splice_descriptor(). It
 // provides an optional extension to the time_signal() and splice_insert()
@@ -191,7 +194,7 @@ type SegmentationDescriptor struct {
 // Name returns the human readable string for the segmentation_type_id.
 func (sd *SegmentationDescriptor) Name() string {
 
-	var table22 = map[uint32]string{
+	var table22 = map[uint8]string{
 		0x00: "Not Indicated",
 		0x01: "Content Identification",
 		0x10: "Program Start",
@@ -229,7 +232,7 @@ func (sd *SegmentationDescriptor) Name() string {
 		0x50: "Network Start",
 		0x51: "Network End",
 	}
-	mesg, ok := table22[sd.SegmentationTypeID]
+	mesg, ok := table22[uint8(sd.SegmentationTypeID)]
 	if ok {
 		return mesg
 	}
