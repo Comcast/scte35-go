@@ -176,17 +176,17 @@ type SegmentationDescriptor struct {
 	DeliveryRestrictions             *DeliveryRestrictions             `xml:"http://www.scte.org/schemas/35 DeliveryRestrictions" json:"deliveryRestrictions"`
 	SegmentationUPIDs                []SegmentationUPID                `xml:"http://www.scte.org/schemas/35 SegmentationUpid" json:"segmentationUpids"`
 	Components                       []SegmentationDescriptorComponent `xml:"http://www.scte.org/schemas/35 Component" json:"components"`
-	SegmentationEventID              uint32                            `xml:"segmentationEventId,attr" json:"segmentationEventId"`
-	SegmentationEventCancelIndicator bool                              `xml:"segmentationEventCancelIndicator,attr" json:"segmentationEventCancelIndicator"`
+	SegmentationEventID              uint32                            `xml:"segmentationEventId,attr,omitempty" json:"segmentationEventId,omitempty"`
+	SegmentationEventCancelIndicator bool                              `xml:"segmentationEventCancelIndicator,attr,omitempty" json:"segmentationEventCancelIndicator,omitempty"`
 	SegmentationDuration             *uint64                           `xml:"segmentationDuration,attr" json:"segmentationDuration"`
-	SegmentationTypeID               uint32                            `xml:"segmentationTypeId,attr" json:"segmentationTypeId"`
-	SegmentNum                       uint32                            `xml:"segmentNum,attr" json:"segmentNum"`
-	SegmentsExpected                 uint32                            `xml:"segmentsExpected,attr" json:"segmentsExpected"`
+	SegmentationTypeID               uint32                            `xml:"segmentationTypeId,attr,omitempty" json:"segmentationTypeId,omitempty"`
+	SegmentNum                       uint32                            `xml:"segmentNum,attr,omitempty" json:"segmentNum,omitempty"`
+	SegmentsExpected                 uint32                            `xml:"segmentsExpected,attr,omitempty" json:"segmentsExpected,omitempty"`
 	SubSegmentNum                    *uint32                           `xml:"subSegmentNum,attr" json:"subSegmentNum"`
 	SubSegmentsExpected              *uint32                           `xml:"subSegmentsExpected,attr" json:"subSegmentsExpected"`
 }
 
-// Name returns the human readable string for the segmentation_type_id.
+// Name returns the human-readable string for the segmentation_type_id.
 func (sd *SegmentationDescriptor) Name() string {
 	switch sd.SegmentationTypeID {
 	case SegmentationTypeNotIndicated:
