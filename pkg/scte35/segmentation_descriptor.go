@@ -173,17 +173,17 @@ const (
 type SegmentationDescriptor struct {
 	XMLName                          xml.Name                          `xml:"http://www.scte.org/schemas/35 SegmentationDescriptor" json:"-"`
 	JSONType                         uint32                            `xml:"-" json:"type"`
-	DeliveryRestrictions             *DeliveryRestrictions             `xml:"http://www.scte.org/schemas/35 DeliveryRestrictions" json:"deliveryRestrictions"`
-	SegmentationUPIDs                []SegmentationUPID                `xml:"http://www.scte.org/schemas/35 SegmentationUpid" json:"segmentationUpids"`
-	Components                       []SegmentationDescriptorComponent `xml:"http://www.scte.org/schemas/35 Component" json:"components"`
+	DeliveryRestrictions             *DeliveryRestrictions             `xml:"http://www.scte.org/schemas/35 DeliveryRestrictions" json:"deliveryRestrictions,omitempty"`
+	SegmentationUPIDs                []SegmentationUPID                `xml:"http://www.scte.org/schemas/35 SegmentationUpid" json:"segmentationUpids,omitempty"`
+	Components                       []SegmentationDescriptorComponent `xml:"http://www.scte.org/schemas/35 Component" json:"components,omitempty"`
 	SegmentationEventID              uint32                            `xml:"segmentationEventId,attr,omitempty" json:"segmentationEventId,omitempty"`
 	SegmentationEventCancelIndicator bool                              `xml:"segmentationEventCancelIndicator,attr,omitempty" json:"segmentationEventCancelIndicator,omitempty"`
-	SegmentationDuration             *uint64                           `xml:"segmentationDuration,attr" json:"segmentationDuration"`
+	SegmentationDuration             *uint64                           `xml:"segmentationDuration,attr" json:"segmentationDuration,omitempty"`
 	SegmentationTypeID               uint32                            `xml:"segmentationTypeId,attr,omitempty" json:"segmentationTypeId,omitempty"`
 	SegmentNum                       uint32                            `xml:"segmentNum,attr,omitempty" json:"segmentNum,omitempty"`
 	SegmentsExpected                 uint32                            `xml:"segmentsExpected,attr,omitempty" json:"segmentsExpected,omitempty"`
-	SubSegmentNum                    *uint32                           `xml:"subSegmentNum,attr" json:"subSegmentNum"`
-	SubSegmentsExpected              *uint32                           `xml:"subSegmentsExpected,attr" json:"subSegmentsExpected"`
+	SubSegmentNum                    *uint32                           `xml:"subSegmentNum,attr" json:"subSegmentNum,omitempty"`
+	SubSegmentsExpected              *uint32                           `xml:"subSegmentsExpected,attr" json:"subSegmentsExpected,omitempty"`
 }
 
 // Name returns the human-readable string for the segmentation_type_id.

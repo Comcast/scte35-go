@@ -60,8 +60,8 @@ type SpliceInfoSection struct {
 	SpliceCommand     SpliceCommand     `xml:""`
 	SpliceDescriptors SpliceDescriptors `xml:""`
 	SAPType           uint32            `xml:"sapType,attr"`
-	PTSAdjustment     uint64            `xml:"ptsAdjustment,attr"`
-	ProtocolVersion   uint32            `xml:"protocolVersion,attr"`
+	PTSAdjustment     uint64            `xml:"ptsAdjustment,attr,omitempty"`
+	ProtocolVersion   uint32            `xml:"protocolVersion,attr,omitempty"`
 	Tier              uint32            `xml:"tier,attr"`
 	alignmentStuffing []byte            // alignment_stuffing
 	ecrc32            []byte            // decoded e_crc_32
@@ -297,9 +297,13 @@ func (sis *SpliceInfoSection) MarshalJSON() ([]byte, error) {
 		"encryptedPacket": sis.EncryptedPacket,
 		"spliceCommand":   sis.SpliceCommand,
 		"sapType":         sis.SAPType,
-		"ptsAdjustment":   sis.PTSAdjustment,
-		"protocolVersion": sis.ProtocolVersion,
 		"tier":            sis.Tier,
+	}
+	if sis.ProtocolVersion > 0 {
+		m["protocolVersion"] = sis.ProtocolVersion
+	}
+	if sis.PTSAdjustment > 0 {
+		m["ptsAdjustment"] = sis.PTSAdjustment
 	}
 	if len(sis.SpliceDescriptors) > 0 {
 		m["spliceDescriptors"] = sis.SpliceDescriptors

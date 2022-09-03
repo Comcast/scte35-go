@@ -31,11 +31,11 @@ const (
 // EncryptedPacket contains the encryption details if this payload has been
 // encrypted.
 type EncryptedPacket struct {
-	EncryptionAlgorithm uint32 `xml:"encryptionAlgorithm,attr" json:"encryptionAlgorithm,omitempty"`
-	CWIndex             uint32 `xml:"cwIndex,attr" json:"cwIndex,omitempty"`
+	EncryptionAlgorithm uint32 `xml:"encryptionAlgorithm,attr,omitempty" json:"encryptionAlgorithm,omitempty"`
+	CWIndex             uint32 `xml:"cwIndex,attr,omitempty" json:"cwIndex,omitempty"`
 }
 
-// encryptionAlgorithmName returns the user friendly encryption algorithm name
+// encryptionAlgorithmName returns the user-friendly encryption algorithm name
 func (p *EncryptedPacket) encryptionAlgorithmName() string {
 	if p == nil {
 		return "No encryption"
