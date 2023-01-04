@@ -58,7 +58,7 @@ var Logger = log.New(io.Discard, "SCTE35 ", log.Ldate|log.Ltime|log.Llongfile)
 
 // DecodeBase64 is a convenience function for decoding a base-64 string into
 // a SpliceInfoSection. If an error occurs, the returned SpliceInfoSection
-// will contains the results of decoding up until the error condition
+// will contain the results of decoding up until the error condition
 // was encountered.
 func DecodeBase64(s string) (*SpliceInfoSection, error) {
 	sis := &SpliceInfoSection{}
@@ -145,7 +145,7 @@ func readerError(r iobit.Reader) error {
 	if r.LeftBits() > 0 {
 		return ErrBufferUnderflow
 	}
-	if r.Error() == iobit.ErrOverflow {
+	if errors.Is(r.Error(), iobit.ErrOverflow) {
 		return ErrBufferOverflow
 	}
 	return nil

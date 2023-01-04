@@ -17,9 +17,9 @@
 package scte35
 
 import (
-	"bytes"
 	"encoding/xml"
 	"fmt"
+	"strconv"
 
 	"github.com/bamiaux/iobit"
 )
@@ -67,47 +67,47 @@ func (cmd *SpliceInsert) Type() uint32 {
 	return SpliceInsertType
 }
 
-// table returns the tabular description of this splice_insert.
-func (cmd *SpliceInsert) table(prefix, indent string) string {
-	var b bytes.Buffer
-	_, _ = fmt.Fprintf(&b, prefix+"splice_insert() {\n")
-	_, _ = fmt.Fprintf(&b, prefix+indent+"splice_event_id: %d\n", cmd.SpliceEventID)
-	_, _ = fmt.Fprintf(&b, prefix+indent+"splice_event_cancel_indicator: %v\n", cmd.SpliceEventCancelIndicator)
+// writeTo the given table.
+func (cmd *SpliceInsert) writeTo(t *table) {
+	tt := t.addTable()
+	tt.open("splice_insert")
+	tt.addRow("splice_event_id", cmd.SpliceEventID)
+	tt.addRow("splice_event_cancel_indicator", cmd.SpliceEventCancelIndicator)
 	if !cmd.SpliceEventCancelIndicator {
-		_, _ = fmt.Fprintf(&b, prefix+indent+"out_of_network_indicator: %v\n", cmd.OutOfNetworkIndicator)
-		_, _ = fmt.Fprintf(&b, prefix+indent+"program_splice_flag: %v\n", cmd.ProgramSpliceFlag())
-		_, _ = fmt.Fprintf(&b, prefix+indent+"duration_flag: %v\n", cmd.DurationFlag())
-		_, _ = fmt.Fprintf(&b, prefix+indent+"splice_immediate_flag: %v\n", cmd.SpliceImmediateFlag)
+		tt.addRow("out_of_network_indicator", cmd.OutOfNetworkIndicator)
+		tt.addRow("program_splice_flag", cmd.ProgramSpliceFlag())
+		tt.addRow("duration_flag", cmd.DurationFlag())
+		tt.addRow("splice_immediate_flag", cmd.SpliceImmediateFlag)
 		if cmd.ProgramSpliceFlag() && !cmd.SpliceImmediateFlag {
-			_, _ = fmt.Fprintf(&b, prefix+indent+"time_specified_flag: %v\n", cmd.TimeSpecifiedFlag())
+			tt.addRow("time_specified_flag", cmd.TimeSpecifiedFlag())
 			if cmd.TimeSpecifiedFlag() {
-				_, _ = fmt.Fprintf(&b, prefix+indent+"pts_time: %d ticks (%s)\n", *cmd.Program.SpliceTime.PTSTime, TicksToDuration(*cmd.Program.SpliceTime.PTSTime))
+				tt.addRow("pts_time", cmd.Program.SpliceTime.PTSTime)
 			}
 		}
 		if !cmd.ProgramSpliceFlag() {
-			_, _ = fmt.Fprintf(&b, prefix+indent+"component_count: %d\n", len(cmd.Components))
+			tt.addRow("component_count", len(cmd.Components))
 			for i, c := range cmd.Components {
-				_, _ = fmt.Fprintf(&b, prefix+indent+"component[%d] {\n", i)
-				_, _ = fmt.Fprintf(&b, prefix+indent+indent+"component_tag: %d\n", c.Tag)
+				ct := tt.addTable()
+				ct.open("component[" + strconv.Itoa(i) + "]")
+				ct.addRow("component_tag", c.Tag)
 				if !cmd.SpliceImmediateFlag {
-					_, _ = fmt.Fprintf(&b, prefix+indent+indent+"time_specified_flag: %v\n", c.TimeSpecifiedFlag())
+					ct.addRow("time_specified_flag", c.TimeSpecifiedFlag())
 					if c.TimeSpecifiedFlag() {
-						_, _ = fmt.Fprintf(&b, prefix+indent+indent+"pts_time: %d ticks (%s)\n", *c.SpliceTime.PTSTime, TicksToDuration(*c.SpliceTime.PTSTime))
+						ct.addRow("pts_time", c.SpliceTime.PTSTime)
 					}
 				}
-				_, _ = fmt.Fprintf(&b, prefix+indent+"}\n")
+				ct.close()
 			}
 		}
 		if cmd.DurationFlag() {
-			_, _ = fmt.Fprintf(&b, prefix+indent+"auto_return: %v\n", cmd.BreakDuration.AutoReturn)
-			_, _ = fmt.Fprintf(&b, prefix+indent+"duration: %d ticks (%s)\n", cmd.BreakDuration.Duration, TicksToDuration(cmd.BreakDuration.Duration))
+			tt.addRow("auto_return", cmd.BreakDuration.AutoReturn)
+			tt.addRow("duration", cmd.BreakDuration.Duration)
 		}
-		_, _ = fmt.Fprintf(&b, prefix+indent+"unique_program_id: %d\n", cmd.UniqueProgramID)
-		_, _ = fmt.Fprintf(&b, prefix+indent+"avail_num: %d\n", cmd.AvailNum)
-		_, _ = fmt.Fprintf(&b, prefix+indent+"avails_expected: %d\n", cmd.AvailsExpected)
+		tt.addRow("unique_program_id", cmd.UniqueProgramID)
+		tt.addRow("avail_num", cmd.AvailNum)
+		tt.addRow("avails_expected", cmd.AvailsExpected)
 	}
-	_, _ = fmt.Fprintf(&b, prefix+"}\n")
-	return b.String()
+	tt.close()
 }
 
 // decode a binary splice_insert.

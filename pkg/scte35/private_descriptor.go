@@ -17,7 +17,6 @@
 package scte35
 
 import (
-	"bytes"
 	"encoding/binary"
 	"encoding/xml"
 	"fmt"
@@ -92,13 +91,12 @@ func (sd *PrivateDescriptor) length() int {
 }
 
 // table returns the tabular description of this PrivateDescriptor.
-func (sd *PrivateDescriptor) table(prefix, indent string) string {
-	var b bytes.Buffer
-	_, _ = fmt.Fprintf(&b, fmt.Sprintf(prefix+"private_descriptor() {\n"))
-	_, _ = fmt.Fprintf(&b, fmt.Sprintf(prefix+indent+"splice_descriptor_tag: %#02x\n", sd.Tag()))
-	_, _ = fmt.Fprintf(&b, fmt.Sprintf(prefix+indent+"descriptor_length: %d bytes\n", sd.length()))
-	_, _ = fmt.Fprintf(&b, fmt.Sprintf(prefix+indent+"identifier: %s\n", sd.IdentifierString()))
-	_, _ = fmt.Fprintf(&b, fmt.Sprintf(prefix+indent+"private_bytes: %#0x\n", sd.PrivateBytes))
-	_, _ = fmt.Fprintf(&b, fmt.Sprintf(prefix+"}\n"))
-	return b.String()
+func (sd *PrivateDescriptor) writeTo(t *table) {
+	tt := t.addTable()
+	tt.open("private_descriptor()")
+	tt.addRow("splice_descriptor_tag", fmt.Sprintf("%#02x", sd.Tag()))
+	tt.addRow("descriptor_length", sd.length())
+	tt.addRow("identifier", sd.IdentifierString())
+	tt.addRow("private_bytes", fmt.Sprintf("%#0x", sd.PrivateBytes))
+	tt.close()
 }

@@ -17,9 +17,9 @@
 package scte35
 
 import (
-	"bytes"
 	"encoding/xml"
 	"fmt"
+	"strconv"
 
 	"github.com/bamiaux/iobit"
 )
@@ -104,25 +104,25 @@ func (sd *AudioDescriptor) length() int {
 	return length / 8
 }
 
-// table returns the tabular description of this SpliceDescriptor.
-func (sd *AudioDescriptor) table(prefix, indent string) string {
-	var buf bytes.Buffer
-	_, _ = fmt.Fprintf(&buf, prefix+"audio_descriptor() {\n")
-	_, _ = fmt.Fprintf(&buf, prefix+indent+"splice_descriptor_tag: %#02x\n", sd.Tag())
-	_, _ = fmt.Fprintf(&buf, prefix+indent+"descriptor_length: %d bytes\n", sd.length())
-	_, _ = fmt.Fprintf(&buf, prefix+indent+"identifier: %s\n", CUEIASCII)
-	_, _ = fmt.Fprintf(&buf, prefix+indent+"audio_count: %d\n", len(sd.AudioChannels))
+// writeTo the given table.
+func (sd *AudioDescriptor) writeTo(t *table) {
+	tt := t.addTable()
+	tt.open("audio_descriptor()")
+	tt.addRow("splice_descriptor_tag", fmt.Sprintf("%#02x", sd.Tag()))
+	tt.addRow("descriptor_length", sd.length())
+	tt.addRow("identifier", CUEIASCII)
+	tt.addRow("audio_count", len(sd.AudioChannels))
 	for i, ac := range sd.AudioChannels {
-		_, _ = fmt.Fprintf(&buf, prefix+indent+"audio_channel[%d] {", i)
-		_, _ = fmt.Fprintf(&buf, prefix+indent+indent+"component_tag: %d\n", ac.ComponentTag)
-		_, _ = fmt.Fprintf(&buf, prefix+indent+indent+"iso_code: %s\n", ac.ISOCode)
-		_, _ = fmt.Fprintf(&buf, prefix+indent+indent+"bit_stream_mode: %d\n", ac.BitStreamMode)
-		_, _ = fmt.Fprintf(&buf, prefix+indent+indent+"num_channels: %d)\n", ac.NumChannels)
-		_, _ = fmt.Fprintf(&buf, prefix+indent+indent+"full_srvc_audio: %v\n", ac.FullSrvcAudio)
-		_, _ = fmt.Fprintf(&buf, prefix+indent+"}\n")
+		at := tt.addTable()
+		at.open("audio_channel[" + strconv.Itoa(i) + "]")
+		at.addRow("component_tag", ac.ComponentTag)
+		at.addRow("iso_code", ac.ISOCode)
+		at.addRow("bit_stream_mode", ac.BitStreamMode)
+		at.addRow("num_channels", ac.NumChannels)
+		at.addRow("full_srvc_audio", ac.FullSrvcAudio)
+		at.close()
 	}
-	_, _ = fmt.Fprintf(&buf, prefix+"}\n")
-	return string(buf.Bytes())
+	tt.close()
 }
 
 // AudioChannel collects the audio PID details.

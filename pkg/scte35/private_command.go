@@ -17,7 +17,6 @@
 package scte35
 
 import (
-	"bytes"
 	"encoding/binary"
 	"encoding/xml"
 	"fmt"
@@ -93,12 +92,11 @@ func (cmd *PrivateCommand) length() int {
 	return length / 8
 }
 
-// table returns the tabular description of this PrivateCommand.
-func (cmd *PrivateCommand) table(prefix, indent string) string {
-	var b bytes.Buffer
-	_, _ = fmt.Fprintln(&b, prefix+"private_command() {\n")
-	_, _ = fmt.Fprintln(&b, prefix+indent+"identifier: %s\n", cmd.IdentifierString())
-	_, _ = fmt.Fprintln(&b, prefix+indent+"private_byte: %#0x\n", cmd.PrivateBytes)
-	_, _ = fmt.Fprintln(&b, prefix+"}\n")
-	return b.String()
+// writeTo the given table.
+func (cmd *PrivateCommand) writeTo(t *table) {
+	tt := t.addTable()
+	tt.open("private_command()")
+	tt.addRow("identifier", cmd.IdentifierString())
+	tt.addRow("private_byte", fmt.Sprintf("%#0x", cmd.PrivateBytes))
+	tt.close()
 }

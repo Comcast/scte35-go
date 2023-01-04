@@ -49,7 +49,7 @@ func encodeCommand() *cobra.Command {
 			} else {
 				scanner := bufio.NewScanner(os.Stdin)
 				for scanner.Scan() {
-					input = input + scanner.Text()
+					input += scanner.Text()
 				}
 				err = scanner.Err()
 				if err != nil {
@@ -58,23 +58,21 @@ func encodeCommand() *cobra.Command {
 				}
 			}
 
-			if strings.HasPrefix(strings.TrimSpace(input), "<") {
+			switch {
+			case strings.HasPrefix(strings.TrimSpace(input), "<"):
 				err = xml.Unmarshal([]byte(input), &sis)
-			} else if strings.HasPrefix(strings.TrimSpace(input), "{") {
+			case strings.HasPrefix(strings.TrimSpace(input), "{"):
 				err = json.Unmarshal([]byte(input), &sis)
-			} else {
+			default:
 				err = fmt.Errorf("unrecognized or empty input")
 			}
-
-			if err == nil {
-				// print encoded signal
-				_, _ = fmt.Fprintf(os.Stdout, "Base64: %s\n", sis.Base64())
-				_, _ = fmt.Fprintf(os.Stdout, "Hex   : %s\n", sis.Hex())
-			} else {
-				// print error
+			if err != nil {
 				_, _ = fmt.Fprintf(os.Stderr, "Error: %s\n", err)
+				return
 			}
 
+			_, _ = fmt.Fprintf(os.Stdout, "Base64: %s\n", sis.Base64())
+			_, _ = fmt.Fprintf(os.Stdout, "Hex   : %s\n", sis.Hex())
 		},
 	}
 	return cmd

@@ -17,7 +17,6 @@
 package scte35
 
 import (
-	"bytes"
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
@@ -55,17 +54,18 @@ const (
 // and equal to 0x00 and the payload_unit_start_indicator bit shall be equal to
 // one (per the requirements of section syntax usage per [MPEG Systems]).
 type SpliceInfoSection struct {
-	XMLName           xml.Name          `xml:"http://www.scte.org/schemas/35 SpliceInfoSection"`
-	EncryptedPacket   EncryptedPacket   `xml:"http://www.scte.org/schemas/35 EncryptedPacket,omitempty"`
-	SpliceCommand     SpliceCommand     `xml:""`
-	SpliceDescriptors SpliceDescriptors `xml:""`
-	SAPType           uint32            `xml:"sapType,attr"`
-	PTSAdjustment     uint64            `xml:"ptsAdjustment,attr,omitempty"`
-	ProtocolVersion   uint32            `xml:"protocolVersion,attr,omitempty"`
-	Tier              uint32            `xml:"tier,attr"`
-	alignmentStuffing []byte            // alignment_stuffing
-	ecrc32            []byte            // decoded e_crc_32
-	crc32             []byte            // decoded crc_32
+	XMLName             xml.Name          `xml:"http://www.scte.org/schemas/35 SpliceInfoSection"`
+	EncryptedPacket     EncryptedPacket   `xml:"http://www.scte.org/schemas/35 EncryptedPacket,omitempty"`
+	SpliceCommand       SpliceCommand     `xml:""`
+	SpliceDescriptors   SpliceDescriptors `xml:""`
+	SAPType             uint32            `xml:"sapType,attr"`
+	PreRollMilliSeconds uint32            `xml:"preRollMilliSeconds,attr,omitempty"` // no corresponding binary field
+	PTSAdjustment       uint64            `xml:"ptsAdjustment,attr,omitempty"`
+	ProtocolVersion     uint32            `xml:"protocolVersion,attr,omitempty"`
+	Tier                uint32            `xml:"tier,attr"`
+	alignmentStuffing   []byte            // alignment_stuffing
+	ecrc32              []byte            // decoded e_crc_32
+	crc32               []byte            // decoded crc_32
 }
 
 // Base64 returns the SpliceInfoSection as a base64 encoded string.
@@ -147,8 +147,7 @@ func (sis *SpliceInfoSection) Decode(b []byte) (err error) {
 // Duration attempts to return the duration of the signal.
 func (sis *SpliceInfoSection) Duration() time.Duration {
 	// if this is a splice insert with a duration, use it
-	switch sc := sis.SpliceCommand.(type) {
-	case *SpliceInsert:
+	if sc, ok := sis.SpliceCommand.(*SpliceInsert); ok {
 		if sc.BreakDuration != nil {
 			return TicksToDuration(sc.BreakDuration.Duration)
 		}
@@ -156,8 +155,7 @@ func (sis *SpliceInfoSection) Duration() time.Duration {
 
 	ticks := uint64(0)
 	for _, sd := range sis.SpliceDescriptors {
-		switch sdt := sd.(type) {
-		case *SegmentationDescriptor:
+		if sdt, ok := sd.(*SegmentationDescriptor); ok {
 			if sdt.SegmentationDuration != nil {
 				ticks += *sdt.SegmentationDuration
 			}
@@ -255,33 +253,33 @@ func (sis *SpliceInfoSection) SAPTypeName() string {
 // Table returns the tabular description of this SpliceInfoSection as described
 // in ANSI/SCTE 35 Table 5.
 func (sis *SpliceInfoSection) Table(prefix, indent string) string {
-	if sis == nil {
-		return ""
-	}
+	t := newTable(prefix, indent)
 
-	var b bytes.Buffer
-	_, _ = fmt.Fprintf(&b, prefix+"splice_info_section() {\n")
-	_, _ = fmt.Fprintf(&b, prefix+indent+"table_id: %#02x\n", TableID)
-	_, _ = fmt.Fprintf(&b, prefix+indent+"section_syntax_indicator: %v\n", SectionSyntaxIndicator)
-	_, _ = fmt.Fprintf(&b, prefix+indent+"private_indicator: %v\n", PrivateIndicator)
-	_, _ = fmt.Fprintf(&b, prefix+indent+"sap_type: %s\n", sis.SAPTypeName())
-	_, _ = fmt.Fprintf(&b, prefix+indent+"section_length: %d bytes\n", sis.sectionLength())
-	_, _ = fmt.Fprintf(&b, prefix+"}\n")
-	_, _ = fmt.Fprintf(&b, prefix+"protocol_version: %d\n", sis.ProtocolVersion)
-	_, _ = fmt.Fprintf(&b, prefix+"encryption_algorithm: %s\n", sis.EncryptedPacket.encryptionAlgorithmName())
-	_, _ = fmt.Fprintf(&b, prefix+"pts_adjustment: %d ticks (%s)\n", sis.PTSAdjustment, TicksToDuration(sis.PTSAdjustment))
-	_, _ = fmt.Fprintf(&b, prefix+"cw_index: %d\n", sis.EncryptedPacket.CWIndex)
-	_, _ = fmt.Fprintf(&b, prefix+"tier: %d\n", sis.Tier)
+	st := t.addTable()
+	st.open("splice_info_section()")
+	st.addRow("table_id", fmt.Sprintf("%#02x", TableID))
+	st.addRow("section_syntax_indicator", SectionSyntaxIndicator)
+	st.addRow("private_indicator", PrivateIndicator)
+	st.addRow("section_length", sis.sectionLength())
+	st.close()
+
+	t.addRow("protocol_version", sis.ProtocolVersion)
+	t.addRow("encryption_algorithm", fmt.Sprintf("%d (%s)", sis.EncryptedPacket.EncryptionAlgorithm, sis.EncryptedPacket.encryptionAlgorithmName()))
+	t.addRow("pts_adjustment", sis.PTSAdjustment)
+	t.addRow("cw_index", sis.EncryptedPacket.CWIndex)
+	t.addRow("tier", sis.Tier)
+
 	if sis.SpliceCommand != nil {
-		_, _ = fmt.Fprintf(&b, prefix+"splice_command_length: %d bytes\n", sis.SpliceCommand.length())
-		_, _ = fmt.Fprintf(&b, prefix+"splice_command_type: %#02x\n", sis.SpliceCommand.Type())
-		_, _ = fmt.Fprintf(&b, sis.SpliceCommand.table(prefix, indent))
+		t.addRow("splice_command_length", sis.SpliceCommand.length())
+		t.addRow("splice_command_type", sis.SpliceCommand.Type())
+		sis.SpliceCommand.writeTo(t)
 	}
-	_, _ = fmt.Fprintf(&b, prefix+"descriptor_loop_length: %d bytes\n", sis.descriptorLoopLength())
+	t.addRow("splice_command_length", sis.SpliceCommand.length())
 	for _, sd := range sis.SpliceDescriptors {
-		_, _ = fmt.Fprintf(&b, sd.table(prefix, indent))
+		sd.writeTo(t)
 	}
-	return b.String()
+	t.addRow("descriptor_loop_length", sis.descriptorLoopLength())
+	return t.String()
 }
 
 // MarshalJSON encodes a SpliceInfoSection to JSON.

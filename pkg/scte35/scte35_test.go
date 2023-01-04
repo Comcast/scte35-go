@@ -585,7 +585,7 @@ func TestDecodeBase64(t *testing.T) {
 			}
 
 			// uncomment this to verify the output as text
-			// scte35.Log.Printf("\n%s", sis.Details())
+			scte35.Logger.Printf("\n%s", sis.Table("", "\t"))
 		})
 	}
 }

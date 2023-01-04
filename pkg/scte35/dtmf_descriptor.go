@@ -17,7 +17,6 @@
 package scte35
 
 import (
-	"bytes"
 	"encoding/xml"
 	"fmt"
 
@@ -40,18 +39,17 @@ type DTMFDescriptor struct {
 	DTMFChars string   `xml:"chars,attr" json:"chars"`
 }
 
-// table returns the tabular description of this DTMFDescriptor.
-func (sd *DTMFDescriptor) table(prefix, indent string) string {
-	var b bytes.Buffer
-	_, _ = fmt.Fprintf(&b, fmt.Sprintf(prefix+"dtmf_descriptor() {\n"))
-	_, _ = fmt.Fprintf(&b, fmt.Sprintf(prefix+indent+"splice_descriptor_tag: %#02x\n", DTMFDescriptorTag))
-	_, _ = fmt.Fprintf(&b, fmt.Sprintf(prefix+indent+"descriptor_length: %d bytes\n", sd.length()))
-	_, _ = fmt.Fprintf(&b, fmt.Sprintf(prefix+indent+"identifier: %s\n", CUEIASCII))
-	_, _ = fmt.Fprintf(&b, fmt.Sprintf(prefix+indent+"preroll: %.2f s\n", float32(sd.Preroll/10)))
-	_, _ = fmt.Fprintf(&b, fmt.Sprintf(prefix+indent+"dtmf_count: %d chars\n", len(sd.DTMFChars)))
-	_, _ = fmt.Fprintf(&b, fmt.Sprintf(prefix+indent+"dtmf_chars: %s\n", sd.DTMFChars))
-	_, _ = fmt.Fprintf(&b, fmt.Sprintf(prefix+"}\n"))
-	return b.String()
+// writeTo the given table.
+func (sd *DTMFDescriptor) writeTo(t *table) {
+	tt := t.addTable()
+	tt.open("dtmf_descriptor()")
+	tt.addRow("splice_descriptor_tag", fmt.Sprintf("%#02x", DTMFDescriptorTag))
+	tt.addRow("descriptor_length", sd.length())
+	tt.addRow("identifier", CUEIASCII)
+	tt.addRow("preroll", float32(sd.Preroll/10))
+	tt.addRow("dtmf_count", len(sd.DTMFChars))
+	tt.addRow("dtmf_chars", sd.DTMFChars)
+	tt.close()
 }
 
 // Tag returns the splice_descriptor_tag.
