@@ -552,7 +552,7 @@ func (sd *SegmentationDescriptor) writeTo(t *table) {
 			tt.addRow("web_delivery_allowed_flag", sd.DeliveryRestrictions.WebDeliveryAllowedFlag)
 			tt.addRow("no_regional_blackout_flag", sd.DeliveryRestrictions.NoRegionalBlackoutFlag)
 			tt.addRow("archive_allowed_flag", sd.DeliveryRestrictions.ArchiveAllowedFlag)
-			tt.addRow("device_restrictions", sd.DeliveryRestrictions.deviceRestrictionsName())
+			tt.addRow("device_restrictions", fmt.Sprintf("%d (%s)", sd.DeliveryRestrictions.DeviceRestrictions, sd.DeliveryRestrictions.deviceRestrictionsName()))
 		}
 		if len(sd.Components) > 0 {
 			tt.addRow("component_count", len(sd.Components))
@@ -588,10 +588,12 @@ func (sd *SegmentationDescriptor) writeTo(t *table) {
 	tt.addRow("segmentation_type_id", fmt.Sprintf("%#02x (%s)", sd.SegmentationTypeID, sd.Name()))
 	tt.addRow("segment_num", sd.SegmentNum)
 	tt.addRow("segments_expected", sd.SegmentsExpected)
-	if sd.SubSegmentNum != nil {
+	switch sd.SegmentationTypeID {
+	case SegmentationTypeProviderPOStart,
+		SegmentationTypeDistributorPOStart,
+		SegmentationTypeProviderOverlayPOStart,
+		SegmentationTypeDistributorOverlayPOStart:
 		tt.addRow("sub_segment_num", sd.SubSegmentNum)
-	}
-	if sd.SubSegmentsExpected != nil {
 		tt.addRow("sub_segments_expected", sd.SubSegmentsExpected)
 	}
 	tt.close()

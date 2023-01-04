@@ -67,6 +67,8 @@ const (
 	SegmentationUPIDTypeURI = 0x0f
 	// SegmentationUPIDTypeUUID is the segmentation_upid_type for UUID.
 	SegmentationUPIDTypeUUID = 0x10
+	// SegmentationUPIDTypeSCR is the segmentation_upid_type for SCR.
+	SegmentationUPIDTypeSCR = 0x11
 )
 
 // NewSegmentationUPID construct a new SegmentationUPID
@@ -154,6 +156,8 @@ func (upid *SegmentationUPID) Name() string {
 		return "URI"
 	case SegmentationUPIDTypeUUID:
 		return "UUID"
+	case SegmentationUPIDTypeSCR:
+		return "SCR"
 	default:
 		return "Unknown"
 	}

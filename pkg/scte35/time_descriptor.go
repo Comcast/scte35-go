@@ -56,9 +56,9 @@ func (sd *TimeDescriptor) writeTo(t *table) {
 	tt.addRow("splice_descriptor_tag", fmt.Sprintf("%#02x", TimeDescriptorTag))
 	tt.addRow("descriptor_length", sd.length())
 	tt.addRow("identifier", CUEIASCII)
-	tt.addRow("TAI_seconds", sd.TAISeconds)
-	tt.addRow("TAI_ns", sd.TAINS)
-	tt.addRow("UTC_offset", sd.UTCOffset)
+	tt.addRow("tai_seconds", sd.TAISeconds)
+	tt.addRow("tai_ns", sd.TAINS)
+	tt.addRow("utc_offset", sd.UTCOffset)
 	tt.close()
 }
 
