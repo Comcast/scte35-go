@@ -576,11 +576,7 @@ func (sd *SegmentationDescriptor) writeTo(t *table) {
 			if u.Type == SegmentationUPIDTypeMPU {
 				ut.addRow("format_identifier", u.formatIdentifierString())
 			}
-			if u.Format == "text" {
-				ut.addRow("segmentation_upid", u.Value)
-			} else {
-				ut.addRow("segmentation_upid", u.valueBytes())
-			}
+			ut.addRow("segmentation_upid", u.Value)
 			ut.close()
 		}
 	}
@@ -593,8 +589,12 @@ func (sd *SegmentationDescriptor) writeTo(t *table) {
 		SegmentationTypeDistributorPOStart,
 		SegmentationTypeProviderOverlayPOStart,
 		SegmentationTypeDistributorOverlayPOStart:
-		tt.addRow("sub_segment_num", sd.SubSegmentNum)
-		tt.addRow("sub_segments_expected", sd.SubSegmentsExpected)
+		if sd.SubSegmentNum != nil {
+			tt.addRow("sub_segment_num", sd.SubSegmentNum)
+		}
+		if sd.SubSegmentsExpected != nil {
+			tt.addRow("sub_segments_expected", sd.SubSegmentsExpected)
+		}
 	}
 	tt.close()
 }
