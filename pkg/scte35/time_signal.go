@@ -17,7 +17,6 @@
 package scte35
 
 import (
-	"bytes"
 	"encoding/xml"
 	"fmt"
 
@@ -107,16 +106,15 @@ func (cmd *TimeSignal) length() int {
 	return length / 8
 }
 
-// table returns the time_signal description in tabular format.
-func (cmd *TimeSignal) table(prefix, indent string) string {
-	var b bytes.Buffer
-	_, _ = fmt.Fprintf(&b, prefix+"time_signal() {\n")
-	_, _ = fmt.Fprintf(&b, prefix+indent+"time_specified_flag: %v\n", cmd.timeSpecifiedFlag())
+// writeTo the given table.
+func (cmd *TimeSignal) writeTo(t *table) {
+	tt := t.addTable()
+	tt.open("time_signal()")
+	tt.addRow("time_specified_flag", cmd.timeSpecifiedFlag())
 	if cmd.timeSpecifiedFlag() {
-		_, _ = fmt.Fprintf(&b, prefix+indent+"pts_time: %d ticks (%s)\n", *cmd.SpliceTime.PTSTime, TicksToDuration(*cmd.SpliceTime.PTSTime))
+		tt.addRow("time_specified_flag", cmd.SpliceTime.PTSTime)
 	}
-	_, _ = fmt.Fprintf(&b, prefix+"}\n")
-	return b.String()
+	tt.close()
 }
 
 // timeSpecifiedFlag return the time_specified_flag.

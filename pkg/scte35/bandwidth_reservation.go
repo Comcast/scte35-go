@@ -67,7 +67,9 @@ func (cmd *BandwidthReservation) length() int {
 	return 0
 }
 
-// table returns the tabular description of this splice_command.
-func (cmd *BandwidthReservation) table(prefix, _ string) string {
-	return prefix+"bandwidth_reservation() {}\n"
+// writeTo the given table.
+func (cmd *BandwidthReservation) writeTo(t *table) {
+	tt := t.addTable()
+	tt.open("bandwidth_reservation()")
+	tt.close()
 }

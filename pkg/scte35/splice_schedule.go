@@ -17,10 +17,9 @@
 package scte35
 
 import (
-	"bytes"
 	"encoding/xml"
 	"fmt"
-	"time"
+	"strconv"
 
 	"github.com/bamiaux/iobit"
 )
@@ -178,42 +177,43 @@ func (cmd SpliceSchedule) length() int {
 	return length / 8
 }
 
-// table returns the splice_null description in tabular format.
-func (cmd *SpliceSchedule) table(prefix, indent string) string {
-	var b bytes.Buffer
-	_, _ = fmt.Fprintf(&b, prefix+"splice_schedule() {\n")
-	_, _ = fmt.Fprintf(&b, prefix+indent+"splice_count: %d\n", len(cmd.Events))
+// writeTo the given table.
+func (cmd *SpliceSchedule) writeTo(t *table) {
+	tt := t.addTable()
+	tt.open("splice_schedule()")
+	tt.addRow("splice_count", strconv.Itoa(len(cmd.Events)))
 	for i, e := range cmd.Events {
-		_, _ = fmt.Fprintln(&b, prefix+indent+"event[%d] {\n", i)
-		_, _ = fmt.Fprintln(&b, prefix+indent+indent+"splice_event_id: %d\n", e.SpliceEventID)
-		_, _ = fmt.Fprintln(&b, prefix+indent+indent+"splice_event_cancel_indicator: %v\n", e.SpliceEventCancelIndicator)
+		et := tt.addTable()
+		et.open("event[" + strconv.Itoa(i) + "]")
+		et.addRow("splice_event_id", e.SpliceEventID)
+		et.addRow("splice_event_cancel_indicator", e.SpliceEventCancelIndicator)
 		if !e.SpliceEventCancelIndicator {
-			_, _ = fmt.Fprintln(&b, prefix+indent+indent+"out_of_network_indicator: %v\n", e.OutOfNetworkIndicator)
-			_, _ = fmt.Fprintln(&b, prefix+indent+indent+"program_splice_flag: %v\n", e.ProgramSpliceFlag())
-			_, _ = fmt.Fprintln(&b, prefix+indent+indent+"duration_flag: %v", e.DurationFlag())
+			et.addRow("out_of_network_indicator", e.OutOfNetworkIndicator)
+			et.addRow("program_splice_flag", e.ProgramSpliceFlag())
+			et.addRow("duration_flag", e.DurationFlag())
 			if e.ProgramSpliceFlag() {
-				_, _ = fmt.Fprintln(&b, prefix+indent+indent+"utc_splice_time: %s\n", e.Program.UTCSpliceTime.Format(time.RFC3339))
+				et.addRow("utc_splice_time", e.Program.UTCSpliceTime)
 			} else {
-				_, _ = fmt.Fprintln(&b, prefix+indent+indent+"component_count: %d\n", len(e.Components))
+				et.addRow("component_count", len(e.Components))
 				for j, c := range e.Components {
-					_, _ = fmt.Fprintln(&b, prefix+indent+indent+"component[%d] {\n", j)
-					_, _ = fmt.Fprintln(&b, prefix+indent+indent+indent+"component_tag: %d\n", c.Tag)
-					_, _ = fmt.Fprintln(&b, prefix+indent+indent+indent+"utc_splice_time: %s\n", c.UTCSpliceTime.Format(time.RFC3339))
-					_, _ = fmt.Fprintln(&b, prefix+indent+indent+"}\n")
+					ct := et.addTable()
+					ct.open("component[" + strconv.Itoa(j) + "]")
+					ct.addRow("component_tag", c.Tag)
+					ct.addRow("utc_splice_time", c.UTCSpliceTime)
+					ct.close()
 				}
 			}
 			if e.DurationFlag() {
-				_, _ = fmt.Fprintln(&b, prefix+indent+indent+"auto_return: %v\n", e.BreakDuration.AutoReturn)
-				_, _ = fmt.Fprintln(&b, prefix+indent+indent+"duration: %d ticks (%s)\n", e.BreakDuration.Duration, TicksToDuration(e.BreakDuration.Duration))
+				et.addRow("auto_return", e.BreakDuration.AutoReturn)
+				et.addRow("duration", e.BreakDuration.Duration)
 			}
-			_, _ = fmt.Fprintln(&b, prefix+indent+indent+"unique_program_id: %d\n", e.UniqueProgramID)
-			_, _ = fmt.Fprintln(&b, prefix+indent+indent+"avail_num: %d\n", e.AvailNum)
-			_, _ = fmt.Fprintln(&b, prefix+indent+indent+"avails_expected: %d\n", e.AvailsExpected)
+			et.addRow("unique_program_id", e.UniqueProgramID)
+			et.addRow("avail_num", e.AvailNum)
+			et.addRow("avails_expected", e.AvailsExpected)
 		}
-		_, _ = fmt.Fprintln(&b, prefix+indent+"}\n")
+		et.close()
 	}
-	_, _ = fmt.Fprintf(&b, prefix+"}\n")
-	return b.String()
+	tt.close()
 }
 
 // Event is a single event within a splice_schedule.

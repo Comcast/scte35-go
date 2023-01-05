@@ -67,6 +67,8 @@ const (
 	SegmentationUPIDTypeURI = 0x0f
 	// SegmentationUPIDTypeUUID is the segmentation_upid_type for UUID.
 	SegmentationUPIDTypeUUID = 0x10
+	// SegmentationUPIDTypeSCR is the segmentation_upid_type for SCR.
+	SegmentationUPIDTypeSCR = 0x11
 )
 
 // NewSegmentationUPID construct a new SegmentationUPID
@@ -74,37 +76,37 @@ func NewSegmentationUPID(upidType uint32, buf []byte) SegmentationUPID {
 	r := iobit.NewReader(buf)
 
 	switch upidType {
+	// EIDR - custom
 	case SegmentationUPIDTypeEIDR:
 		return SegmentationUPID{
-			Type:   upidType,
-			Format: "text",
-			Value:  canonicalEIDR(r.LeftBytes()),
+			Type:  upidType,
+			Value: canonicalEIDR(r.LeftBytes()),
 		}
+	// ISAN - base64
 	case SegmentationUPIDTypeISAN, SegmentationUPIDTypeISANDeprecated:
 		return SegmentationUPID{
-			Type:   upidType,
-			Format: "base-64",
-			Value:  base64.StdEncoding.EncodeToString(r.LeftBytes()),
+			Type:  upidType,
+			Value: base64.StdEncoding.EncodeToString(r.LeftBytes()),
 		}
+	// MPU - custom
 	case SegmentationUPIDTypeMPU:
 		fi := r.Uint32(32)
 		return SegmentationUPID{
 			Type:             upidType,
-			Format:           "base-64",
 			FormatIdentifier: &fi,
 			Value:            base64.StdEncoding.EncodeToString(r.LeftBytes()),
 		}
+	// TI - unsigned int
 	case SegmentationUPIDTypeTI:
 		return SegmentationUPID{
-			Type:   upidType,
-			Format: "text",
-			Value:  fmt.Sprintf("%d", r.Uint64(r.LeftBits())),
+			Type:  upidType,
+			Value: strconv.FormatUint(r.Uint64(r.LeftBits()), 10),
 		}
+	// everything else - plain text
 	default:
 		return SegmentationUPID{
-			Type:   upidType,
-			Format: "text",
-			Value:  string(r.LeftBytes()),
+			Type:  upidType,
+			Value: string(r.LeftBytes()),
 		}
 	}
 }
@@ -113,8 +115,9 @@ func NewSegmentationUPID(upidType uint32, buf []byte) SegmentationUPID {
 type SegmentationUPID struct {
 	Type             uint32  `xml:"segmentationUpidType,attr" json:"segmentationUpidType"`
 	FormatIdentifier *uint32 `xml:"formatIdentifier,attr,omitempty" json:"formatIdentifier,omitempty"`
-	Format           string  `xml:"format,attr,omitempty" json:"format,omitempty"`
 	Value            string  `xml:",chardata" json:"value"`
+	// Deprecated: no longer used and will be removed in a future release
+	Format string
 }
 
 // Name returns the name for the segmentation_upid_type.
@@ -154,6 +157,8 @@ func (upid *SegmentationUPID) Name() string {
 		return "URI"
 	case SegmentationUPIDTypeUUID:
 		return "UUID"
+	case SegmentationUPIDTypeSCR:
+		return "SCR"
 	default:
 		return "Unknown"
 	}
@@ -184,13 +189,13 @@ func (upid *SegmentationUPID) compressEIDR(s string) []byte {
 	})
 
 	if len(parts) != 3 {
-		Logger.Printf("non-canonical EIDR string: %s", s)
+		Logger.Printf("EIDR string contains too many parts: %s", s)
 		return []byte(s)
 	}
 
 	i, err := strconv.Atoi(parts[1])
 	if err != nil {
-		Logger.Printf("non-canonical EIDR string: %s", s)
+		Logger.Printf("Non-canonical EIDR prefix: '%s'", s)
 		return []byte(s)
 	}
 
@@ -200,7 +205,7 @@ func (upid *SegmentationUPID) compressEIDR(s string) []byte {
 
 	h, err := hex.DecodeString(strings.ReplaceAll(parts[2], "-", ""))
 	if err != nil {
-		Logger.Printf("non-canonical EIDR string: %s", s)
+		Logger.Printf("Non-canonical EIDR suffix: '%s'", s)
 		return []byte(s)
 	}
 
@@ -236,32 +241,45 @@ func (upid *SegmentationUPID) formatIdentifierString() string {
 
 // valueBytes returns the value as a byte array.
 func (upid *SegmentationUPID) valueBytes() []byte {
+	upid.Value = strings.TrimSpace(upid.Value)
+
+	// this switch should align with the constructor above
 	switch upid.Type {
+	// EIDR - custom
+	case SegmentationUPIDTypeEIDR:
+		return upid.compressEIDR(upid.Value)
+	// ISAN - base64
+	case SegmentationUPIDTypeISAN, SegmentationUPIDTypeISANDeprecated:
+		b, err := base64.StdEncoding.DecodeString(upid.Value)
+		if err != nil {
+			Logger.Fatalf("Error parsing UPID value: %s", err)
+			return b
+		}
+		return b
+	// MPU - custom
 	case SegmentationUPIDTypeMPU:
 		b := make([]byte, 4)
 		binary.BigEndian.PutUint32(b, *upid.FormatIdentifier)
-		v, _ := base64.StdEncoding.DecodeString(upid.Value)
+		v, err := base64.StdEncoding.DecodeString(upid.Value)
+		if err != nil {
+			Logger.Fatalf("Error parsing UPID value: %s", err)
+			return b
+		}
 		b = append(b, v...)
 		return b
-	case SegmentationUPIDTypeEIDR:
-		return upid.compressEIDR(upid.Value)
+	// TI - unsigned int
 	case SegmentationUPIDTypeTI:
 		b := make([]byte, 8)
-		if i, err := strconv.Atoi(upid.Value); err == nil {
-			binary.BigEndian.PutUint64(b, uint64(i))
+		i, err := strconv.ParseUint(strings.TrimSpace(upid.Value), 10, 64)
+		if err != nil {
+			Logger.Fatalf("Error parsing UPID value: %s", err)
+			return b
 		}
+		binary.BigEndian.PutUint64(b, i)
 		return b
+	// everything else - plain text
 	default:
-		switch upid.Format {
-		case "hexbinary":
-			b, _ := hex.DecodeString(upid.Value)
-			return b
-		case "base-64":
-			b, _ := base64.StdEncoding.DecodeString(upid.Value)
-			return b
-		default:
-			return []byte(upid.Value)
-		}
+		return []byte(upid.Value)
 	}
 }
 
@@ -274,7 +292,7 @@ func canonicalEIDR(b []byte) string {
 
 	// dunno what this is
 	if len(b) != 12 {
-		Logger.Printf("unexpected eidr value received: %s", b)
+		Logger.Printf("Unexpected eidr value received: %s", b)
 		return ""
 	}
 

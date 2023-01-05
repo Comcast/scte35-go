@@ -62,7 +62,9 @@ func (cmd *SpliceNull) length() int {
 	return 0
 }
 
-// table returns the splice_null description in tabular format.
-func (cmd *SpliceNull) table(prefix, _ string) string {
-	return prefix+"splice_null() {}\n"
+// writeTo the given table.
+func (cmd *SpliceNull) writeTo(t *table) {
+	tt := t.addTable()
+	tt.open("splice_null()")
+	tt.close()
 }

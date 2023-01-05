@@ -36,7 +36,7 @@ type DeliveryRestrictions struct {
 	DeviceRestrictions     uint32 `xml:"deviceRestrictions,attr" json:"deviceRestrictions"`
 }
 
-// deviceRestrictionsName returns the human readable name for the
+// deviceRestrictionsName returns the human-readable name for the
 // device_restrictions.
 func (dr *DeliveryRestrictions) deviceRestrictionsName() string {
 	switch dr.DeviceRestrictions {

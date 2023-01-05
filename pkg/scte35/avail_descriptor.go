@@ -17,7 +17,6 @@
 package scte35
 
 import (
-	"bytes"
 	"encoding/xml"
 	"fmt"
 
@@ -49,16 +48,15 @@ func (sd *AvailDescriptor) Tag() uint32 {
 	return AvailDescriptorTag
 }
 
-// table returns the avail_descriptor details in tabular format.
-func (sd *AvailDescriptor) table(prefix, indent string) string {
-	var b bytes.Buffer
-	_, _ = fmt.Fprintf(&b, prefix+"avail_descriptor() {\n")
-	_, _ = fmt.Fprintf(&b, prefix+indent+"splice_descriptor_tag: %#02x\n", AvailDescriptorTag)
-	_, _ = fmt.Fprintf(&b, prefix+indent+"descriptor_length: %d bytes\n", sd.length())
-	_, _ = fmt.Fprintf(&b, prefix+indent+"identifier: %s\n", CUEIASCII)
-	_, _ = fmt.Fprintf(&b, prefix+indent+"provider_avail_id: %d\n", sd.ProviderAvailID)
-	_, _ = fmt.Fprintf(&b, prefix+"}\n")
-	return b.String()
+// writeTo the given table.
+func (sd *AvailDescriptor) writeTo(t *table) {
+	tt := t.addTable()
+	tt.open("avail_descriptor()")
+	tt.addRow("splice_descriptor_tag", fmt.Sprintf("%#02x", AvailDescriptorTag))
+	tt.addRow("descriptor_length", sd.length())
+	tt.addRow("identifier", CUEIASCII)
+	tt.addRow("provider_avail_id", sd.ProviderAvailID)
+	tt.close()
 }
 
 // decode updates this splice_descriptor from binary.

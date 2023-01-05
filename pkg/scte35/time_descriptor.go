@@ -17,7 +17,6 @@
 package scte35
 
 import (
-	"bytes"
 	"encoding/xml"
 	"fmt"
 
@@ -51,17 +50,16 @@ func (sd *TimeDescriptor) Tag() uint32 {
 }
 
 // table returns the tabular description of this TimeDescriptor.
-func (sd *TimeDescriptor) table(prefix, indent string) string {
-	var b bytes.Buffer
-	_, _ = fmt.Fprintf(&b, prefix+"time_descriptor() {\n")
-	_, _ = fmt.Fprintf(&b, prefix+indent+"splice_descriptor_tag: %#02x\n", TimeDescriptorTag)
-	_, _ = fmt.Fprintf(&b, prefix+indent+"descriptor_length: %d bytes\n", sd.length())
-	_, _ = fmt.Fprintf(&b, prefix+indent+"identifier: %s\n", CUEIASCII)
-	_, _ = fmt.Fprintf(&b, prefix+indent+"TAI_seconds: %d", sd.TAISeconds)
-	_, _ = fmt.Fprintf(&b, prefix+indent+"TAI_ns: %d\n", sd.TAINS)
-	_, _ = fmt.Fprintf(&b, prefix+indent+"UTC_offset: %d\n", sd.UTCOffset)
-	_, _ = fmt.Fprintf(&b, prefix+"}\n")
-	return b.String()
+func (sd *TimeDescriptor) writeTo(t *table) {
+	tt := t.addTable()
+	tt.open("time_descriptor()")
+	tt.addRow("splice_descriptor_tag", fmt.Sprintf("%#02x", TimeDescriptorTag))
+	tt.addRow("descriptor_length", sd.length())
+	tt.addRow("identifier", CUEIASCII)
+	tt.addRow("tai_seconds", sd.TAISeconds)
+	tt.addRow("tai_ns", sd.TAINS)
+	tt.addRow("utc_offset", sd.UTCOffset)
+	tt.close()
 }
 
 // decode updates this splice_descriptor from binary.
