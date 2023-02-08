@@ -117,7 +117,7 @@ type SegmentationUPID struct {
 	FormatIdentifier *uint32 `xml:"formatIdentifier,attr,omitempty" json:"formatIdentifier,omitempty"`
 	Value            string  `xml:",chardata" json:"value"`
 	// Deprecated: no longer used and will be removed in a future release
-	Format string
+	Format string `xml:"-" json:"-"`
 }
 
 // Name returns the name for the segmentation_upid_type.

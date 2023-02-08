@@ -7,12 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [1.4.1] - 2023-02-08
+
+### Deprecated
+
+* `SegmentationUPID.Format` is no longer used and will be removed from a future release. 
+
 ## [1.4.0] - 2023-02-08
 
 ### Added
 
-* Add support for `SegmentationUPIDTypeSCR` 
-* 
+* Add support for `SegmentationUPIDTypeSCR`
+
 * Add `preRollMilliSeconds` XML attribute (informative only; not carried by binary)
 
 ### Changed
