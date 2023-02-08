@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- This is the normative schema for SCTE 35 2019. The schema references specific sections in SCTE 35 2019. The applicable section in SCTE 35 2019 contains details on attributes, elements and interpretation. -->
+<!-- This is the normative schema for SCTE 35. The schema references specific sections in SCTE 35. -->
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.scte.org/schemas/35"
 	targetNamespace="http://www.scte.org/schemas/35" elementFormDefault="qualified"
-	version="20201012" attributeFormDefault="unqualified">
+	version="20220816" attributeFormDefault="unqualified">
 	<xsd:complexType name="SpliceInfoSectionType">
 		<xsd:annotation>
 			<xsd:documentation>See Section 9.6 - Splice Info Section</xsd:documentation>
@@ -21,7 +21,7 @@
 			</xsd:element>
 			<xsd:choice>
 				<xsd:annotation>
-					<xsd:documentation>See Column XML Element in Table 6 - splice_command_type
+					<xsd:documentation>See Column XML Element in Table 7 - splice_command_type
 						Values. </xsd:documentation>
 				</xsd:annotation>
 				<xsd:element ref="SpliceNull"/>
@@ -34,12 +34,14 @@
 			<xsd:choice minOccurs="0" maxOccurs="unbounded">
 				<xsd:annotation>
 					<xsd:documentation>See Section 10 - Splice Descriptors AND Column XML Element in
-						Table 15 Splice Descriptor Tags </xsd:documentation>
+						Table 16 Splice Descriptor Tags </xsd:documentation>
 				</xsd:annotation>
 				<xsd:element ref="AvailDescriptor"/>
 				<xsd:element ref="DTMFDescriptor"/>
 				<xsd:element ref="SegmentationDescriptor"/>
 				<xsd:element ref="TimeDescriptor"/>
+				<xsd:element ref="AudioDescriptor"/>
+				<xsd:element ref="PrivateDescriptor"/>
 			</xsd:choice>
 		</xsd:sequence>
 		<xsd:attribute name="sapType" default="3">
@@ -48,6 +50,12 @@
 					<xsd:maxInclusive value="3"/>
 				</xsd:restriction>
 			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="preRollMilliSeconds" type="xsd:unsignedInt" default="0">
+			<xsd:annotation>
+				<xsd:documentation>
+			This attribute does NOT correspond to any field in the binary SCTE 35 SpliceInfoSection</xsd:documentation>
+			</xsd:annotation>
 		</xsd:attribute>
 		<xsd:attribute name="ptsAdjustment" type="PTSType" default="0"/>
 		<xsd:attribute name="protocolVersion" type="xsd:unsignedByte" fixed="0"/>
@@ -301,7 +309,7 @@
 	</xsd:complexType>
 	<xsd:element name="BreakDuration" type="BreakDurationType"/>
 	<!--Splice Descriptors - See Section 10 - Splice Descriptors -->
-	<!-- Table 15 - Splice Descriptor Tags - See column XML Element -->
+	<!-- Table 16 - Splice Descriptor Tags - See column XML Element -->
 	<xsd:complexType name="SpliceDescriptorType" abstract="true">
 		<xsd:sequence>
 			<xsd:element ref="Ext" minOccurs="0"/>
@@ -361,7 +369,7 @@
 								use="required"/>
 							<xsd:attribute name="deviceRestrictions" use="required">
 								<xsd:annotation>
-									<xsd:documentation>See Table 20 - device_restrictions
+									<xsd:documentation>See Table 21 - device_restrictions
 									</xsd:documentation>
 								</xsd:annotation>
 								<xsd:simpleType>
@@ -398,7 +406,7 @@
 				</xsd:attribute>
 				<xsd:attribute name="segmentationTypeId" type="xsd:unsignedByte">
 					<xsd:annotation>
-						<xsd:documentation>See Table 22 - segmentation_type_id </xsd:documentation>
+						<xsd:documentation>See Table 23 - segmentation_type_id </xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
 				<xsd:attribute name="segmentNum" type="xsd:unsignedByte"/>
@@ -418,8 +426,7 @@
 			<xsd:extension base="xsd:token">
 				<xsd:attribute name="segmentationUpidType" type="xsd:unsignedByte">
 					<xsd:annotation>
-						<xsd:documentation>See Table 21 -
-segmentation_upid_type</xsd:documentation>
+						<xsd:documentation>See Table 22 - segmentation_upid_type</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
 				<xsd:attribute name="formatIdentifier" type="xsd:unsignedInt">
@@ -514,15 +521,15 @@ segmentation_upid_type</xsd:documentation>
 					<xsd:annotation>
 						<xsd:documentation>This is a 4-bit field that indicates the number of channels in the AC-3 elementary stream. When the MSB is 0, the lower 3 bits are set to the same value as the acmod field in the AC-3 elementary stream. When the MSB field is 1, the lower 3 bits indicate the maximum number of encoded audio channels (counting the lfe channel as 1).
 
-num_channels 	Audio coding mode (acmod) 
+num_channels 	Audio coding mode (acmod)
 ‘0000’ 		1 + 1
-‘0001’ 		1/0 
-‘0010’ 		2/0 
-‘0011’ 		3/0 
-‘0100’ 		2/1 
-‘0101’ 		3/1 
-‘0110’ 		2/2 
-‘0111’ 		3/2 
+‘0001’ 		1/0
+‘0010’ 		2/0
+‘0011’ 		3/0
+‘0100’ 		2/1
+‘0101’ 		3/1
+‘0110’ 		2/2
+‘0111’ 		3/2
 num_channels 	Number of encoded channels
 ‘1000’ 		1
 ‘1001’ 		≤ 2
@@ -559,4 +566,28 @@ being combined with another audio service (e.g., a visually impaired service whi
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
+	<!-- Private Descriptor -->
+	<xsd:complexType name="PrivateDescriptorType">
+		<xsd:annotation>
+			<xsd:documentation>See Section 10.3.x - private descriptor </xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="SpliceDescriptorType">
+				<xsd:sequence>
+					<xsd:element name="PrivateBytes" type="xsd:hexBinary" minOccurs="0"/>
+				</xsd:sequence>
+				<xsd:attribute name="descriptorTag" type="xsd:unsignedByte" use="required">
+					<xsd:annotation>
+						<xsd:documentation>The descriptor tags are defined by the owner of the descriptor, as registered using the identifier.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="identifier" type="xsd:unsignedInt" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Only identifier values registered and recognized by SMPTE Registration Authority, LLC should be used.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="PrivateDescriptor" type="PrivateDescriptorType"/>
 </xsd:schema>

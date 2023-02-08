@@ -5,7 +5,7 @@ binary Digital Program Insertion Cueing Messages.
 
 This library is fully compliant and compatible with all versions of the 
 [ANSI/SCTE 35](https://www.scte.org/standards-development/library/standards-catalog/scte-35-2019/) 
-specification up to and including [ANSI/SCTE 35 2020](./docs/SCTE-35_2020.pdf).
+specification up to and including [ANSI/SCTE 35 2020](./docs/SCTE_35_2022b.pdf).
 
 This project uses [Semantic Versioning](https://semver.org) and is published as
 a [Go Module](https://blog.golang.org/using-go-modules).
@@ -32,8 +32,8 @@ Binary signals can be quickly and easily decoded from base-64 or hexadecimal
 strings.
 
 The results can be output as a:
-* String - emulating the table structure used in the [SCTE 35 specification](./docs/ANSI_SCTE-35-2020.pdf).
-* XML - compliant with the [SCTE 35 XML Schema](./docs/scte35.xsd)
+* String - emulating the table structure used in the [SCTE 35 specification](./docs/SCTE_35_2022b.pdf).
+* XML - compliant with the [SCTE 35 XML Schema](./docs/scte_35_20220816.xsd)
 * JSON - for integrating with JSON based tools such as [jq](https://stedolan.github.io/jq/)
 
 [decode.go](../examples/decode.go)
