@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [1.4.0] - 2023-02-08
+
+### Added
+
+* Add support for `SegmentationUPIDTypeSCR` 
+* 
+* Add `preRollMilliSeconds` XML attribute (informative only; not carried by binary)
+
+### Changed
+
+* Simplify rendering of splice_info_section table, correcting some minor inconsistencies.
+
 ## [1.3.2] - 2022-09-03
 
 ### Changed
