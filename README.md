@@ -1,11 +1,11 @@
-# scte35-go: ANSI/SCTE 35 Decoder/Encoder 
+# scte35-go: ANSI/SCTE 35 Decoder/Encoder
 
-`scte35-go` is a Go library to supports creating, decorating, and analyzing 
+`scte35-go` is a Go library to supports creating, decorating, and analyzing
 binary Digital Program Insertion Cueing Messages.
 
-This library is fully compliant and compatible with all versions of the 
-[ANSI/SCTE 35](https://www.scte.org/standards-development/library/standards-catalog/scte-35-2019/) 
-specification up to and including [ANSI/SCTE 35 2020](./docs/SCTE_35_2022b.pdf).
+This library is fully compliant and compatible with all versions of the
+[ANSI/SCTE 35](https://www.scte.org/standards-development/library/standards-catalog/scte-35-2019/)
+specification up to and including [ANSI/SCTE 35 2022b](./docs/SCTE_35_2022b.pdf).
 
 This project uses [Semantic Versioning](https://semver.org) and is published as
 a [Go Module](https://blog.golang.org/using-go-modules).
@@ -162,7 +162,7 @@ JSON:
 #### Encode Signal
 
 Encoding signals is equally simple. You can start from scratch and build a
-`scte35.SpliceInfoSection` or decode an existing signal and modify it to suit 
+`scte35.SpliceInfoSection` or decode an existing signal and modify it to suit
 your needs.
 
 [encode.go](./examples/encode.go)
@@ -305,7 +305,7 @@ splice_insert() {
     duration: 0 ticks (0s)
     unique_program_id: 0
     avail_num: 0
-    avails_expected: 0    
+    avails_expected: 0  
 }
 ```
 
@@ -318,7 +318,7 @@ can be explicitly ignored if desired.
 sis, err := scte35.DecodeBase64("/DA4AAAAAAAAAP/wFAUABDEAf+//mWEhzP4Azf5gAQAAAAATAhFDVUVJAAAAAX+/AQIwNAEAAKeYO3Q=")
 if err != nil && !errors.Is(err, scte35.ErrCRC32Invalid) {
   return err
-} 
+}
 ```
 
 #### Logging
@@ -353,16 +353,16 @@ Flags:
 
 ## License
 
-`scte35-go` is licensed under [Apache License 2.0](/LICENSE.md). 
+`scte35-go` is licensed under [Apache License 2.0](/LICENSE.md).
 
 ## Code of Conduct
 
-We take our [code of conduct](CODE_OF_CONDUCT.md) very seriously. Please abide 
+We take our [code of conduct](CODE_OF_CONDUCT.md) very seriously. Please abide
 by it.
 
 ## Contributing
 
-Please read our [contributing guide](CONTRIBUTING.md) for details on how to 
+Please read our [contributing guide](CONTRIBUTING.md) for details on how to
 contribute to our project.
 
 ## Releases
