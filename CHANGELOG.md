@@ -7,11 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [1.4.2] - 2023-02-09
+
+### Fixed
+
+* Fixed formatting inconsistencies when calling `SpliceInfoSection.Table()`.
+
 ## [1.4.1] - 2023-02-08
 
 ### Deprecated
 
-* `SegmentationUPID.Format` is no longer used and will be removed from a future release. 
+* `SegmentationUPID.Format` is no longer used and will be removed from a future release.
 
 ## [1.4.0] - 2023-02-08
 
@@ -70,9 +76,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Added `SpliceInfoSection.Table(prefix, indent)` to format tabular output.
 
-* Added methods for computing `_flag` values. 
+* Added methods for computing `_flag` values.
 
-* Added latest specification and XML schema to /docs 
+* Added latest specification and XML schema to /docs
 
 ## [1.0.0] - 2021-07-01
 
