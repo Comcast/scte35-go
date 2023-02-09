@@ -41,15 +41,14 @@ type DTMFDescriptor struct {
 
 // writeTo the given table.
 func (sd *DTMFDescriptor) writeTo(t *table) {
-	tt := t.addTable()
-	tt.open("dtmf_descriptor()")
-	tt.addRow("splice_descriptor_tag", fmt.Sprintf("%#02x", DTMFDescriptorTag))
-	tt.addRow("descriptor_length", sd.length())
-	tt.addRow("identifier", CUEIASCII)
-	tt.addRow("preroll", float32(sd.Preroll/10))
-	tt.addRow("dtmf_count", len(sd.DTMFChars))
-	tt.addRow("dtmf_chars", sd.DTMFChars)
-	tt.close()
+	t.row(0, "dtmf_descriptor() {", nil)
+	t.row(1, "splice_descriptor_tag", fmt.Sprintf("%#02x", DTMFDescriptorTag))
+	t.row(1, "descriptor_length", sd.length())
+	t.row(1, "identifier", fmt.Sprintf("%#08x (%s)", CUEIdentifier, CUEIASCII))
+	t.row(1, "preroll", float32(sd.Preroll/10))
+	t.row(1, "dtmf_count", len(sd.DTMFChars))
+	t.row(1, "dtmf_chars", sd.DTMFChars)
+	t.row(0, "}", nil)
 }
 
 // Tag returns the splice_descriptor_tag.

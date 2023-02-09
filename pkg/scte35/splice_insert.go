@@ -69,45 +69,43 @@ func (cmd *SpliceInsert) Type() uint32 {
 
 // writeTo the given table.
 func (cmd *SpliceInsert) writeTo(t *table) {
-	tt := t.addTable()
-	tt.open("splice_insert")
-	tt.addRow("splice_event_id", cmd.SpliceEventID)
-	tt.addRow("splice_event_cancel_indicator", cmd.SpliceEventCancelIndicator)
+	t.row(0, "splice_insert() {", nil)
+	t.row(1, "splice_event_id", cmd.SpliceEventID)
+	t.row(1, "splice_event_cancel_indicator", cmd.SpliceEventCancelIndicator)
 	if !cmd.SpliceEventCancelIndicator {
-		tt.addRow("out_of_network_indicator", cmd.OutOfNetworkIndicator)
-		tt.addRow("program_splice_flag", cmd.ProgramSpliceFlag())
-		tt.addRow("duration_flag", cmd.DurationFlag())
-		tt.addRow("splice_immediate_flag", cmd.SpliceImmediateFlag)
+		t.row(1, "out_of_network_indicator", cmd.OutOfNetworkIndicator)
+		t.row(1, "program_splice_flag", cmd.ProgramSpliceFlag())
+		t.row(1, "duration_flag", cmd.DurationFlag())
+		t.row(1, "splice_immediate_flag", cmd.SpliceImmediateFlag)
 		if cmd.ProgramSpliceFlag() && !cmd.SpliceImmediateFlag {
-			tt.addRow("time_specified_flag", cmd.TimeSpecifiedFlag())
+			t.row(1, "time_specified_flag", cmd.TimeSpecifiedFlag())
 			if cmd.TimeSpecifiedFlag() {
-				tt.addRow("pts_time", cmd.Program.SpliceTime.PTSTime)
+				t.row(1, "pts_time", cmd.Program.SpliceTime.PTSTime)
 			}
 		}
 		if !cmd.ProgramSpliceFlag() {
-			tt.addRow("component_count", len(cmd.Components))
+			t.row(1, "component_count", len(cmd.Components))
 			for i, c := range cmd.Components {
-				ct := tt.addTable()
-				ct.open("component[" + strconv.Itoa(i) + "]")
-				ct.addRow("component_tag", c.Tag)
+				t.row(1, "component["+strconv.Itoa(i)+"]", nil)
+				t.row(2, "component_tag", c.Tag)
 				if !cmd.SpliceImmediateFlag {
-					ct.addRow("time_specified_flag", c.TimeSpecifiedFlag())
+					t.row(2, "time_specified_flag", c.TimeSpecifiedFlag())
 					if c.TimeSpecifiedFlag() {
-						ct.addRow("pts_time", c.SpliceTime.PTSTime)
+						t.row(2, "pts_time", c.SpliceTime.PTSTime)
 					}
 				}
-				ct.close()
+				t.row(1, "}", nil)
 			}
 		}
 		if cmd.DurationFlag() {
-			tt.addRow("auto_return", cmd.BreakDuration.AutoReturn)
-			tt.addRow("duration", cmd.BreakDuration.Duration)
+			t.row(1, "auto_return", cmd.BreakDuration.AutoReturn)
+			t.row(1, "duration", cmd.BreakDuration.Duration)
 		}
-		tt.addRow("unique_program_id", cmd.UniqueProgramID)
-		tt.addRow("avail_num", cmd.AvailNum)
-		tt.addRow("avails_expected", cmd.AvailsExpected)
+		t.row(1, "unique_program_id", cmd.UniqueProgramID)
+		t.row(1, "avail_num", cmd.AvailNum)
+		t.row(1, "avails_expected", cmd.AvailsExpected)
 	}
-	tt.close()
+	t.row(0, "}", nil)
 }
 
 // decode a binary splice_insert.

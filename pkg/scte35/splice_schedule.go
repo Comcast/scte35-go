@@ -179,41 +179,38 @@ func (cmd SpliceSchedule) length() int {
 
 // writeTo the given table.
 func (cmd *SpliceSchedule) writeTo(t *table) {
-	tt := t.addTable()
-	tt.open("splice_schedule()")
-	tt.addRow("splice_count", strconv.Itoa(len(cmd.Events)))
+	t.row(0, "splice_schedule() {", nil)
+	t.row(1, "splice_count", strconv.Itoa(len(cmd.Events)))
 	for i, e := range cmd.Events {
-		et := tt.addTable()
-		et.open("event[" + strconv.Itoa(i) + "]")
-		et.addRow("splice_event_id", e.SpliceEventID)
-		et.addRow("splice_event_cancel_indicator", e.SpliceEventCancelIndicator)
+		t.row(1, "event["+strconv.Itoa(i)+"]", nil)
+		t.row(2, "splice_event_id", e.SpliceEventID)
+		t.row(2, "splice_event_cancel_indicator", e.SpliceEventCancelIndicator)
 		if !e.SpliceEventCancelIndicator {
-			et.addRow("out_of_network_indicator", e.OutOfNetworkIndicator)
-			et.addRow("program_splice_flag", e.ProgramSpliceFlag())
-			et.addRow("duration_flag", e.DurationFlag())
+			t.row(2, "out_of_network_indicator", e.OutOfNetworkIndicator)
+			t.row(2, "program_splice_flag", e.ProgramSpliceFlag())
+			t.row(2, "duration_flag", e.DurationFlag())
 			if e.ProgramSpliceFlag() {
-				et.addRow("utc_splice_time", e.Program.UTCSpliceTime)
+				t.row(2, "utc_splice_time", e.Program.UTCSpliceTime)
 			} else {
-				et.addRow("component_count", len(e.Components))
+				t.row(2, "component_count", len(e.Components))
 				for j, c := range e.Components {
-					ct := et.addTable()
-					ct.open("component[" + strconv.Itoa(j) + "]")
-					ct.addRow("component_tag", c.Tag)
-					ct.addRow("utc_splice_time", c.UTCSpliceTime)
-					ct.close()
+					t.row(2, "component["+strconv.Itoa(j)+"]", nil)
+					t.row(3, "component_tag", c.Tag)
+					t.row(3, "utc_splice_time", c.UTCSpliceTime)
+					t.row(2, "}", nil)
 				}
 			}
 			if e.DurationFlag() {
-				et.addRow("auto_return", e.BreakDuration.AutoReturn)
-				et.addRow("duration", e.BreakDuration.Duration)
+				t.row(1, "auto_return", e.BreakDuration.AutoReturn)
+				t.row(1, "duration", e.BreakDuration.Duration)
 			}
-			et.addRow("unique_program_id", e.UniqueProgramID)
-			et.addRow("avail_num", e.AvailNum)
-			et.addRow("avails_expected", e.AvailsExpected)
+			t.row(1, "unique_program_id", e.UniqueProgramID)
+			t.row(1, "avail_num", e.AvailNum)
+			t.row(1, "avails_expected", e.AvailsExpected)
 		}
-		et.close()
+		t.row(1, "}", nil)
 	}
-	tt.close()
+	t.row(0, "}", nil)
 }
 
 // Event is a single event within a splice_schedule.

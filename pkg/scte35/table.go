@@ -23,36 +23,18 @@ type table struct {
 	b      *strings.Builder
 }
 
-// open the table.
-func (t *table) open(label string) {
+// row0 writes a new row with 0 indents.
+func (t *table) row(indents int, key string, value any) {
 	_, _ = t.b.WriteString(t.prefix)
-	_, _ = t.b.WriteString(label)
-	_, _ = t.b.WriteString(" {\n")
-}
-
-// close the table
-func (t *table) close() {
-	_, _ = t.b.WriteString(t.prefix)
-	_, _ = t.b.WriteString("}\n")
-}
-
-// addRow adds a row to the table.
-func (t *table) addRow(key string, value any) {
-	_, _ = t.b.WriteString(t.prefix)
-	_, _ = t.b.WriteString(t.indent)
-	_, _ = t.b.WriteString(key)
-	_, _ = t.b.WriteString(": ")
-	_, _ = t.b.WriteString(valueString(value))
-	_, _ = t.b.WriteRune('\n')
-}
-
-// addTable adds a child table that is indented one additional level.
-func (t *table) addTable() *table {
-	return &table{
-		b:      t.b,
-		prefix: t.indent + t.prefix,
-		indent: t.indent + t.indent,
+	for i := 0; i < indents; i++ {
+		_, _ = t.b.WriteString(t.indent)
 	}
+	_, _ = t.b.WriteString(key)
+	if value != nil {
+		_, _ = t.b.WriteString(": ")
+		_, _ = t.b.WriteString(valueString(value))
+	}
+	_, _ = t.b.WriteRune('\n')
 }
 
 // String returns the table string.

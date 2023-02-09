@@ -106,23 +106,21 @@ func (sd *AudioDescriptor) length() int {
 
 // writeTo the given table.
 func (sd *AudioDescriptor) writeTo(t *table) {
-	tt := t.addTable()
-	tt.open("audio_descriptor()")
-	tt.addRow("splice_descriptor_tag", fmt.Sprintf("%#02x", sd.Tag()))
-	tt.addRow("descriptor_length", sd.length())
-	tt.addRow("identifier", CUEIASCII)
-	tt.addRow("audio_count", len(sd.AudioChannels))
+	t.row(0, "audio_descriptor() {", nil)
+	t.row(1, "splice_descriptor_tag", fmt.Sprintf("%#02x", sd.Tag()))
+	t.row(1, "descriptor_length", sd.length())
+	t.row(1, "identifier", fmt.Sprintf("%#08x, (%s)", CUEIdentifier, CUEIASCII))
+	t.row(1, "audio_count", len(sd.AudioChannels))
 	for i, ac := range sd.AudioChannels {
-		at := tt.addTable()
-		at.open("audio_channel[" + strconv.Itoa(i) + "]")
-		at.addRow("component_tag", ac.ComponentTag)
-		at.addRow("iso_code", ac.ISOCode)
-		at.addRow("bit_stream_mode", ac.BitStreamMode)
-		at.addRow("num_channels", ac.NumChannels)
-		at.addRow("full_srvc_audio", ac.FullSrvcAudio)
-		at.close()
+		t.row(1, "audio_channel["+strconv.Itoa(i)+"] {", nil)
+		t.row(2, "component_tag", ac.ComponentTag)
+		t.row(2, "iso_code", ac.ISOCode)
+		t.row(2, "bit_stream_mode", ac.BitStreamMode)
+		t.row(2, "num_channels", ac.NumChannels)
+		t.row(2, "full_srvc_audio", ac.FullSrvcAudio)
+		t.row(1, "}", nil)
 	}
-	tt.close()
+	t.row(0, "}", nil)
 }
 
 // AudioChannel collects the audio PID details.

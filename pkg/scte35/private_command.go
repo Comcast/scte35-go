@@ -94,9 +94,8 @@ func (cmd *PrivateCommand) length() int {
 
 // writeTo the given table.
 func (cmd *PrivateCommand) writeTo(t *table) {
-	tt := t.addTable()
-	tt.open("private_command()")
-	tt.addRow("identifier", cmd.IdentifierString())
-	tt.addRow("private_byte", fmt.Sprintf("%#0x", cmd.PrivateBytes))
-	tt.close()
+	t.row(0, "private_command() {", nil)
+	t.row(1, "identifier", fmt.Sprintf("%#08x, (%s)", cmd.Identifier, cmd.IdentifierString()))
+	t.row(1, "private_byte", fmt.Sprintf("%#0x", cmd.PrivateBytes))
+	t.row(0, "}", nil)
 }

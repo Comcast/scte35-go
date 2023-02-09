@@ -92,11 +92,10 @@ func (sd *PrivateDescriptor) length() int {
 
 // table returns the tabular description of this PrivateDescriptor.
 func (sd *PrivateDescriptor) writeTo(t *table) {
-	tt := t.addTable()
-	tt.open("private_descriptor()")
-	tt.addRow("splice_descriptor_tag", fmt.Sprintf("%#02x", sd.Tag()))
-	tt.addRow("descriptor_length", sd.length())
-	tt.addRow("identifier", sd.IdentifierString())
-	tt.addRow("private_bytes", fmt.Sprintf("%#0x", sd.PrivateBytes))
-	tt.close()
+	t.row(0, "private_descriptor() {", nil)
+	t.row(1, "splice_descriptor_tag", fmt.Sprintf("%#02x", sd.Tag()))
+	t.row(1, "descriptor_length", sd.length())
+	t.row(1, "identifier", fmt.Sprintf("%#08x, (%s)", sd.Identifier, sd.IdentifierString()))
+	t.row(1, "private_bytes", fmt.Sprintf("%#0x", sd.PrivateBytes))
+	t.row(0, "}", nil)
 }

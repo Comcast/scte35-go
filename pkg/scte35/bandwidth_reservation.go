@@ -69,7 +69,5 @@ func (cmd *BandwidthReservation) length() int {
 
 // writeTo the given table.
 func (cmd *BandwidthReservation) writeTo(t *table) {
-	tt := t.addTable()
-	tt.open("bandwidth_reservation()")
-	tt.close()
+	t.row(0, "bandwidth_reservation() {}", nil)
 }

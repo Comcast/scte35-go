@@ -108,13 +108,12 @@ func (cmd *TimeSignal) length() int {
 
 // writeTo the given table.
 func (cmd *TimeSignal) writeTo(t *table) {
-	tt := t.addTable()
-	tt.open("time_signal()")
-	tt.addRow("time_specified_flag", cmd.timeSpecifiedFlag())
+	t.row(0, "time_signal() {", nil)
+	t.row(1, "time_specified_flag", cmd.timeSpecifiedFlag())
 	if cmd.timeSpecifiedFlag() {
-		tt.addRow("time_specified_flag", cmd.SpliceTime.PTSTime)
+		t.row(1, "pts_time", cmd.SpliceTime.PTSTime)
 	}
-	tt.close()
+	t.row(0, "}", nil)
 }
 
 // timeSpecifiedFlag return the time_specified_flag.

@@ -537,66 +537,63 @@ func (sd *SegmentationDescriptor) length() int {
 
 // table returns the tabular description of this SegmentationDescriptor.
 func (sd *SegmentationDescriptor) writeTo(t *table) {
-	tt := t.addTable()
-	tt.open("avail_descriptor()")
-	tt.addRow("splice_descriptor_tag", fmt.Sprintf("%#02x", sd.Tag()))
-	tt.addRow("descriptor_length", sd.length())
-	tt.addRow("identifier", CUEIASCII)
-	tt.addRow("segmentation_event_id", sd.SegmentationEventID)
-	tt.addRow("segmentation_event_cancel_indicator", sd.SegmentationEventCancelIndicator)
+	t.row(0, "segmentation_descriptor()", nil)
+	t.row(1, "splice_descriptor_tag", fmt.Sprintf("%#02x", sd.Tag()))
+	t.row(1, "descriptor_length", sd.length())
+	t.row(1, "identifier", fmt.Sprintf("%#08x (%s)", CUEIdentifier, CUEIASCII))
+	t.row(1, "segmentation_event_id", sd.SegmentationEventID)
+	t.row(1, "segmentation_event_cancel_indicator", sd.SegmentationEventCancelIndicator)
 	if !sd.SegmentationEventCancelIndicator {
-		tt.addRow("program_segmentation_flag", sd.ProgramSegmentationFlag())
-		tt.addRow("segmentation_duration_flag", sd.SegmentationDurationFlag())
-		tt.addRow("delivery_not_restricted_flag", sd.DeliveryNotRestrictedFlag())
+		t.row(1, "program_segmentation_flag", sd.ProgramSegmentationFlag())
+		t.row(1, "segmentation_duration_flag", sd.SegmentationDurationFlag())
+		t.row(1, "delivery_not_restricted_flag", sd.DeliveryNotRestrictedFlag())
 		if sd.DeliveryRestrictions != nil {
-			tt.addRow("web_delivery_allowed_flag", sd.DeliveryRestrictions.WebDeliveryAllowedFlag)
-			tt.addRow("no_regional_blackout_flag", sd.DeliveryRestrictions.NoRegionalBlackoutFlag)
-			tt.addRow("archive_allowed_flag", sd.DeliveryRestrictions.ArchiveAllowedFlag)
-			tt.addRow("device_restrictions", fmt.Sprintf("%d (%s)", sd.DeliveryRestrictions.DeviceRestrictions, sd.DeliveryRestrictions.deviceRestrictionsName()))
+			t.row(1, "web_delivery_allowed_flag", sd.DeliveryRestrictions.WebDeliveryAllowedFlag)
+			t.row(1, "no_regional_blackout_flag", sd.DeliveryRestrictions.NoRegionalBlackoutFlag)
+			t.row(1, "archive_allowed_flag", sd.DeliveryRestrictions.ArchiveAllowedFlag)
+			t.row(1, "device_restrictions", fmt.Sprintf("%d (%s)", sd.DeliveryRestrictions.DeviceRestrictions, sd.DeliveryRestrictions.deviceRestrictionsName()))
 		}
 		if len(sd.Components) > 0 {
-			tt.addRow("component_count", len(sd.Components))
+			t.row(1, "component_count", len(sd.Components))
 			for i, c := range sd.Components {
-				ct := tt.addTable()
-				ct.open("component[" + strconv.Itoa(i) + "]")
-				ct.addRow("component_tag", c.Tag)
-				ct.addRow("pts_offset", c.PTSOffset)
-				ct.close()
+				t.row(1, "component["+strconv.Itoa(i)+"] {", nil)
+				t.row(2, "component_tag", c.Tag)
+				t.row(2, "pts_offset", c.PTSOffset)
+				t.row(1, "}", nil)
 			}
 		}
 		if sd.SegmentationDurationFlag() {
-			tt.addRow("segmentation_duration", sd.SegmentationDuration)
+			t.row(1, "segmentation_duration", sd.SegmentationDuration)
 		}
 
-		tt.addRow("segmentation_upid_length", sd.SegmentationUpidLength())
+		t.row(1, "segmentation_upid_length", sd.SegmentationUpidLength())
 		for i, u := range sd.SegmentationUPIDs {
-			ut := tt.addTable()
-			ut.open("segmentation_upid[" + strconv.Itoa(i) + "]")
-			ut.addRow("segmentation_upid_type", fmt.Sprintf("%#02x (%s)", u.Type, u.Name()))
+			t.row(1, "segmentation_upid["+strconv.Itoa(i)+"] {", nil)
+			t.row(2, "segmentation_upid_type", fmt.Sprintf("%#02x (%s)", u.Type, u.Name()))
 			if u.Type == SegmentationUPIDTypeMPU {
-				ut.addRow("format_identifier", u.formatIdentifierString())
+				t.row(2, "format_identifier", u.formatIdentifierString())
 			}
-			ut.addRow("segmentation_upid", u.Value)
-			ut.close()
+			t.row(2, "segmentation_upid", u.Value)
+			t.row(1, "}", nil)
 		}
 	}
 
-	tt.addRow("segmentation_type_id", fmt.Sprintf("%#02x (%s)", sd.SegmentationTypeID, sd.Name()))
-	tt.addRow("segment_num", sd.SegmentNum)
-	tt.addRow("segments_expected", sd.SegmentsExpected)
+	t.row(1, "segmentation_type_id", fmt.Sprintf("%#02x (%s)", sd.SegmentationTypeID, sd.Name()))
+	t.row(1, "segment_num", sd.SegmentNum)
+	t.row(1, "segments_expected", sd.SegmentsExpected)
 	switch sd.SegmentationTypeID {
 	case SegmentationTypeProviderPOStart,
 		SegmentationTypeDistributorPOStart,
 		SegmentationTypeProviderOverlayPOStart,
 		SegmentationTypeDistributorOverlayPOStart:
 		if sd.SubSegmentNum != nil {
-			tt.addRow("sub_segment_num", sd.SubSegmentNum)
+			t.row(1, "sub_segment_num", sd.SubSegmentNum)
 		}
 		if sd.SubSegmentsExpected != nil {
-			tt.addRow("sub_segments_expected", sd.SubSegmentsExpected)
+			t.row(1, "sub_segments_expected", sd.SubSegmentsExpected)
 		}
 	}
-	tt.close()
+	t.row(0, "}", nil)
 }
 
 // SegmentationDescriptorComponent describes the Component element contained

@@ -64,7 +64,5 @@ func (cmd *SpliceNull) length() int {
 
 // writeTo the given table.
 func (cmd *SpliceNull) writeTo(t *table) {
-	tt := t.addTable()
-	tt.open("splice_null()")
-	tt.close()
+	t.row(0, "splice_null() {}", nil)
 }
