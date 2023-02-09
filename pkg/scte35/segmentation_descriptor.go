@@ -537,7 +537,7 @@ func (sd *SegmentationDescriptor) length() int {
 
 // table returns the tabular description of this SegmentationDescriptor.
 func (sd *SegmentationDescriptor) writeTo(t *table) {
-	t.row(0, "segmentation_descriptor()", nil)
+	t.row(0, "segmentation_descriptor() {", nil)
 	t.row(1, "splice_descriptor_tag", fmt.Sprintf("%#02x", sd.Tag()))
 	t.row(1, "descriptor_length", sd.length())
 	t.row(1, "identifier", fmt.Sprintf("%#08x (%s)", CUEIdentifier, CUEIASCII))

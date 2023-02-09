@@ -6,9 +6,7 @@ repos:
     hooks:
       - id: go-fmt
       - id: go-vet
-      - id: go-imports
       - id: golangci-lint
-      - id: go-critic
       - id: go-unit-tests
       - id: go-build
       - id: go-mod-tidy
