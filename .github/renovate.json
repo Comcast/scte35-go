@@ -4,6 +4,12 @@
     "config:base"
   ],
   "semanticCommits": "enabled",
+  "gitIgnoredAuthors": [
+    "blahspambot"
+  ],
+  "repositories": [
+    "Comcast/scte-35"
+  ],
   "enabledManagers": [
     "gomod",
     "github-actions",

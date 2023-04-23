@@ -5,6 +5,7 @@ changelog:
       - question
       - wontfix
     authors:
+      - blahspambot
       - renovate
   categories:
     - title: Features
