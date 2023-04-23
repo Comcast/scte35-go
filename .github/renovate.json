@@ -8,7 +8,7 @@
     "blahspambot"
   ],
   "repositories": [
-    "Comcast/scte-35"
+    "Comcast/scte35-go"
   ],
   "enabledManagers": [
     "gomod",
