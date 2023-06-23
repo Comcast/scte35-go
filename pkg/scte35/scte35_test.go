@@ -24,6 +24,7 @@ import (
 	"io"
 	"os"
 	"testing"
+	"unicode/utf8"
 
 	"github.com/Comcast/scte35-go/pkg/scte35"
 	"github.com/stretchr/testify/assert"
@@ -696,6 +697,35 @@ func TestEncodeWithAlignmentStuffing(t *testing.T) {
 			sis, err := scte35.DecodeBase64(c.binary)
 			require.NoError(t, err)
 			require.Equal(t, c.binary, sis.Base64())
+		})
+	}
+}
+
+// Segmentation UPIDs are required to be US-ASCII, but Go uses UTF8 strings.  Make sure the decoder
+// decodes the strings properly.
+func TestASCIItoUTF8(t *testing.T) {
+	cases := []struct {
+		name   string
+		binary string
+	}{
+		{
+			name:   "Time Signal, multiple descriptors, valid ASCII but invalid UTF8 segmentation UPIDs",
+			binary: "/DDHAAAAABc0AP/wBQb/tVo+agCxAhdDVUVJQA4hwH+fCAgAAAAAPj6IcCMAAAIXQ1VFSUAOI1x/nwgIAAAAAD4+iHARAAACF0NVRUlADiHgf58ICAAAAAA+Poi2EAAAAhxDVUVJQA4hyn/fAABSlKwICAAAAAA+Poi2IgAAAkZDVUVJQA4h1n/PAABSlKwNMgoMFHf5uXs0AAAAAAAADhh0eXBlPUxBJmR1cj02MDAwMCZ0aWVy/DDHAAAAAAAAAP/wBQb/dvhrwQ==",
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			sis, err := scte35.DecodeBase64(c.binary)
+			require.NoError(t, err)
+
+			for _, sd := range sis.SpliceDescriptors {
+				if seg, ok := sd.(*scte35.SegmentationDescriptor); ok {
+					for _, upid := range seg.SegmentationUPIDs {
+						require.True(t, utf8.ValidString(upid.Value))
+					}
+				}
+			}
 		})
 	}
 }

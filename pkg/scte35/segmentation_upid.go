@@ -22,11 +22,14 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
+	"io/ioutil"
 	"strconv"
 	"strings"
 	"unicode/utf8"
 
 	"github.com/bamiaux/iobit"
+	"golang.org/x/text/encoding/ianaindex"
+	"golang.org/x/text/transform"
 )
 
 const (
@@ -106,9 +109,26 @@ func NewSegmentationUPID(upidType uint32, buf []byte) SegmentationUPID {
 	default:
 		return SegmentationUPID{
 			Type:  upidType,
-			Value: string(r.LeftBytes()),
+			Value: DecodeASCII(r.LeftBytes()),
 		}
 	}
+}
+
+// DecodeASCII assumes the byte array holds an ASCII-encoded string and converts it to a UTF-8
+// compatible string.
+func DecodeASCII(b []byte) string {
+	// This shouldn't fail...
+	e, _ := ianaindex.MIME.Encoding("US-ASCII")
+
+	r := transform.NewReader(bytes.NewReader(b), e.NewDecoder())
+	result, err := ioutil.ReadAll(r)
+	if err != nil {
+		// Note: NewSegmentationUPID, which calls this function, doesn't return errors.
+		// Not sure how best to account for this?
+		return "invalid encoding"
+	}
+
+	return string(result)
 }
 
 // SegmentationUPID is used to express a UPID in an XML document.
