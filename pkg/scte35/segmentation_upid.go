@@ -176,7 +176,7 @@ func (upid *SegmentationUPID) ASCIIValue() string {
 			rs[i] = b[i]
 			continue
 		}
-		rs[i] = byte(46) // "."
+		rs[i] = '.'
 	}
 	return string(rs)
 }
