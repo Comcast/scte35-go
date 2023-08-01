@@ -10,7 +10,7 @@ specification up to and including [ANSI/SCTE 35 2022b](./docs/SCTE_35_2022b.pdf)
 This project uses [Semantic Versioning](https://semver.org) and is published as
 a [Go Module](https://blog.golang.org/using-go-modules).
 
-![Build Status](https://github.com/Comcast/scte35-go/actions/workflows/build.yml/badge.svg)
+[![Build Status](https://github.com/Comcast/scte35-go/actions/workflows/check.yml/badge.svg)](https://github.com/Comcast/scte35-go/actions/workflows/check.yml)
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/Comcast/scte35-go)](https://pkg.go.dev/github.com/Comcast/scte35-go)
 
 ## Getting Started
