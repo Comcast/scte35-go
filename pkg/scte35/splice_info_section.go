@@ -31,7 +31,7 @@ import (
 const (
 	// TableID is an 8-bit field that shall be 0xFC.
 	TableID = 0xFC
-	// SectionSyntaxIndicator is a 1-bit field that should always be set to ‘0’.
+	// SectionSyntaxIndicator is a 1-bit field that should always be set to '0'.
 	SectionSyntaxIndicator = false
 	// PrivateIndicator is a 1-bit flag that shall be set to 0.
 	PrivateIndicator = false
@@ -319,7 +319,11 @@ func (sis *SpliceInfoSection) UnmarshalJSON(b []byte) error {
 	sis.EncryptedPacket = tmp.EncryptedPacket
 	sis.SpliceCommand = tmp.SpliceCommand()
 	sis.SpliceDescriptors = tmp.SpliceDescriptors
-	sis.SAPType = tmp.SAPType
+	if tmp.SAPType != nil {
+		sis.SAPType = *tmp.SAPType
+	} else {
+		sis.SAPType = SAPTypeNotSpecified
+	}
 	sis.PTSAdjustment = tmp.PTSAdjustment
 	sis.ProtocolVersion = tmp.ProtocolVersion
 	sis.Tier = tmp.Tier
@@ -335,7 +339,11 @@ func (sis *SpliceInfoSection) UnmarshalXML(d *xml.Decoder, start xml.StartElemen
 	sis.EncryptedPacket = tmp.EncryptedPacket
 	sis.SpliceCommand = tmp.SpliceCommand()
 	sis.SpliceDescriptors = tmp.SpliceDescriptors
-	sis.SAPType = tmp.SAPType
+	if tmp.SAPType != nil {
+		sis.SAPType = *tmp.SAPType
+	} else {
+		sis.SAPType = SAPTypeNotSpecified
+	}
 	sis.PTSAdjustment = tmp.PTSAdjustment
 	sis.ProtocolVersion = tmp.ProtocolVersion
 	sis.Tier = tmp.Tier
@@ -404,7 +412,7 @@ type iSIS struct {
 	BandwidthReservation *BandwidthReservation `xml:"http://www.scte.org/schemas/35 BandwidthReservation" json:"-"`
 	PrivateCommand       *PrivateCommand       `xml:"http://www.scte.org/schemas/35 PrivateCommand" json:"-"`
 	SpliceDescriptors    SpliceDescriptors     `xml:",any" json:"spliceDescriptors"`
-	SAPType              uint32                `xml:"sapType,attr" json:"sapType"`
+	SAPType              *uint32               `xml:"sapType,attr" json:"sapType,omitempty"`
 	PTSAdjustment        uint64                `xml:"ptsAdjustment,attr" json:"ptsAdjustment"`
 	ProtocolVersion      uint32                `xml:"protocolVersion,attr" json:"protocolVersion"`
 	Tier                 uint32                `xml:"tier,attr" json:"tier"`

@@ -37,15 +37,13 @@ func TestDecodeBase64(t *testing.T) {
 	// when adding tests that contain multiple splice descriptors, care must be
 	// taken to ensure they are in the order specified in the custom UnmarshalXML
 	// implementation, otherwise misleading error may occur
-	cases := []struct {
-		name     string
+	cases := map[string]struct {
 		binary   string
 		err      error
 		expected scte35.SpliceInfoSection
 		legacy   bool
 	}{
-		{
-			name:   "Sample 14.1 time_signal - Placement Opportunity Start",
+		"Sample 14.1 time_signal - Placement Opportunity Start": {
 			binary: "/DA0AAAAAAAA///wBQb+cr0AUAAeAhxDVUVJSAAAjn/PAAGlmbAICAAAAAAsoKGKNAIAmsnRfg==",
 			expected: scte35.SpliceInfoSection{
 				EncryptedPacket: scte35.EncryptedPacket{EncryptionAlgorithm: scte35.EncryptionAlgorithmNone, CWIndex: 255},
@@ -74,8 +72,7 @@ func TestDecodeBase64(t *testing.T) {
 				SAPType: 3,
 			},
 		},
-		{
-			name:   "Sample 14.2 splice_insert",
+		"Sample 14.2 splice_insert": {
 			binary: "/DAvAAAAAAAA///wFAVIAACPf+/+c2nALv4AUsz1AAAAAAAKAAhDVUVJAAABNWLbowo=",
 			expected: scte35.SpliceInfoSection{
 				EncryptedPacket: scte35.EncryptedPacket{EncryptionAlgorithm: scte35.EncryptionAlgorithmNone, CWIndex: 255},
@@ -101,8 +98,7 @@ func TestDecodeBase64(t *testing.T) {
 				SAPType: 3,
 			},
 		},
-		{
-			name:   "Sample 14.3 time_signal - Placement Opportunity End",
+		"Sample 14.3 time_signal - Placement Opportunity End": {
 			binary: "/DAvAAAAAAAA///wBQb+dGKQoAAZAhdDVUVJSAAAjn+fCAgAAAAALKChijUCAKnMZ1g=",
 			expected: scte35.SpliceInfoSection{
 				EncryptedPacket: scte35.EncryptedPacket{EncryptionAlgorithm: scte35.EncryptionAlgorithmNone, CWIndex: 255},
@@ -131,8 +127,7 @@ func TestDecodeBase64(t *testing.T) {
 				SAPType: 3,
 			},
 		},
-		{
-			name:   "Sample 14.4 time_signal - Program Start/End",
+		"Sample 14.4 time_signal - Program Start/End": {
 			binary: "/DBIAAAAAAAA///wBQb+ek2ItgAyAhdDVUVJSAAAGH+fCAgAAAAALMvDRBEAAAIXQ1VFSUgAABl/nwgIAAAAACyk26AQAACZcuND",
 			expected: scte35.SpliceInfoSection{
 				EncryptedPacket: scte35.EncryptedPacket{EncryptionAlgorithm: scte35.EncryptionAlgorithmNone, CWIndex: 255},
@@ -173,8 +168,7 @@ func TestDecodeBase64(t *testing.T) {
 				SAPType: 3,
 			},
 		},
-		{
-			name:   "Sample 14.5 time_signal - Program Overlap Start",
+		"Sample 14.5 time_signal - Program Overlap Start": {
 			binary: "/DAvAAAAAAAA///wBQb+rr//ZAAZAhdDVUVJSAAACH+fCAgAAAAALKVs9RcAAJUdsKg=",
 			expected: scte35.SpliceInfoSection{
 				EncryptedPacket: scte35.EncryptedPacket{EncryptionAlgorithm: scte35.EncryptionAlgorithmNone, CWIndex: 255},
@@ -202,8 +196,7 @@ func TestDecodeBase64(t *testing.T) {
 				SAPType: 3,
 			},
 		},
-		{
-			name:   "Sample 14.6 time_signal - Program Blackout Override / Program End",
+		"Sample 14.6 time_signal - Program Blackout Override / Program End": {
 			binary: "/DBIAAAAAAAA///wBQb+ky44CwAyAhdDVUVJSAAACn+fCAgAAAAALKCh4xgAAAIXQ1VFSUgAAAl/nwgIAAAAACygoYoRAAC0IX6w",
 			expected: scte35.SpliceInfoSection{
 				EncryptedPacket: scte35.EncryptedPacket{EncryptionAlgorithm: scte35.EncryptionAlgorithmNone, CWIndex: 255},
@@ -244,8 +237,7 @@ func TestDecodeBase64(t *testing.T) {
 				SAPType: 3,
 			},
 		},
-		{
-			name:   "Sample 14.7 time_signal - Program End",
+		"Sample 14.7 time_signal - Program End": {
 			binary: "/DAvAAAAAAAA///wBQb+rvF8TAAZAhdDVUVJSAAAB3+fCAgAAAAALKVslxEAAMSHai4=",
 			expected: scte35.SpliceInfoSection{
 				EncryptedPacket: scte35.EncryptedPacket{EncryptionAlgorithm: scte35.EncryptionAlgorithmNone, CWIndex: 255},
@@ -273,8 +265,7 @@ func TestDecodeBase64(t *testing.T) {
 				SAPType: 3,
 			},
 		},
-		{
-			name:   "Sample 14.8 time_signal - Program Start/End - Placement Opportunity End",
+		"Sample 14.8 time_signal - Program Start/End - Placement Opportunity End": {
 			binary: "/DBhAAAAAAAA///wBQb+qM1E7QBLAhdDVUVJSAAArX+fCAgAAAAALLLXnTUCAAIXQ1VFSUgAACZ/nwgIAAAAACyy150RAAACF0NVRUlIAAAnf58ICAAAAAAsstezEAAAihiGnw==",
 			expected: scte35.SpliceInfoSection{
 				EncryptedPacket: scte35.EncryptedPacket{EncryptionAlgorithm: scte35.EncryptionAlgorithmNone, CWIndex: 255},
@@ -329,8 +320,7 @@ func TestDecodeBase64(t *testing.T) {
 				SAPType: 3,
 			},
 		},
-		{
-			name:   "SpliceInsert With DTMF",
+		"SpliceInsert With DTMF": {
 			binary: "/DAxAAAAAAAAAP/wFAVAAIeuf+/+0AWRK/4AUmXAAC0AfwAMAQpDVUVJUJ81MTkqo5/+gA==",
 			expected: scte35.SpliceInfoSection{
 				SpliceCommand: &scte35.SpliceInsert{
@@ -354,8 +344,7 @@ func TestDecodeBase64(t *testing.T) {
 				SAPType: 3,
 			},
 		},
-		{
-			name:   "Time Signal with Segmentation Descriptors",
+		"Time Signal with Segmentation Descriptors": {
 			binary: "/DBIAAAAAAAAAP/wBQb/tB67hgAyAhdDVUVJQAABEn+fCAgAAAAALzE8BTUAAAIXQ1VFSUAAAEV/nwgIAAAAAC8xPN4jAAAfiOPE",
 			expected: scte35.SpliceInfoSection{
 				SpliceCommand: scte35.NewTimeSignal(7316880262),
@@ -397,18 +386,15 @@ func TestDecodeBase64(t *testing.T) {
 				SAPType: 3,
 			},
 		},
-		{
-			name:   "Empty String",
+		"Empty String": {
 			binary: "",
 			err:    fmt.Errorf("splice_info_section: %w", scte35.ErrBufferOverflow),
 		},
-		{
-			name:   "Invalid Base64 Encoding",
+		"Invalid Base64 Encoding": {
 			binary: "/DBaf%^",
 			err:    scte35.ErrUnsupportedEncoding,
 		},
-		{
-			name:   "Splice Insert with Avail Descriptor",
+		"Splice Insert with Avail Descriptor": {
 			binary: "/DAqAAAAAAAAAP/wDwUAAHn+f8/+QubGOQAAAAAACgAIQ1VFSQAAAADizteX",
 			expected: scte35.SpliceInfoSection{
 				SpliceCommand: &scte35.SpliceInsert{
@@ -425,8 +411,7 @@ func TestDecodeBase64(t *testing.T) {
 				SAPType: 3,
 			},
 		},
-		{
-			name:   "Multiple SegmentationUPIDs",
+		"Multiple SegmentationUPIDs": {
 			binary: "/DBrAAAAAAAAAP/wBQb/AAAAAABVAlNDVUVJAAAAAn+/DUQKDBR3i+Xj9gAAAAAAAAoMFHeL5eP2AAAAAAAACSZTSUdOQUw6THk5RU1HeEtSMGhGWlV0cE1IZENVVlpuUlVGblp6MTcBA6QTOe8=",
 			expected: scte35.SpliceInfoSection{
 				SpliceCommand: scte35.NewTimeSignal(4294967296),
@@ -456,8 +441,7 @@ func TestDecodeBase64(t *testing.T) {
 				SAPType: 3,
 			},
 		},
-		{
-			name:   "Legacy splice_command_length: 0xFFF",
+		"Legacy splice_command_length: 0xFFF": {
 			binary: "/DA8AAAAAAAAAP///wb+06ACpQAmAiRDVUVJAACcHX//AACky4AMEERJU0NZTVdGMDQ1MjAwMEgxAQEMm4c0",
 			expected: scte35.SpliceInfoSection{
 				SpliceCommand: scte35.NewTimeSignal(3550479013),
@@ -482,13 +466,11 @@ func TestDecodeBase64(t *testing.T) {
 			},
 			legacy: true,
 		},
-		{
-			name:   "SpliceInsert Time Specified With Invalid Component Count",
+		"SpliceInsert Time Specified With Invalid Component Count": {
 			binary: "FkC1lwP3uTQD0VvxHwVBEH89G6B7VjzaZ9eNuyUF9q8pYAIXsRM9ZpDCczBeDbytQhXkssQstGJVGcvjZ3tiIMULiA4BpRHlzLGFa0q6aVMtzk8ZRUeLcxtKibgVOKBBnkCbOQyhSflFiDkrAAIp+Fk+VRsByTSkPN3RvyK+lWcjHElhwa9hNFcAy4dm3DdeRXnrD3I2mISNc7DkgS0ReotPyp94FV77xMHT4D7SYL48XU20UM4bgg==",
 			err:    fmt.Errorf("splice_insert: %w", scte35.ErrBufferOverflow),
 		},
-		{
-			name:   "Signal with non-CUEI descriptor",
+		"Signal with non-CUEI descriptor": {
 			binary: "/DBPAAAAAAAAAP/wBQb/Gq9LggA5AAVTQVBTCwIwQ1VFSf////9//wAAFI4PDxx1cm46bmJjdW5pLmNvbTpicmM6NDk5ODY2NDM0MQoBbM98zw==",
 			expected: scte35.SpliceInfoSection{
 				SpliceCommand: scte35.NewTimeSignal(4742663042),
@@ -515,8 +497,7 @@ func TestDecodeBase64(t *testing.T) {
 				SAPType: 3,
 			},
 		},
-		{
-			name:   "Splice Null - Heartbeat",
+		"Splice Null - Heartbeat": {
 			binary: "/DARAAAAAAAAAP/wAAAAAHpPv/8=",
 			expected: scte35.SpliceInfoSection{
 				SpliceCommand: &scte35.SpliceNull{},
@@ -524,13 +505,11 @@ func TestDecodeBase64(t *testing.T) {
 				SAPType:       3,
 			},
 		},
-		{
-			name:   "Invalid CRC_32",
+		"Invalid CRC_32": {
 			binary: "/DA4AAAAAAAAAP/wFAUABDEAf+//mWEhzP4Azf5gAQAAAAATAhFDVUVJAAAAAX+/AQIwNAEAAKeYO3Q=",
 			err:    fmt.Errorf("splice_info_section: %w", scte35.ErrCRC32Invalid),
 		},
-		{
-			name:   "Alignment Stuffing without Encryption",
+		"Alignment Stuffing without Encryption": {
 			binary: "/DAeAAAAAAAAAP///wViAA/nf18ACQAAAAAskJv+YPtE",
 			expected: scte35.SpliceInfoSection{
 				SpliceCommand: &scte35.SpliceInsert{
@@ -546,8 +525,8 @@ func TestDecodeBase64(t *testing.T) {
 		},
 	}
 
-	for _, c := range cases {
-		t.Run(c.name, func(t *testing.T) {
+	for k, c := range cases {
+		t.Run(k, func(t *testing.T) {
 			// decode the binary
 			sis, err := scte35.DecodeBase64(c.binary)
 			require.Equal(t, c.err, err)
@@ -587,15 +566,13 @@ func TestDecodeHex(t *testing.T) {
 	// when adding tests that contain multiple splice descriptors, care must be
 	// taken to ensure they are in the order specified in the custom UnmarshalXML
 	// implementation, otherwise misleading error may occur
-	cases := []struct {
-		name     string
+	cases := map[string]struct {
 		hex      string
 		err      error
 		expected scte35.SpliceInfoSection
 	}{
-		{
-			name: "Sample 14.1 time_signal - Placement Opportunity Start",
-			hex:  "0xFC3034000000000000FFFFF00506FE72BD0050001E021C435545494800008E7FCF0001A599B00808000000002CA0A18A3402009AC9D17E",
+		"Sample 14.1 time_signal - Placement Opportunity Start": {
+			hex: "0xFC3034000000000000FFFFF00506FE72BD0050001E021C435545494800008E7FCF0001A599B00808000000002CA0A18A3402009AC9D17E",
 			expected: scte35.SpliceInfoSection{
 				EncryptedPacket: scte35.EncryptedPacket{EncryptionAlgorithm: scte35.EncryptionAlgorithmNone, CWIndex: 255},
 				SpliceCommand: &scte35.TimeSignal{
@@ -623,9 +600,8 @@ func TestDecodeHex(t *testing.T) {
 				SAPType: 3,
 			},
 		},
-		{
-			name: "Sample 14.2 splice_insert (no prefix)",
-			hex:  "FC302F000000000000FFFFF014054800008F7FEFFE7369C02EFE0052CCF500000000000A0008435545490000013562DBA30A",
+		"Sample 14.2 splice_insert (no prefix)": {
+			hex: "FC302F000000000000FFFFF014054800008F7FEFFE7369C02EFE0052CCF500000000000A0008435545490000013562DBA30A",
 			expected: scte35.SpliceInfoSection{
 				EncryptedPacket: scte35.EncryptedPacket{EncryptionAlgorithm: scte35.EncryptionAlgorithmNone, CWIndex: 255},
 				SpliceCommand: &scte35.SpliceInsert{
@@ -652,8 +628,8 @@ func TestDecodeHex(t *testing.T) {
 		},
 	}
 
-	for _, c := range cases {
-		t.Run(c.name, func(t *testing.T) {
+	for k, c := range cases {
+		t.Run(k, func(t *testing.T) {
 			// decode the binary
 			sis, err := scte35.DecodeHex(c.hex)
 			require.Equal(t, c.err, err)
@@ -677,16 +653,14 @@ func TestDecodeHex(t *testing.T) {
 }
 
 func TestEncodeWithAlignmentStuffing(t *testing.T) {
-	cases := []struct {
+	cases := map[string]struct {
 		name   string
 		binary string
 	}{
-		{
-			name:   "SpliceInsert Program Out Point with 3 bytes alignment stuffing",
+		"SpliceInsert Program Out Point with 3 bytes alignment stuffing": {
 			binary: "/DA0AABS2+YAAACgFAUALJGCf+/+MSwPcX4AUmXAAAAAAAAMAQpDVUVJRp8xMjEq3pnIPCi6lw==",
 		},
-		{
-			name:   "SpliceInsert Program In Point with 3 bytes alignment stuffing",
+		"SpliceInsert Program In Point with 3 bytes alignment stuffing": {
 			binary: "/DAvAABS2+YAAACgDwUALJGEf0/+MX7z3AAAAAAADAEKQ1VFSQCfMTIxI6SMuQkzWQI=",
 		},
 	}
