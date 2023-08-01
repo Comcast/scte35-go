@@ -623,10 +623,10 @@ func TestDecodeBase64(t *testing.T) {
 		t.Run(k, func(t *testing.T) {
 			// decode the binary
 			sis, err := scte35.DecodeBase64(c.binary)
-			assert.ErrorIs(t, err, c.err)
-			// if err != nil {
-			// 	return
-			// }
+			require.ErrorIs(t, err, c.err)
+			if err != nil {
+				return
+			}
 
 			// test encode/decode XML
 			encodedXML := toXML(sis)
