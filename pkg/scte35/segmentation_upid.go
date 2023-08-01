@@ -166,13 +166,13 @@ func (upid *SegmentationUPID) Name() string {
 	}
 }
 
-// ASCIIValue returns the UPID value as an ASCII string. Bytes outside ASCII
-// range are represented by a dot (.).
+// ASCIIValue returns Value as an ASCII string. Characters outside the printable
+// range are represented by a dot (".").
 func (upid *SegmentationUPID) ASCIIValue() string {
 	b := upid.valueBytes()
 	rs := make([]byte, 0, len(b))
 	for i := range b {
-		if b[i] <= 127 {
+		if b[i] > 31 && b[i] < 127 {
 			rs[i] = b[i]
 			continue
 		}
