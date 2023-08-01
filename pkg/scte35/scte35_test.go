@@ -20,16 +20,19 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"encoding/xml"
-	"fmt"
 	"io"
 	"os"
 	"testing"
-	"unicode/utf8"
 
 	"github.com/Comcast/scte35-go/pkg/scte35"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+func TestMain(m *testing.M) {
+	scte35.Logger.SetOutput(os.Stderr)
+	os.Exit(m.Run())
+}
 
 func TestDecodeBase64(t *testing.T) {
 	scte35.Logger.SetOutput(os.Stderr)
@@ -64,7 +67,7 @@ func TestDecodeBase64(t *testing.T) {
 						SegmentationTypeID:   scte35.SegmentationTypeProviderPOStart,
 						SegmentationDuration: uint64ptr(0x0001a599b0),
 						SegmentationUPIDs: []scte35.SegmentationUPID{
-							scte35.NewSegmentationUPID(scte35.SegmentationUPIDTypeTI, bytes(0x000000002ca0a18a)),
+							scte35.NewSegmentationUPID(scte35.SegmentationUPIDTypeTI, toBytes(0x000000002ca0a18a)),
 						},
 						SegmentNum: 2,
 					},
@@ -119,7 +122,7 @@ func TestDecodeBase64(t *testing.T) {
 						SegmentationEventID: 0x4800008e,
 						SegmentationTypeID:  scte35.SegmentationTypeProviderPOEnd,
 						SegmentationUPIDs: []scte35.SegmentationUPID{
-							scte35.NewSegmentationUPID(scte35.SegmentationUPIDTypeTI, bytes(0x000000002ca0a18a)),
+							scte35.NewSegmentationUPID(scte35.SegmentationUPIDTypeTI, toBytes(0x000000002ca0a18a)),
 						},
 						SegmentNum: 2,
 					},
@@ -148,7 +151,7 @@ func TestDecodeBase64(t *testing.T) {
 						SegmentationEventID: 0x48000018,
 						SegmentationTypeID:  scte35.SegmentationTypeProgramEnd,
 						SegmentationUPIDs: []scte35.SegmentationUPID{
-							scte35.NewSegmentationUPID(scte35.SegmentationUPIDTypeTI, bytes(0x000000002ccbc344)),
+							scte35.NewSegmentationUPID(scte35.SegmentationUPIDTypeTI, toBytes(0x000000002ccbc344)),
 						},
 					},
 					&scte35.SegmentationDescriptor{
@@ -161,7 +164,7 @@ func TestDecodeBase64(t *testing.T) {
 						SegmentationEventID: 0x48000019,
 						SegmentationTypeID:  scte35.SegmentationTypeProgramStart,
 						SegmentationUPIDs: []scte35.SegmentationUPID{
-							scte35.NewSegmentationUPID(scte35.SegmentationUPIDTypeTI, bytes(0x000000002ca4dba0)),
+							scte35.NewSegmentationUPID(scte35.SegmentationUPIDTypeTI, toBytes(0x000000002ca4dba0)),
 						},
 					},
 				},
@@ -189,7 +192,7 @@ func TestDecodeBase64(t *testing.T) {
 						SegmentationEventID: 0x48000008,
 						SegmentationTypeID:  scte35.SegmentationTypeProgramOverlapStart,
 						SegmentationUPIDs: []scte35.SegmentationUPID{
-							scte35.NewSegmentationUPID(scte35.SegmentationUPIDTypeTI, bytes(0x000000002ca56cf5)),
+							scte35.NewSegmentationUPID(scte35.SegmentationUPIDTypeTI, toBytes(0x000000002ca56cf5)),
 						},
 					},
 				},
@@ -217,7 +220,7 @@ func TestDecodeBase64(t *testing.T) {
 						SegmentationEventID: 0x4800000a,
 						SegmentationTypeID:  scte35.SegmentationTypeProgramBlackoutOverride,
 						SegmentationUPIDs: []scte35.SegmentationUPID{
-							scte35.NewSegmentationUPID(scte35.SegmentationUPIDTypeTI, bytes(0x000000002ca0a1e3)),
+							scte35.NewSegmentationUPID(scte35.SegmentationUPIDTypeTI, toBytes(0x000000002ca0a1e3)),
 						},
 					},
 					&scte35.SegmentationDescriptor{
@@ -230,7 +233,7 @@ func TestDecodeBase64(t *testing.T) {
 						SegmentationEventID: 0x48000009,
 						SegmentationTypeID:  scte35.SegmentationTypeProgramEnd,
 						SegmentationUPIDs: []scte35.SegmentationUPID{
-							scte35.NewSegmentationUPID(scte35.SegmentationUPIDTypeTI, bytes(0x000000002ca0a18a)),
+							scte35.NewSegmentationUPID(scte35.SegmentationUPIDTypeTI, toBytes(0x000000002ca0a18a)),
 						},
 					},
 				},
@@ -258,7 +261,7 @@ func TestDecodeBase64(t *testing.T) {
 						SegmentationEventID: 0x48000007,
 						SegmentationTypeID:  scte35.SegmentationTypeProgramEnd,
 						SegmentationUPIDs: []scte35.SegmentationUPID{
-							scte35.NewSegmentationUPID(scte35.SegmentationUPIDTypeTI, bytes(0x000000002ca56c97)),
+							scte35.NewSegmentationUPID(scte35.SegmentationUPIDTypeTI, toBytes(0x000000002ca56c97)),
 						},
 					},
 				},
@@ -286,7 +289,7 @@ func TestDecodeBase64(t *testing.T) {
 						SegmentationEventID: 0x480000ad,
 						SegmentationTypeID:  scte35.SegmentationTypeProviderPOEnd,
 						SegmentationUPIDs: []scte35.SegmentationUPID{
-							scte35.NewSegmentationUPID(scte35.SegmentationUPIDTypeTI, bytes(0x000000002cb2d79d)),
+							scte35.NewSegmentationUPID(scte35.SegmentationUPIDTypeTI, toBytes(0x000000002cb2d79d)),
 						},
 						SegmentNum: 2,
 					},
@@ -300,7 +303,7 @@ func TestDecodeBase64(t *testing.T) {
 						SegmentationEventID: 0x48000026,
 						SegmentationTypeID:  scte35.SegmentationTypeProgramEnd,
 						SegmentationUPIDs: []scte35.SegmentationUPID{
-							scte35.NewSegmentationUPID(scte35.SegmentationUPIDTypeTI, bytes(0x000000002cb2d79d)),
+							scte35.NewSegmentationUPID(scte35.SegmentationUPIDTypeTI, toBytes(0x000000002cb2d79d)),
 						},
 					},
 					&scte35.SegmentationDescriptor{
@@ -313,7 +316,7 @@ func TestDecodeBase64(t *testing.T) {
 						SegmentationEventID: 0x48000027,
 						SegmentationTypeID:  scte35.SegmentationTypeProgramStart,
 						SegmentationUPIDs: []scte35.SegmentationUPID{
-							scte35.NewSegmentationUPID(scte35.SegmentationUPIDTypeTI, bytes(0x000000002cb2d7b3)),
+							scte35.NewSegmentationUPID(scte35.SegmentationUPIDTypeTI, toBytes(0x000000002cb2d7b3)),
 						},
 					},
 				},
@@ -389,7 +392,7 @@ func TestDecodeBase64(t *testing.T) {
 		},
 		"Empty String": {
 			binary: "",
-			err:    fmt.Errorf("splice_info_section: %w", scte35.ErrBufferOverflow),
+			err:    scte35.ErrBufferOverflow,
 		},
 		"Invalid Base64 Encoding": {
 			binary: "/DBaf%^",
@@ -469,7 +472,7 @@ func TestDecodeBase64(t *testing.T) {
 		},
 		"SpliceInsert Time Specified With Invalid Component Count": {
 			binary: "FkC1lwP3uTQD0VvxHwVBEH89G6B7VjzaZ9eNuyUF9q8pYAIXsRM9ZpDCczBeDbytQhXkssQstGJVGcvjZ3tiIMULiA4BpRHlzLGFa0q6aVMtzk8ZRUeLcxtKibgVOKBBnkCbOQyhSflFiDkrAAIp+Fk+VRsByTSkPN3RvyK+lWcjHElhwa9hNFcAy4dm3DdeRXnrD3I2mISNc7DkgS0ReotPyp94FV77xMHT4D7SYL48XU20UM4bgg==",
-			err:    fmt.Errorf("splice_insert: %w", scte35.ErrBufferOverflow),
+			err:    scte35.ErrBufferOverflow,
 		},
 		"Signal with non-CUEI descriptor": {
 			binary: "/DBPAAAAAAAAAP/wBQb/Gq9LggA5AAVTQVBTCwIwQ1VFSf////9//wAAFI4PDxx1cm46bmJjdW5pLmNvbTpicmM6NDk5ODY2NDM0MQoBbM98zw==",
@@ -508,7 +511,7 @@ func TestDecodeBase64(t *testing.T) {
 		},
 		"Invalid CRC_32": {
 			binary: "/DA4AAAAAAAAAP/wFAUABDEAf+//mWEhzP4Azf5gAQAAAAATAhFDVUVJAAAAAX+/AQIwNAEAAKeYO3Q=",
-			err:    fmt.Errorf("splice_info_section: %w", scte35.ErrCRC32Invalid),
+			err:    scte35.ErrCRC32Invalid,
 		},
 		"Alignment Stuffing without Encryption": {
 			binary: "/DAeAAAAAAAAAP///wViAA/nf18ACQAAAAAskJv+YPtE",
@@ -524,16 +527,106 @@ func TestDecodeBase64(t *testing.T) {
 			},
 			legacy: true, // binary wont match because of stuffing
 		},
+		"UPID with Valid ASCII Invalid UTF8": {
+			binary: "/DDHAAAAABc0AP/wBQb/tVo+agCxAhdDVUVJQA4hwH+fCAgAAAAAPj6IcCMAAAIXQ1VFSUAOI1x/nwgIAAAAAD4+iHARAAACF0NVRUlADiHgf58ICAAAAAA+Poi2EAAAAhxDVUVJQA4hyn/fAABSlKwICAAAAAA+Poi2IgAAAkZDVUVJQA4h1n/PAABSlKwNMgoMFHf5uXs0AAAAAAAADhh0eXBlPUxBJmR1cj02MDAwMCZ0aWVy/DDHAAAAAAAAAP8ABQb/HPCt2w==",
+			expected: scte35.SpliceInfoSection{
+				SpliceCommand: &scte35.TimeSignal{
+					SpliceTime: scte35.SpliceTime{
+						PTSTime: uint64ptr(7337557610),
+					},
+				},
+				SpliceDescriptors: scte35.SpliceDescriptors{
+					&scte35.SegmentationDescriptor{
+						SegmentationEventID: uint32(1074667968),
+						SegmentationTypeID:  scte35.SegmentationTypeBreakEnd,
+						DeliveryRestrictions: &scte35.DeliveryRestrictions{
+							ArchiveAllowedFlag:     true,
+							WebDeliveryAllowedFlag: true,
+							NoRegionalBlackoutFlag: true,
+							DeviceRestrictions:     3,
+						},
+						SegmentationUPIDs: []scte35.SegmentationUPID{
+							{Type: scte35.SegmentationUPIDTypeTI, Value: "1044285552"},
+						},
+					},
+					&scte35.SegmentationDescriptor{
+						SegmentationEventID: uint32(1074668380),
+						SegmentationTypeID:  scte35.SegmentationTypeProgramEnd,
+						DeliveryRestrictions: &scte35.DeliveryRestrictions{
+							ArchiveAllowedFlag:     true,
+							WebDeliveryAllowedFlag: true,
+							NoRegionalBlackoutFlag: true,
+							DeviceRestrictions:     3,
+						},
+						SegmentationUPIDs: []scte35.SegmentationUPID{
+							{Type: scte35.SegmentationUPIDTypeTI, Value: "1044285552"},
+						},
+					},
+					&scte35.SegmentationDescriptor{
+						SegmentationEventID: uint32(1074668000),
+						SegmentationTypeID:  scte35.SegmentationTypeProgramStart,
+						DeliveryRestrictions: &scte35.DeliveryRestrictions{
+							ArchiveAllowedFlag:     true,
+							WebDeliveryAllowedFlag: true,
+							NoRegionalBlackoutFlag: true,
+							DeviceRestrictions:     3,
+						},
+						SegmentationUPIDs: []scte35.SegmentationUPID{
+							{Type: scte35.SegmentationUPIDTypeTI, Value: "1044285622"},
+						},
+					},
+					&scte35.SegmentationDescriptor{
+						SegmentationEventID:  uint32(1074667978),
+						SegmentationDuration: uint64ptr(5412012),
+						SegmentationTypeID:   scte35.SegmentationTypeBreakStart,
+						DeliveryRestrictions: &scte35.DeliveryRestrictions{
+							ArchiveAllowedFlag:     true,
+							WebDeliveryAllowedFlag: true,
+							NoRegionalBlackoutFlag: true,
+							DeviceRestrictions:     3,
+						},
+						SegmentationUPIDs: []scte35.SegmentationUPID{
+							{Type: scte35.SegmentationUPIDTypeTI, Value: "1044285622"},
+						},
+					},
+					&scte35.SegmentationDescriptor{
+						SegmentationEventID:  uint32(1074667990),
+						SegmentationTypeID:   0x05,
+						SegmentationDuration: uint64ptr(5412012),
+						SegmentNum:           6,
+						SegmentsExpected:     255,
+						DeliveryRestrictions: &scte35.DeliveryRestrictions{
+							ArchiveAllowedFlag:     true,
+							WebDeliveryAllowedFlag: false,
+							NoRegionalBlackoutFlag: true,
+							DeviceRestrictions:     3,
+						},
+						SegmentationUPIDs: []scte35.SegmentationUPID{
+							{Type: scte35.SegmentationUPIDTypeEIDR, Value: "10.5239/F9B9-7B34-0000-0000-0000"},
+							{Type: scte35.SegmentationUPIDTypeADS, Value: "type=LA&dur=60000&tierü0"},
+							{Type: uint32(199)},
+							{Type: uint32(0)},
+							{Type: uint32(0)},
+							{Type: uint32(0)},
+							{Type: uint32(255)},
+						},
+					},
+				},
+				PTSAdjustment: uint64(5940),
+				Tier:          4095,
+				SAPType:       3,
+			},
+		},
 	}
 
 	for k, c := range cases {
 		t.Run(k, func(t *testing.T) {
 			// decode the binary
 			sis, err := scte35.DecodeBase64(c.binary)
-			require.Equal(t, c.err, err)
-			if err != nil {
-				return
-			}
+			assert.ErrorIs(t, err, c.err)
+			// if err != nil {
+			// 	return
+			// }
 
 			// test encode/decode XML
 			encodedXML := toXML(sis)
@@ -592,7 +685,7 @@ func TestDecodeHex(t *testing.T) {
 						SegmentationTypeID:   scte35.SegmentationTypeProviderPOStart,
 						SegmentationDuration: uint64ptr(0x0001a599b0),
 						SegmentationUPIDs: []scte35.SegmentationUPID{
-							scte35.NewSegmentationUPID(scte35.SegmentationUPIDTypeTI, bytes(0x000000002ca0a18a)),
+							scte35.NewSegmentationUPID(scte35.SegmentationUPIDTypeTI, toBytes(0x000000002ca0a18a)),
 						},
 						SegmentNum: 2,
 					},
@@ -675,35 +768,6 @@ func TestEncodeWithAlignmentStuffing(t *testing.T) {
 	}
 }
 
-// Segmentation UPIDs are required to be US-ASCII, but Go uses UTF8 strings.  Make sure the decoder
-// decodes the strings properly.
-func TestASCIItoUTF8(t *testing.T) {
-	cases := []struct {
-		name   string
-		binary string
-	}{
-		{
-			name:   "Time Signal, multiple descriptors, valid ASCII but invalid UTF8 segmentation UPIDs",
-			binary: "/DDHAAAAABc0AP/wBQb/tVo+agCxAhdDVUVJQA4hwH+fCAgAAAAAPj6IcCMAAAIXQ1VFSUAOI1x/nwgIAAAAAD4+iHARAAACF0NVRUlADiHgf58ICAAAAAA+Poi2EAAAAhxDVUVJQA4hyn/fAABSlKwICAAAAAA+Poi2IgAAAkZDVUVJQA4h1n/PAABSlKwNMgoMFHf5uXs0AAAAAAAADhh0eXBlPUxBJmR1cj02MDAwMCZ0aWVy/DDHAAAAAAAAAP/wBQb/dvhrwQ==",
-		},
-	}
-
-	for _, c := range cases {
-		t.Run(c.name, func(t *testing.T) {
-			sis, err := scte35.DecodeBase64(c.binary)
-			require.NoError(t, err)
-
-			for _, sd := range sis.SpliceDescriptors {
-				if seg, ok := sd.(*scte35.SegmentationDescriptor); ok {
-					for _, upid := range seg.SegmentationUPIDs {
-						require.True(t, utf8.ValidString(upid.Value))
-					}
-				}
-			}
-		})
-	}
-}
-
 func TestTicksToDuration(t *testing.T) {
 	// test a wide range of tick values
 	min := 29 * scte35.TicksPerSecond
@@ -716,7 +780,7 @@ func TestTicksToDuration(t *testing.T) {
 
 // helper func to make test life a bit easier
 
-func bytes(i uint64) []byte {
+func toBytes(i uint64) []byte {
 	b := make([]byte, 8)
 	binary.BigEndian.PutUint64(b, i)
 	return b

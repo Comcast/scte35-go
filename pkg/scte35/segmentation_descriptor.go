@@ -326,6 +326,8 @@ func (sd *SegmentationDescriptor) SegmentationUpidLength() int {
 
 // decode updates this splice_descriptor from binary.
 func (sd *SegmentationDescriptor) decode(b []byte) error {
+	var err error
+
 	r := iobit.NewReader(b)
 	r.Skip(8)  // splice_descriptor_tag
 	r.Skip(8)  // descriptor_length
@@ -378,6 +380,9 @@ func (sd *SegmentationDescriptor) decode(b []byte) error {
 					upidType := upidr.Uint32(8)
 					upidLength := int(upidr.Uint32(8))
 					upidValue := upidr.Bytes(upidLength)
+					if len(upidValue) < upidLength {
+						Logger.Printf("Cannot read value for segmentation_upid_type %d; %d of %d bytes remaining.", upidType, len(upidValue), upidLength)
+					}
 					sd.SegmentationUPIDs = append(
 						sd.SegmentationUPIDs,
 						NewSegmentationUPID(upidType, upidValue),
@@ -406,6 +411,9 @@ func (sd *SegmentationDescriptor) decode(b []byte) error {
 		}
 	}
 
+	if err != nil {
+		return err
+	}
 	if err := readerError(r); err != nil {
 		return fmt.Errorf("segmentation_descriptor: %w", err)
 	}

@@ -8,4 +8,3 @@ To execute an example from the command line:
 ```shell
 $ go run ./examples/simple_decode
 ```
-

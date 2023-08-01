@@ -22,14 +22,11 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
-	"io/ioutil"
 	"strconv"
 	"strings"
-	"unicode/utf8"
 
 	"github.com/bamiaux/iobit"
-	"golang.org/x/text/encoding/ianaindex"
-	"golang.org/x/text/transform"
+	"golang.org/x/text/encoding/charmap"
 )
 
 const (
@@ -107,28 +104,12 @@ func NewSegmentationUPID(upidType uint32, buf []byte) SegmentationUPID {
 		}
 	// everything else - plain text
 	default:
+		b, _ := charmap.ISO8859_1.NewDecoder().Bytes(r.LeftBytes())
 		return SegmentationUPID{
 			Type:  upidType,
-			Value: DecodeASCII(r.LeftBytes()),
+			Value: string(b),
 		}
 	}
-}
-
-// DecodeASCII assumes the byte array holds an ASCII-encoded string and converts it to a UTF-8
-// compatible string.
-func DecodeASCII(b []byte) string {
-	// This shouldn't fail...
-	e, _ := ianaindex.MIME.Encoding("US-ASCII")
-
-	r := transform.NewReader(bytes.NewReader(b), e.NewDecoder())
-	result, err := ioutil.ReadAll(r)
-	if err != nil {
-		// Note: NewSegmentationUPID, which calls this function, doesn't return errors.
-		// Not sure how best to account for this?
-		return "invalid encoding"
-	}
-
-	return string(result)
 }
 
 // SegmentationUPID is used to express a UPID in an XML document.
@@ -188,18 +169,15 @@ func (upid *SegmentationUPID) Name() string {
 // range are represented by a dot (.).
 func (upid *SegmentationUPID) ASCIIValue() string {
 	b := upid.valueBytes()
-	var stringsValues []string
-	for _, b := range b {
-		var stringVal string
-		if utf8.Valid([]byte{b}) {
-			stringVal = string(b)
-		} else {
-			// non valid ascii byte element, it is represented as a dot
-			stringVal = "."
+	rs := make([]byte, 0, len(b))
+	for i := range b {
+		if b[i] <= 127 {
+			rs[i] = b[i]
+			continue
 		}
-		stringsValues = append(stringsValues, stringVal)
+		rs[i] = byte(46) // "."
 	}
-	return strings.Join(stringsValues, "")
+	return string(rs)
 }
 
 // compressEIRD returns a compressed EIDR.
@@ -272,7 +250,7 @@ func (upid *SegmentationUPID) valueBytes() []byte {
 	case SegmentationUPIDTypeISAN, SegmentationUPIDTypeISANDeprecated:
 		b, err := base64.StdEncoding.DecodeString(upid.Value)
 		if err != nil {
-			Logger.Fatalf("Error parsing UPID value: %s", err)
+			Logger.Printf("Error parsing UPID value: %s", err)
 			return b
 		}
 		return b
@@ -282,7 +260,7 @@ func (upid *SegmentationUPID) valueBytes() []byte {
 		binary.BigEndian.PutUint32(b, *upid.FormatIdentifier)
 		v, err := base64.StdEncoding.DecodeString(upid.Value)
 		if err != nil {
-			Logger.Fatalf("Error parsing UPID value: %s", err)
+			Logger.Printf("Error parsing UPID value: %s", err)
 			return b
 		}
 		b = append(b, v...)
@@ -292,14 +270,15 @@ func (upid *SegmentationUPID) valueBytes() []byte {
 		b := make([]byte, 8)
 		i, err := strconv.ParseUint(strings.TrimSpace(upid.Value), 10, 64)
 		if err != nil {
-			Logger.Fatalf("Error parsing UPID value: %s", err)
+			Logger.Printf("Error parsing UPID value: %s", err)
 			return b
 		}
 		binary.BigEndian.PutUint64(b, i)
 		return b
 	// everything else - plain text
 	default:
-		return []byte(upid.Value)
+		b, _ := charmap.ISO8859_1.NewEncoder().Bytes([]byte(upid.Value))
+		return b
 	}
 }
 
