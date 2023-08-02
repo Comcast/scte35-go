@@ -1,4 +1,4 @@
-SCTE-35 
+SCTE-35
 
 Copyright 2021 Comcast Cable Communications Management, LLC
 
