@@ -170,7 +170,7 @@ func (upid *SegmentationUPID) Name() string {
 // range are represented by a dot (".").
 func (upid *SegmentationUPID) ASCIIValue() string {
 	b := upid.valueBytes()
-	rs := make([]byte, 0, len(b))
+	rs := make([]byte, len(b))
 	for i := range b {
 		if b[i] > 31 && b[i] < 127 {
 			rs[i] = b[i]
