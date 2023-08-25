@@ -42,8 +42,8 @@ type AudioDescriptor struct {
 // Tag returns the splice_descriptor_tag.
 func (sd *AudioDescriptor) Tag() uint32 {
 	// ensure JSONType is set
-	sd.JSONType = TimeDescriptorTag
-	return TimeDescriptorTag
+	sd.JSONType = AudioDescriptorTag
+	return AudioDescriptorTag
 }
 
 // decode updates this SpliceDescriptor from binary.
