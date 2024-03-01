@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/bamiaux/iobit v0.0.0-20170418073505-498159a04883
 	github.com/spf13/cobra v1.8.0
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.9.0
 	golang.org/x/text v0.14.0
 )
 
