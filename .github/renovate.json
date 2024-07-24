@@ -1,7 +1,7 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:base",
+    "config:recommended",
     ":semanticCommitTypeAll(chore)"
   ],
   "enabledManagers": [
@@ -10,6 +10,9 @@
     "pre-commit"
   ],
   "gitAuthor": "blahspam-bot <bot@blahspam.com>",
+  "labels": [
+    "dependency"
+  ],
   "packageRules": [
     {
       "matchUpdateTypes": [
@@ -29,13 +32,10 @@
   ],
   "platform": "github",
   "platformAutomerge": true,
-  "pre-commit": {
-    "enabled": true
-  },
   "postUpdateOptions": [
     "gomodTidy"
   ],
-  "repositories": [
-    "Comcast/scte35-go"
-  ]
+  "pre-commit": {
+    "enabled": true
+  }
 }

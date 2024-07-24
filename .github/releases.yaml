@@ -1,19 +1,22 @@
 changelog:
   exclude:
     labels:
+      - dependency
       - duplicate
       - question
       - wontfix
     authors:
-      - blahspambot
+      - linear-ci_comcast
       - renovate
   categories:
-    - title: Features
+    - title: Features 🚀
       labels:
         - enhancement
-    - title: Fixes
+        - feature
+    - title: Fixes 🛠
       labels:
         - bug
-    - title: Other Changes
+        - fix
+    - title: Other Changes 📦
       labels:
         - "*"
