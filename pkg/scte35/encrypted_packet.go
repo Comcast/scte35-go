@@ -31,8 +31,8 @@ const (
 // EncryptedPacket contains the encryption details if this payload has been
 // encrypted.
 type EncryptedPacket struct {
-	EncryptionAlgorithm uint32 `xml:"encryptionAlgorithm,attr,omitempty" json:"encryptionAlgorithm,omitempty"`
-	CWIndex             uint32 `xml:"cwIndex,attr,omitempty" json:"cwIndex,omitempty"`
+	EncryptionAlgorithm uint32 `xml:"encryptionAlgorithm,attr" json:"encryptionAlgorithm"`
+	CWIndex             uint32 `xml:"cwIndex,attr" json:"cwIndex"`
 }
 
 // encryptionAlgorithmName returns the user-friendly encryption algorithm name

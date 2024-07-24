@@ -33,13 +33,13 @@ func decodeCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "decode",
 		Short: "Decode a splice_info_section from binary",
-		Args: func(cmd *cobra.Command, args []string) error {
+		Args: func(_ *cobra.Command, args []string) error {
 			if len(args) != 1 {
 				return fmt.Errorf("requires a binary signal")
 			}
 			return nil
 		},
-		Run: func(cmd *cobra.Command, args []string) {
+		Run: func(_ *cobra.Command, args []string) {
 			bin := args[0]
 			var sis *scte35.SpliceInfoSection
 			var err error

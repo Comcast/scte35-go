@@ -26,7 +26,7 @@ type table struct {
 // row0 writes a new row with 0 indents.
 func (t *table) row(indents int, key string, value any) {
 	_, _ = t.b.WriteString(t.prefix)
-	for i := 0; i < indents; i++ {
+	for range indents {
 		_, _ = t.b.WriteString(t.indent)
 	}
 	_, _ = t.b.WriteString(key)

@@ -49,6 +49,7 @@ func (dr *DeliveryRestrictions) deviceRestrictionsName() string {
 	case DeviceRestrictionsNone:
 		return "None"
 	default:
+		// nolint:goconst
 		return "Unknown"
 	}
 }

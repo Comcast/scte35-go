@@ -109,6 +109,7 @@ func (cmd *SpliceInsert) writeTo(t *table) {
 }
 
 // decode a binary splice_insert.
+// nolint: nestif
 func (cmd *SpliceInsert) decode(b []byte) error {
 	r := iobit.NewReader(b)
 
@@ -136,7 +137,7 @@ func (cmd *SpliceInsert) decode(b []byte) error {
 		} else {
 			componentCount := int(r.Uint32(8))
 			cmd.Components = make([]SpliceInsertComponent, componentCount)
-			for i := 0; i < componentCount; i++ {
+			for i := range componentCount {
 				c := SpliceInsertComponent{}
 				c.Tag = r.Uint32(8)
 				if !cmd.SpliceImmediateFlag {

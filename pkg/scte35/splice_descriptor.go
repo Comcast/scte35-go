@@ -52,7 +52,6 @@ func NewSpliceDescriptor(identifier uint32, tag uint32) SpliceDescriptor {
 	// as a last resort, fall back to private_descriptor. This is not strictly
 	// compliant but allows us to deal with a wider array of quirky signals.
 	return &PrivateDescriptor{Identifier: identifier}
-
 }
 
 // SpliceDescriptor is a prototype for adding new fields to the

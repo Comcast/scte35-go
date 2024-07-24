@@ -354,7 +354,7 @@ func (sd *SegmentationDescriptor) decode(b []byte) error {
 		if !programSegmentationFlag {
 			componentCount := int(r.Uint32(8))
 			sd.Components = make([]SegmentationDescriptorComponent, componentCount)
-			for i := 0; i < componentCount; i++ {
+			for i := range componentCount {
 				c := SegmentationDescriptorComponent{}
 				c.Tag = r.Uint32(8)
 				r.Skip(7) // reserved
