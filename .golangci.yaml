@@ -1,0 +1,46 @@
+---
+run:
+  tests: false
+  timeout: 5m
+
+linters-settings:
+  errcheck:
+    check-type-assertions: true
+
+linters:
+  enable:
+    - bodyclose
+    - containedctx
+    - contextcheck
+    - copyloopvar
+    - decorder
+    - errname
+    - errorlint
+    - exhaustive
+    - exportloopref
+    - gci
+    - gochecknoinits
+    - gocritic
+    - godox
+    - gofmt
+    - goimports
+    - goprintffuncname
+    - gosec
+    - intrange
+    - misspell
+    - noctx
+    - nosprintfhostport
+    - revive
+    - sqlclosecheck
+    - stylecheck
+    - testpackage
+    - unparam
+    - wastedassign
+    - whitespace
+
+issues:
+  include:
+    - EXC0012
+    - EXC0013
+    - EXC0014
+    - EXC0015

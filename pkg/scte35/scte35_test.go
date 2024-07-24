@@ -362,8 +362,9 @@ func TestDecodeBase64(t *testing.T) {
 						},
 						SegmentationUPIDs: []scte35.SegmentationUPID{
 							{
-								Type:  8,
-								Value: "791755781",
+								Type:   8,
+								Format: scte35.SegmentationUPIDFormatText,
+								Value:  "791755781",
 							},
 						},
 						SegmentationTypeID:  53,
@@ -378,8 +379,9 @@ func TestDecodeBase64(t *testing.T) {
 						},
 						SegmentationUPIDs: []scte35.SegmentationUPID{
 							{
-								Type:  8,
-								Value: "791755998",
+								Type:   8,
+								Format: scte35.SegmentationUPIDFormatText,
+								Value:  "791755998",
 							},
 						},
 						SegmentationTypeID:  35,
@@ -423,16 +425,19 @@ func TestDecodeBase64(t *testing.T) {
 					&scte35.SegmentationDescriptor{
 						SegmentationUPIDs: []scte35.SegmentationUPID{
 							{
-								Type:  scte35.SegmentationUPIDTypeEIDR,
-								Value: "10.5239/8BE5-E3F6-0000-0000-0000",
+								Type:   scte35.SegmentationUPIDTypeEIDR,
+								Format: scte35.SegmentationUPIDFormatText,
+								Value:  "10.5239/8BE5-E3F6-0000-0000-0000",
 							},
 							{
-								Type:  scte35.SegmentationUPIDTypeEIDR,
-								Value: "10.5239/8BE5-E3F6-0000-0000-0000",
+								Type:   scte35.SegmentationUPIDTypeEIDR,
+								Format: scte35.SegmentationUPIDFormatText,
+								Value:  "10.5239/8BE5-E3F6-0000-0000-0000",
 							},
 							{
-								Type:  scte35.SegmentationUPIDTypeADI,
-								Value: "SIGNAL:Ly9EMGxKR0hFZUtpMHdCUVZnRUFnZz1",
+								Type:   scte35.SegmentationUPIDTypeADI,
+								Format: scte35.SegmentationUPIDFormatText,
+								Value:  "SIGNAL:Ly9EMGxKR0hFZUtpMHdCUVZnRUFnZz1",
 							},
 						},
 						SegmentationEventID: 2,
@@ -454,6 +459,7 @@ func TestDecodeBase64(t *testing.T) {
 						SegmentationUPIDs: []scte35.SegmentationUPID{
 							{
 								Type:             scte35.SegmentationUPIDTypeMPU,
+								Format:           scte35.SegmentationUPIDFormatBase64,
 								FormatIdentifier: uint32ptr(1145656131),
 								Value:            "WU1XRjA0NTIwMDBI",
 							},
@@ -486,8 +492,9 @@ func TestDecodeBase64(t *testing.T) {
 					&scte35.SegmentationDescriptor{
 						SegmentationUPIDs: []scte35.SegmentationUPID{
 							{
-								Type:  scte35.SegmentationUPIDTypeURI,
-								Value: "urn:nbcuni.com:brc:499866434",
+								Type:   scte35.SegmentationUPIDTypeURI,
+								Format: scte35.SegmentationUPIDFormatText,
+								Value:  "urn:nbcuni.com:brc:499866434",
 							},
 						},
 						SegmentationDuration: uint64ptr(1347087),
@@ -546,7 +553,7 @@ func TestDecodeBase64(t *testing.T) {
 							DeviceRestrictions:     3,
 						},
 						SegmentationUPIDs: []scte35.SegmentationUPID{
-							{Type: scte35.SegmentationUPIDTypeTI, Value: "1044285552"},
+							{Type: scte35.SegmentationUPIDTypeTI, Format: scte35.SegmentationUPIDFormatText, Value: "1044285552"},
 						},
 					},
 					&scte35.SegmentationDescriptor{
@@ -559,7 +566,7 @@ func TestDecodeBase64(t *testing.T) {
 							DeviceRestrictions:     3,
 						},
 						SegmentationUPIDs: []scte35.SegmentationUPID{
-							{Type: scte35.SegmentationUPIDTypeTI, Value: "1044285552"},
+							{Type: scte35.SegmentationUPIDTypeTI, Format: scte35.SegmentationUPIDFormatText, Value: "1044285552"},
 						},
 					},
 					&scte35.SegmentationDescriptor{
@@ -572,7 +579,7 @@ func TestDecodeBase64(t *testing.T) {
 							DeviceRestrictions:     3,
 						},
 						SegmentationUPIDs: []scte35.SegmentationUPID{
-							{Type: scte35.SegmentationUPIDTypeTI, Value: "1044285622"},
+							{Type: scte35.SegmentationUPIDTypeTI, Format: scte35.SegmentationUPIDFormatText, Value: "1044285622"},
 						},
 					},
 					&scte35.SegmentationDescriptor{
@@ -586,7 +593,7 @@ func TestDecodeBase64(t *testing.T) {
 							DeviceRestrictions:     3,
 						},
 						SegmentationUPIDs: []scte35.SegmentationUPID{
-							{Type: scte35.SegmentationUPIDTypeTI, Value: "1044285622"},
+							{Type: scte35.SegmentationUPIDTypeTI, Format: scte35.SegmentationUPIDFormatText, Value: "1044285622"},
 						},
 					},
 					&scte35.SegmentationDescriptor{
@@ -602,13 +609,13 @@ func TestDecodeBase64(t *testing.T) {
 							DeviceRestrictions:     3,
 						},
 						SegmentationUPIDs: []scte35.SegmentationUPID{
-							{Type: scte35.SegmentationUPIDTypeEIDR, Value: "10.5239/F9B9-7B34-0000-0000-0000"},
-							{Type: scte35.SegmentationUPIDTypeADS, Value: "type=LA&dur=60000&tierü0"},
-							{Type: uint32(199)},
-							{Type: uint32(0)},
-							{Type: uint32(0)},
-							{Type: uint32(0)},
-							{Type: uint32(255)},
+							{Type: scte35.SegmentationUPIDTypeEIDR, Format: scte35.SegmentationUPIDFormatText, Value: "10.5239/F9B9-7B34-0000-0000-0000"},
+							{Type: scte35.SegmentationUPIDTypeADS, Format: scte35.SegmentationUPIDFormatText, Value: "type=LA&dur=60000&tierü0"},
+							{Type: uint32(199), Format: scte35.SegmentationUPIDFormatText},
+							{Type: uint32(0), Format: scte35.SegmentationUPIDFormatText},
+							{Type: uint32(0), Format: scte35.SegmentationUPIDFormatText},
+							{Type: uint32(0), Format: scte35.SegmentationUPIDFormatText},
+							{Type: uint32(255), Format: scte35.SegmentationUPIDFormatText},
 						},
 					},
 				},

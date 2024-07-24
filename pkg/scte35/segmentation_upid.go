@@ -69,6 +69,16 @@ const (
 	SegmentationUPIDTypeUUID = 0x10
 	// SegmentationUPIDTypeSCR is the segmentation_upid_type for SCR.
 	SegmentationUPIDTypeSCR = 0x11
+
+	// SegmentationUPIDFormatText is the text segmentation upid value format.
+	SegmentationUPIDFormatText = "text"
+	// SegmentationUPIDFormatHex is the hex segmentation upid value format.
+	SegmentationUPIDFormatHex = "hex"
+	// SegmentationUPIDFormatBase64 is the hex segmentation upid value format.
+	SegmentationUPIDFormatBase64 = "base-64"
+	// SegmentationUPIDFormatPrivatePrefix is the private segmentation upid value
+	// format.
+	SegmentationUPIDFormatPrivatePrefix = "private:"
 )
 
 // NewSegmentationUPID construct a new SegmentationUPID
@@ -79,36 +89,41 @@ func NewSegmentationUPID(upidType uint32, buf []byte) SegmentationUPID {
 	// EIDR - custom
 	case SegmentationUPIDTypeEIDR:
 		return SegmentationUPID{
-			Type:  upidType,
-			Value: canonicalEIDR(r.LeftBytes()),
+			Type:   upidType,
+			Format: SegmentationUPIDFormatText,
+			Value:  canonicalEIDR(r.LeftBytes()),
 		}
 	// ISAN - base64
 	case SegmentationUPIDTypeISAN, SegmentationUPIDTypeISANDeprecated:
 		return SegmentationUPID{
-			Type:  upidType,
-			Value: base64.StdEncoding.EncodeToString(r.LeftBytes()),
+			Type:   upidType,
+			Format: SegmentationUPIDFormatBase64,
+			Value:  base64.StdEncoding.EncodeToString(r.LeftBytes()),
 		}
 	// MPU - custom
 	case SegmentationUPIDTypeMPU:
 		fi := r.Uint32(32)
 		return SegmentationUPID{
 			Type:             upidType,
+			Format:           SegmentationUPIDFormatBase64,
 			FormatIdentifier: &fi,
 			Value:            base64.StdEncoding.EncodeToString(r.LeftBytes()),
 		}
 	// TI - unsigned int
 	case SegmentationUPIDTypeTI:
 		return SegmentationUPID{
-			Type:  upidType,
-			Value: strconv.FormatUint(r.Uint64(r.LeftBits()), 10),
+			Format: SegmentationUPIDFormatText,
+			Type:   upidType,
+			Value:  strconv.FormatUint(r.Uint64(r.LeftBits()), 10),
 		}
 	// everything else - plain text
 	default:
 		// decode troublesome Latin1 characters to their UTF8 equivalents
 		b, _ := charmap.ISO8859_1.NewDecoder().Bytes(r.LeftBytes())
 		return SegmentationUPID{
-			Type:  upidType,
-			Value: string(b),
+			Type:   upidType,
+			Format: SegmentationUPIDFormatText,
+			Value:  string(b),
 		}
 	}
 }
@@ -116,10 +131,9 @@ func NewSegmentationUPID(upidType uint32, buf []byte) SegmentationUPID {
 // SegmentationUPID is used to express a UPID in an XML document.
 type SegmentationUPID struct {
 	Type             uint32  `xml:"segmentationUpidType,attr" json:"segmentationUpidType"`
+	Format           string  `xml:"segmentationUpidFormat,attr,omitempty" json:"segmentationUpidFormat,omitempty"`
 	FormatIdentifier *uint32 `xml:"formatIdentifier,attr,omitempty" json:"formatIdentifier,omitempty"`
 	Value            string  `xml:",chardata" json:"value"`
-	// Deprecated: no longer used and will be removed in a future release
-	Format string `xml:"-" json:"-"`
 }
 
 // Name returns the name for the segmentation_upid_type.

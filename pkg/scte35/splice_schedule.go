@@ -51,7 +51,7 @@ func (cmd *SpliceSchedule) decode(b []byte) error {
 
 	spliceCount := int(r.Uint32(8))
 	cmd.Events = make([]Event, spliceCount)
-	for i := 0; i < spliceCount; i++ {
+	for i := range spliceCount {
 		e := Event{}
 		e.SpliceEventID = r.Uint32(32)
 		e.SpliceEventCancelIndicator = r.Bit()
@@ -66,7 +66,7 @@ func (cmd *SpliceSchedule) decode(b []byte) error {
 			} else {
 				componentCount := int(r.Uint32(8))
 				e.Components = make([]EventComponent, componentCount)
-				for j := 0; j < componentCount; j++ {
+				for j := range componentCount {
 					c := EventComponent{}
 					c.Tag = r.Uint32(8)
 					c.UTCSpliceTime = NewUTCSpliceTime(r.Uint32(32))

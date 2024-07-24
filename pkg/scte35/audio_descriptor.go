@@ -55,7 +55,7 @@ func (sd *AudioDescriptor) decode(b []byte) error {
 	audioCount := int(r.Uint32(4))
 	r.Skip(4) // reserved
 	sd.AudioChannels = make([]AudioChannel, audioCount)
-	for i := 0; i < audioCount; i++ {
+	for i := range audioCount {
 		ac := AudioChannel{}
 		ac.ComponentTag = r.Uint32(8)
 		ac.ISOCode = r.String(3)

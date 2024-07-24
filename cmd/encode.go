@@ -33,13 +33,13 @@ func encodeCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "encode < filename or encode {\"protocolVersion\"... ",
 		Short: "Encode a splice_info_section to binary being provided from stdin or as a parameter",
-		Args: func(cmd *cobra.Command, args []string) error {
+		Args: func(_ *cobra.Command, args []string) error {
 			if len(args) > 1 {
 				return fmt.Errorf("invalid number of parameter provided")
 			}
 			return nil
 		},
-		Run: func(cmd *cobra.Command, args []string) {
+		Run: func(_ *cobra.Command, args []string) {
 			var err error
 			var input string
 			var sis *scte35.SpliceInfoSection

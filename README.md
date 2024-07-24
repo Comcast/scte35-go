@@ -112,12 +112,13 @@ avail_descriptor() {
 }
 
 XML:
-<SpliceInfoSection xmlns="http://www.scte.org/schemas/35" sapType="3" ptsAdjustment="0" protocolVersion="0" tier="4095">
+<SpliceInfoSection xmlns="http://www.scte.org/schemas/35" sapType="3" tier="4095">
+  <EncryptedPacket xmlns="http://www.scte.org/schemas/35" encryptionAlgorithm="0" cwIndex="0"></EncryptedPacket>
   <TimeSignal xmlns="http://www.scte.org/schemas/35">
     <SpliceTime xmlns="http://www.scte.org/schemas/35" ptsTime="3550479013"></SpliceTime>
   </TimeSignal>
-  <SegmentationDescriptor xmlns="http://www.scte.org/schemas/35" segmentationEventId="39965" segmentationEventCancelIndicator="false" segmentationDuration="10800000" segmentationTypeId="49" segmentNum="1" segmentsExpected="1">
-    <SegmentationUpid xmlns="http://www.scte.org/schemas/35" segmentationUpidType="12" formatIdentifier="1145656131" format="base-64">WU1XRjA0NTIwMDBI</SegmentationUpid>
+  <SegmentationDescriptor xmlns="http://www.scte.org/schemas/35" segmentationEventId="39965" segmentationDuration="10800000" segmentationTypeId="49" segmentNum="1" segmentsExpected="1">
+    <SegmentationUpid xmlns="http://www.scte.org/schemas/35" segmentationUpidType="12" segmentationUpidFormat="base-64" formatIdentifier="1145656131">WU1XRjA0NTIwMDBI</SegmentationUpid>
   </SegmentationDescriptor>
 </SpliceInfoSection>
 
