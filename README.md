@@ -365,7 +365,3 @@ by it.
 
 Please read our [contributing guide](CONTRIBUTING.md) for details on how to
 contribute to our project.
-
-## Releases
-
-* [Change Log](CHANGELOG.md)
