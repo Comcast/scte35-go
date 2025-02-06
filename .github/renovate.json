@@ -4,6 +4,8 @@
     "config:recommended",
     ":semanticCommitTypeAll(chore)"
   ],
+  "automergeType": "branch",
+  "baseBranches": ["main"],
   "enabledManagers": [
     "gomod",
     "github-actions",
@@ -30,7 +32,6 @@
       "automerge": true
     }
   ],
-  "platform": "github",
   "platformAutomerge": true,
   "postUpdateOptions": [
     "gomodTidy"
