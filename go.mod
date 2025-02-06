@@ -2,12 +2,12 @@ module github.com/Comcast/scte35-go
 
 go 1.22.0
 
-toolchain go1.22.5
+toolchain go1.23.6
 
 require (
 	github.com/bamiaux/iobit v0.0.0-20170418073505-498159a04883
 	github.com/spf13/cobra v1.8.1
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	golang.org/x/text v0.22.0
 )
 
