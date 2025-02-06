@@ -1,0 +1,21 @@
+---
+name: release
+on: # yamllint disable-line rule:truthy
+  push:
+    tags: "v*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        id: release
+        with:
+          draft: false
+          name: ${{ github.ref_name }}
+          generate_release_notes: true
+          append_body: true

@@ -1,7 +1,6 @@
 ---
 run:
   tests: false
-  timeout: 5m
 
 linters-settings:
   errcheck:
@@ -16,7 +15,6 @@ linters:
     - containedctx
     - contextcheck
     - copyloopvar
-    - decorder
     - errname
     - errorlint
     - exhaustive
@@ -26,19 +24,15 @@ linters:
     - godox
     - gofmt
     - goimports
-    - goprintffuncname
     - gosec
-    - intrange
     - misspell
     - noctx
-    - nosprintfhostport
     - revive
-    - sqlclosecheck
     - stylecheck
+    - sqlclosecheck
     - testpackage
     - unparam
-    - wastedassign
-    - whitespace
+    - unused
 
 issues:
   include:

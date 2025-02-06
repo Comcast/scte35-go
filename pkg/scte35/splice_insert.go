@@ -32,9 +32,10 @@ const (
 // SpliceInsert is a  command shall be sent at least once for every splice
 // event.
 type SpliceInsert struct {
-	XMLName                    xml.Name                `xml:"http://www.scte.org/schemas/35 SpliceInsert" json:"-"`
-	JSONType                   uint32                  `xml:"-" json:"type"`
-	Program                    *SpliceInsertProgram    `xml:"http://www.scte.org/schemas/35 Program" json:"program,omitempty"`
+	XMLName  xml.Name             `xml:"http://www.scte.org/schemas/35 SpliceInsert" json:"-"`
+	JSONType uint32               `xml:"-" json:"type"`
+	Program  *SpliceInsertProgram `xml:"http://www.scte.org/schemas/35 Program" json:"program,omitempty"`
+	// Deprecated.
 	Components                 []SpliceInsertComponent `xml:"http://www.scte.org/schemas/35 Component" json:"components,omitempty"`
 	BreakDuration              *BreakDuration          `xml:"http://www.scte.org/schemas/35 BreakDuration" json:"breakDuration,omitempty"`
 	SpliceEventID              uint32                  `xml:"spliceEventId,attr" json:"spliceEventId,omitempty"`
@@ -292,6 +293,7 @@ func (cmd SpliceInsert) length() int {
 }
 
 // SpliceInsertComponent contains the Splice Point in Component Splice Mode.
+// Deprecated.
 type SpliceInsertComponent struct {
 	Tag        uint32      `xml:"componentTag,attr" json:"componentTag,omitempty"`
 	SpliceTime *SpliceTime `xml:"http://www.scte.org/schemas/35 SpliceTime" json:"spliceTime,omitempty"`

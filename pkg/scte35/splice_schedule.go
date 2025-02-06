@@ -55,6 +55,8 @@ func (cmd *SpliceSchedule) decode(b []byte) error {
 		e := Event{}
 		e.SpliceEventID = r.Uint32(32)
 		e.SpliceEventCancelIndicator = r.Bit()
+		e.EventIDComplianceFlag = r.Bit()
+		r.Skip(6) // reserved
 		if !e.SpliceEventCancelIndicator {
 			e.OutOfNetworkIndicator = r.Bit()
 			programSpliceFlag := r.Bit()
@@ -101,7 +103,8 @@ func (cmd *SpliceSchedule) encode() ([]byte, error) {
 	for _, e := range cmd.Events {
 		iow.PutUint32(32, e.SpliceEventID)
 		iow.PutBit(e.SpliceEventCancelIndicator)
-		iow.PutUint32(7, Reserved) // reserved
+		iow.PutBit(e.EventIDComplianceFlag)
+		iow.PutUint32(6, Reserved) // reserved
 		if !e.SpliceEventCancelIndicator {
 			iow.PutBit(e.OutOfNetworkIndicator)
 			iow.PutBit(e.ProgramSpliceFlag())
@@ -140,7 +143,8 @@ func (cmd SpliceSchedule) length() int {
 	for _, e := range cmd.Events {
 		length += 32 // splice_event_id
 		length++     // splice_event_cancel_indicator
-		length += 7  // reserved
+		length++     // event_id_compliance_flag
+		length += 6  // reserved
 
 		// if splice_event_cancel_indicator == 0
 		if !e.SpliceEventCancelIndicator {
@@ -185,6 +189,7 @@ func (cmd *SpliceSchedule) writeTo(t *table) {
 		t.row(1, "event["+strconv.Itoa(i)+"]", nil)
 		t.row(2, "splice_event_id", e.SpliceEventID)
 		t.row(2, "splice_event_cancel_indicator", e.SpliceEventCancelIndicator)
+		t.row(2, "event_id_compliance_flag", e.EventIDComplianceFlag)
 		if !e.SpliceEventCancelIndicator {
 			t.row(2, "out_of_network_indicator", e.OutOfNetworkIndicator)
 			t.row(2, "program_splice_flag", e.ProgramSpliceFlag())
@@ -215,11 +220,13 @@ func (cmd *SpliceSchedule) writeTo(t *table) {
 
 // Event is a single event within a splice_schedule.
 type Event struct {
-	Program                    *EventProgram    `xml:"http://www.scte.org/schemas/35 Program" json:"program"`
+	Program *EventProgram `xml:"http://www.scte.org/schemas/35 Program" json:"program"`
+	// Deprecated.
 	Components                 []EventComponent `xml:"http://www.scte.org/schemas/35 Component" json:"components"`
 	BreakDuration              *BreakDuration   `xml:"http://www.scte.org/schemas/35 BreakDuration" json:"breakDuration"`
 	SpliceEventID              uint32           `xml:"spliceEventId,attr" json:"spliceEventId"`
 	SpliceEventCancelIndicator bool             `xml:"spliceEventCancelIndicator,attr" json:"spliceEventCancelIndicator"`
+	EventIDComplianceFlag      bool             `xml:"eventIdComplianceFlag,attr,omitempty" json:"eventIdComplianceFlag,omitempty"`
 	OutOfNetworkIndicator      bool             `xml:"outOfNetworkIndicator,attr" json:"outOfNetworkIndicator,omitempty"`
 	UniqueProgramID            uint32           `xml:"uniqueProgramId,attr" json:"uniqueProgramId,omitempty"`
 	AvailNum                   uint32           `xml:"availNum,attr" json:"availNum,omitempty"`
@@ -237,6 +244,7 @@ func (e *Event) ProgramSpliceFlag() bool {
 }
 
 // EventComponent contains the Splice Points in Component Splice Mode.
+// Deprecated.
 type EventComponent struct {
 	Tag           uint32        `xml:"componentTag,attr" json:"componentTag"`
 	UTCSpliceTime UTCSpliceTime `xml:"utcSpliceTime,attr" json:"utcSpliceTime"`

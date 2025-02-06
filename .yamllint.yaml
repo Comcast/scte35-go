@@ -1,0 +1,20 @@
+---
+extends: default
+
+rules:
+  braces:
+    min-spaces-inside: 0
+    max-spaces-inside: 1
+  comments:
+    require-starting-space: true
+    ignore-shebangs: true
+    min-spaces-from-content: 1
+  indentation:
+    spaces: 2
+    indent-sequences: true
+  line-length: disable
+  quoted-strings:
+    quote-type: double
+    required: false
+    ignore: |
+      Taskfile.yaml
