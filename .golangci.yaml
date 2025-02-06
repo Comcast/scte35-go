@@ -6,6 +6,9 @@ run:
 linters-settings:
   errcheck:
     check-type-assertions: true
+  gosec:
+    excludes:
+      - G115
 
 linters:
   enable:
@@ -17,7 +20,6 @@ linters:
     - errname
     - errorlint
     - exhaustive
-    - exportloopref
     - gci
     - gochecknoinits
     - gocritic

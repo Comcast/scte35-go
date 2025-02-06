@@ -326,8 +326,6 @@ func (sd *SegmentationDescriptor) SegmentationUpidLength() int {
 
 // decode updates this splice_descriptor from binary.
 func (sd *SegmentationDescriptor) decode(b []byte) error {
-	var err error
-
 	r := iobit.NewReader(b)
 	r.Skip(8)  // splice_descriptor_tag
 	r.Skip(8)  // descriptor_length
@@ -399,21 +397,15 @@ func (sd *SegmentationDescriptor) decode(b []byte) error {
 		sd.SegmentNum = r.Uint32(8)
 		sd.SegmentsExpected = r.Uint32(8)
 
-		// these fields are new in 2016 so we need a secondary check whether
-		// they were actually included in the binary payload
-		if sd.SegmentationTypeID == SegmentationTypeProviderPOStart || sd.SegmentationTypeID == SegmentationTypeDistributorPOStart {
-			if r.LeftBits() == 16 {
-				n := r.Uint32(8)
-				e := r.Uint32(8)
-				sd.SubSegmentNum = &n
-				sd.SubSegmentsExpected = &e
-			}
+		// If exactly 2 bytes remain, these are subsegment indicators.
+		if r.LeftBits() == 16 {
+			n := r.Uint32(8)
+			e := r.Uint32(8)
+			sd.SubSegmentNum = &n
+			sd.SubSegmentsExpected = &e
 		}
 	}
 
-	if err != nil {
-		return err
-	}
 	if err := readerError(r); err != nil {
 		return fmt.Errorf("segmentation_descriptor: %w", err)
 	}

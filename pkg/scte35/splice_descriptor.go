@@ -155,10 +155,11 @@ func (sds *SpliceDescriptors) UnmarshalXML(d *xml.Decoder, start xml.StartElemen
 func decodeSpliceDescriptors(b []byte) ([]SpliceDescriptor, error) {
 	r := iobit.NewReader(b)
 
+	var err error
 	var sds []SpliceDescriptor
 	for r.LeftBits() > 0 {
 		// Peek to get splice_descriptor_tag, descriptor_length, and
-		// identifier
+		// identifier.
 		sdr := r.Peek()
 		spliceDescriptorTag := sdr.Uint32(8)
 		descriptorLength := int(sdr.Uint32(8))
@@ -167,12 +168,12 @@ func decodeSpliceDescriptors(b []byte) ([]SpliceDescriptor, error) {
 		// Decode the full splice_descriptor (including splice_descriptor_tag
 		// and descriptor_length).
 		sd := NewSpliceDescriptor(identifier, spliceDescriptorTag)
-		err := sd.decode(r.Bytes(descriptorLength + 2))
-		if err != nil {
-			return sds, err
+		if derr := sd.decode(r.Bytes(descriptorLength + 2)); derr != nil {
+			// Store the error but continue decoding the rest of the signal.
+			err = derr
 		}
 		sds = append(sds, sd)
 	}
 
-	return sds, nil
+	return sds, err
 }

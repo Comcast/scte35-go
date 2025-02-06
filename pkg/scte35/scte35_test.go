@@ -53,7 +53,7 @@ func TestDecodeBase64(t *testing.T) {
 				EncryptedPacket: scte35.EncryptedPacket{EncryptionAlgorithm: scte35.EncryptionAlgorithmNone, CWIndex: 255},
 				SpliceCommand: &scte35.TimeSignal{
 					SpliceTime: scte35.SpliceTime{
-						PTSTime: uint64ptr(0x072bd0050),
+						PTSTime: ptr(uint64(0x072bd0050)),
 					},
 				},
 				SpliceDescriptors: []scte35.SpliceDescriptor{
@@ -65,7 +65,7 @@ func TestDecodeBase64(t *testing.T) {
 						},
 						SegmentationEventID:  uint32(0x4800008e),
 						SegmentationTypeID:   scte35.SegmentationTypeProviderPOStart,
-						SegmentationDuration: uint64ptr(0x0001a599b0),
+						SegmentationDuration: ptr(uint64(0x0001a599b0)),
 						SegmentationUPIDs: []scte35.SegmentationUPID{
 							scte35.NewSegmentationUPID(scte35.SegmentationUPIDTypeTI, toBytes(0x000000002ca0a18a)),
 						},
@@ -89,7 +89,7 @@ func TestDecodeBase64(t *testing.T) {
 					OutOfNetworkIndicator: true,
 					Program: &scte35.SpliceInsertProgram{
 						SpliceTime: scte35.SpliceTime{
-							PTSTime: uint64ptr(0x07369c02e),
+							PTSTime: ptr(uint64(0x07369c02e)),
 						},
 					},
 				},
@@ -108,7 +108,7 @@ func TestDecodeBase64(t *testing.T) {
 				EncryptedPacket: scte35.EncryptedPacket{EncryptionAlgorithm: scte35.EncryptionAlgorithmNone, CWIndex: 255},
 				SpliceCommand: &scte35.TimeSignal{
 					SpliceTime: scte35.SpliceTime{
-						PTSTime: uint64ptr(0x0746290a0),
+						PTSTime: ptr(uint64(0x0746290a0)),
 					},
 				},
 				SpliceDescriptors: []scte35.SpliceDescriptor{
@@ -137,7 +137,7 @@ func TestDecodeBase64(t *testing.T) {
 				EncryptedPacket: scte35.EncryptedPacket{EncryptionAlgorithm: scte35.EncryptionAlgorithmNone, CWIndex: 255},
 				SpliceCommand: &scte35.TimeSignal{
 					SpliceTime: scte35.SpliceTime{
-						PTSTime: uint64ptr(0x07a4d88b6),
+						PTSTime: ptr(uint64(0x07a4d88b6)),
 					},
 				},
 				SpliceDescriptors: []scte35.SpliceDescriptor{
@@ -178,7 +178,7 @@ func TestDecodeBase64(t *testing.T) {
 				EncryptedPacket: scte35.EncryptedPacket{EncryptionAlgorithm: scte35.EncryptionAlgorithmNone, CWIndex: 255},
 				SpliceCommand: &scte35.TimeSignal{
 					SpliceTime: scte35.SpliceTime{
-						PTSTime: uint64ptr(0x0aebfff64),
+						PTSTime: ptr(uint64(0x0aebfff64)),
 					},
 				},
 				SpliceDescriptors: []scte35.SpliceDescriptor{
@@ -206,7 +206,7 @@ func TestDecodeBase64(t *testing.T) {
 				EncryptedPacket: scte35.EncryptedPacket{EncryptionAlgorithm: scte35.EncryptionAlgorithmNone, CWIndex: 255},
 				SpliceCommand: &scte35.TimeSignal{
 					SpliceTime: scte35.SpliceTime{
-						PTSTime: uint64ptr(0x0932e380b),
+						PTSTime: ptr(uint64(0x0932e380b)),
 					},
 				},
 				SpliceDescriptors: []scte35.SpliceDescriptor{
@@ -247,7 +247,7 @@ func TestDecodeBase64(t *testing.T) {
 				EncryptedPacket: scte35.EncryptedPacket{EncryptionAlgorithm: scte35.EncryptionAlgorithmNone, CWIndex: 255},
 				SpliceCommand: &scte35.TimeSignal{
 					SpliceTime: scte35.SpliceTime{
-						PTSTime: uint64ptr(0x0aef17c4c),
+						PTSTime: ptr(uint64(0x0aef17c4c)),
 					},
 				},
 				SpliceDescriptors: []scte35.SpliceDescriptor{
@@ -275,7 +275,7 @@ func TestDecodeBase64(t *testing.T) {
 				EncryptedPacket: scte35.EncryptedPacket{EncryptionAlgorithm: scte35.EncryptionAlgorithmNone, CWIndex: 255},
 				SpliceCommand: &scte35.TimeSignal{
 					SpliceTime: scte35.SpliceTime{
-						PTSTime: uint64ptr(0x0a8cd44ed),
+						PTSTime: ptr(uint64(0x0a8cd44ed)),
 					},
 				},
 				SpliceDescriptors: []scte35.SpliceDescriptor{
@@ -460,11 +460,11 @@ func TestDecodeBase64(t *testing.T) {
 							{
 								Type:             scte35.SegmentationUPIDTypeMPU,
 								Format:           scte35.SegmentationUPIDFormatBase64,
-								FormatIdentifier: uint32ptr(1145656131),
+								FormatIdentifier: ptr(uint32(1145656131)),
 								Value:            "WU1XRjA0NTIwMDBI",
 							},
 						},
-						SegmentationDuration: uint64ptr(10800000),
+						SegmentationDuration: ptr(uint64(10800000)),
 						SegmentationEventID:  39965,
 						SegmentationTypeID:   scte35.SegmentationTypeProviderAdEnd,
 						SegmentNum:           1,
@@ -497,7 +497,7 @@ func TestDecodeBase64(t *testing.T) {
 								Value:  "urn:nbcuni.com:brc:499866434",
 							},
 						},
-						SegmentationDuration: uint64ptr(1347087),
+						SegmentationDuration: ptr(uint64(1347087)),
 						SegmentationEventID:  4294967295,
 						SegmentationTypeID:   scte35.SegmentationTypeProviderAdEnd,
 						SegmentNum:           10,
@@ -534,12 +534,47 @@ func TestDecodeBase64(t *testing.T) {
 			},
 			legacy: true, // binary wont match because of stuffing
 		},
+		"Unused Subsegments Included": {
+			binary: "/DCRAAAAAAAAAP/wBQb/9peOEAB7AjhDVUVJAAAAnH+/DilhdmFpbGlkPTkxNDg2NjA2NSZiaXRtYXA9JmluYWN0aXZpdHk9MzEyMDEHCgI/Q1VFSQAAAJ1//wAANu6ADilhdmFpbGlkPTkxMDkwMTM4OSZiaXRtYXA9JmluYWN0aXZpdHk9MzEyMDAICgAAoJMeaA==",
+			expected: scte35.SpliceInfoSection{
+				SAPType: scte35.SAPTypeNotSpecified,
+				Tier:    4095,
+				SpliceCommand: &scte35.TimeSignal{
+					SpliceTime: scte35.SpliceTime{
+						PTSTime: ptr(uint64(8432094736)),
+					},
+				},
+				SpliceDescriptors: scte35.SpliceDescriptors{
+					&scte35.SegmentationDescriptor{
+						SegmentationEventID: uint32(156),
+						SegmentationTypeID:  scte35.SegmentationTypeProviderAdEnd,
+						SegmentNum:          7,
+						SegmentsExpected:    10,
+						SegmentationUPIDs: []scte35.SegmentationUPID{
+							{Type: scte35.SegmentationUPIDTypeADS, Format: scte35.SegmentationUPIDFormatText, Value: "availid=914866065\u0026bitmap=\u0026inactivity=3120"},
+						},
+					},
+					&scte35.SegmentationDescriptor{
+						SegmentationEventID:  uint32(157),
+						SegmentationTypeID:   scte35.SegmentationTypeProviderAdStart,
+						SegmentationDuration: ptr(uint64(3600000)),
+						SegmentNum:           8,
+						SegmentsExpected:     10,
+						SubSegmentNum:        ptr(uint32(0)),
+						SubSegmentsExpected:  ptr(uint32(0)),
+						SegmentationUPIDs: []scte35.SegmentationUPID{
+							{Type: scte35.SegmentationUPIDTypeADS, Format: scte35.SegmentationUPIDFormatText, Value: "availid=910901389\u0026bitmap=\u0026inactivity=3120"},
+						},
+					},
+				},
+			},
+		},
 		"UPID with Valid ASCII Invalid UTF8": {
 			binary: "/DDHAAAAABc0AP/wBQb/tVo+agCxAhdDVUVJQA4hwH+fCAgAAAAAPj6IcCMAAAIXQ1VFSUAOI1x/nwgIAAAAAD4+iHARAAACF0NVRUlADiHgf58ICAAAAAA+Poi2EAAAAhxDVUVJQA4hyn/fAABSlKwICAAAAAA+Poi2IgAAAkZDVUVJQA4h1n/PAABSlKwNMgoMFHf5uXs0AAAAAAAADhh0eXBlPUxBJmR1cj02MDAwMCZ0aWVy/DDHAAAAAAAAAP8ABQb/HPCt2w==",
 			expected: scte35.SpliceInfoSection{
 				SpliceCommand: &scte35.TimeSignal{
 					SpliceTime: scte35.SpliceTime{
-						PTSTime: uint64ptr(7337557610),
+						PTSTime: ptr(uint64(7337557610)),
 					},
 				},
 				SpliceDescriptors: scte35.SpliceDescriptors{
@@ -584,7 +619,7 @@ func TestDecodeBase64(t *testing.T) {
 					},
 					&scte35.SegmentationDescriptor{
 						SegmentationEventID:  uint32(1074667978),
-						SegmentationDuration: uint64ptr(5412012),
+						SegmentationDuration: ptr(uint64(5412012)),
 						SegmentationTypeID:   scte35.SegmentationTypeBreakStart,
 						DeliveryRestrictions: &scte35.DeliveryRestrictions{
 							ArchiveAllowedFlag:     true,
@@ -599,7 +634,7 @@ func TestDecodeBase64(t *testing.T) {
 					&scte35.SegmentationDescriptor{
 						SegmentationEventID:  uint32(1074667990),
 						SegmentationTypeID:   0x05,
-						SegmentationDuration: uint64ptr(5412012),
+						SegmentationDuration: ptr(uint64(5412012)),
 						SegmentNum:           6,
 						SegmentsExpected:     255,
 						DeliveryRestrictions: &scte35.DeliveryRestrictions{
@@ -678,7 +713,7 @@ func TestDecodeHex(t *testing.T) {
 				EncryptedPacket: scte35.EncryptedPacket{EncryptionAlgorithm: scte35.EncryptionAlgorithmNone, CWIndex: 255},
 				SpliceCommand: &scte35.TimeSignal{
 					SpliceTime: scte35.SpliceTime{
-						PTSTime: uint64ptr(0x072bd0050),
+						PTSTime: ptr(uint64(0x072bd0050)),
 					},
 				},
 				SpliceDescriptors: []scte35.SpliceDescriptor{
@@ -690,7 +725,7 @@ func TestDecodeHex(t *testing.T) {
 						},
 						SegmentationEventID:  uint32(0x4800008e),
 						SegmentationTypeID:   scte35.SegmentationTypeProviderPOStart,
-						SegmentationDuration: uint64ptr(0x0001a599b0),
+						SegmentationDuration: ptr(uint64(0x0001a599b0)),
 						SegmentationUPIDs: []scte35.SegmentationUPID{
 							scte35.NewSegmentationUPID(scte35.SegmentationUPIDTypeTI, toBytes(0x000000002ca0a18a)),
 						},
@@ -714,7 +749,7 @@ func TestDecodeHex(t *testing.T) {
 					OutOfNetworkIndicator: true,
 					Program: &scte35.SpliceInsertProgram{
 						SpliceTime: scte35.SpliceTime{
-							PTSTime: uint64ptr(0x07369c02e),
+							PTSTime: ptr(uint64(0x07369c02e)),
 						},
 					},
 				},
@@ -803,10 +838,6 @@ func toXML(sis *scte35.SpliceInfoSection) string {
 	return string(b)
 }
 
-func uint32ptr(i uint32) *uint32 {
-	return &i
-}
-
-func uint64ptr(i uint64) *uint64 {
+func ptr[T any](i T) *T {
 	return &i
 }
