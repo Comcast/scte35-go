@@ -1,12 +1,13 @@
 ---
 name: check
-on:
+on: # yamllint disable-line rule:truthy
   push:
     branches:
       - main
+      - renovate/*
   pull_request:
-    branches:
-      - main
+    branches-ignore:
+      - renovate/*
 
 jobs:
   validate:
