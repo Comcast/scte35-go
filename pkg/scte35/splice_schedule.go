@@ -55,8 +55,8 @@ func (cmd *SpliceSchedule) decode(b []byte) error {
 		e := Event{}
 		e.SpliceEventID = r.Uint32(32)
 		e.SpliceEventCancelIndicator = r.Bit()
-		e.EventIDComplianceFlag = r.Bit()
-		r.Skip(6) // reserved
+		e.EventIDComplianceFlag = !r.Bit() // event_id_compliance_flag has inverted semantics
+		r.Skip(6)                          // reserved
 		if !e.SpliceEventCancelIndicator {
 			e.OutOfNetworkIndicator = r.Bit()
 			programSpliceFlag := r.Bit()
@@ -103,8 +103,8 @@ func (cmd *SpliceSchedule) encode() ([]byte, error) {
 	for _, e := range cmd.Events {
 		iow.PutUint32(32, e.SpliceEventID)
 		iow.PutBit(e.SpliceEventCancelIndicator)
-		iow.PutBit(e.EventIDComplianceFlag)
-		iow.PutUint32(6, Reserved) // reserved
+		iow.PutBit(!e.EventIDComplianceFlag) // event_id_compliance_flag has inverted semantics
+		iow.PutUint32(6, Reserved)           // reserved
 		if !e.SpliceEventCancelIndicator {
 			iow.PutBit(e.OutOfNetworkIndicator)
 			iow.PutBit(e.ProgramSpliceFlag())
