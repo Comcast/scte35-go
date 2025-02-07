@@ -22,7 +22,6 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"errors"
-	"io"
 	"log"
 	"math"
 	"strings"
@@ -54,7 +53,7 @@ var (
 )
 
 // Logger for emitting debug messages.
-var Logger = log.New(io.Discard, "SCTE35 ", log.Ldate|log.Ltime|log.Llongfile)
+var Logger = log.Default()
 
 // DecodeBase64 is a convenience function for decoding a base-64 string into
 // a SpliceInfoSection. If an error occurs, the returned SpliceInfoSection

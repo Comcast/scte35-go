@@ -58,6 +58,7 @@ func TestDecodeBase64(t *testing.T) {
 				},
 				SpliceDescriptors: []scte35.SpliceDescriptor{
 					&scte35.SegmentationDescriptor{
+						SegmentationEventIDComplianceIndicator: true,
 						DeliveryRestrictions: &scte35.DeliveryRestrictions{
 							NoRegionalBlackoutFlag: true,
 							ArchiveAllowedFlag:     true,
@@ -113,6 +114,7 @@ func TestDecodeBase64(t *testing.T) {
 				},
 				SpliceDescriptors: []scte35.SpliceDescriptor{
 					&scte35.SegmentationDescriptor{
+						SegmentationEventIDComplianceIndicator: true,
 						DeliveryRestrictions: &scte35.DeliveryRestrictions{
 							NoRegionalBlackoutFlag: true,
 							ArchiveAllowedFlag:     true,
@@ -142,6 +144,7 @@ func TestDecodeBase64(t *testing.T) {
 				},
 				SpliceDescriptors: []scte35.SpliceDescriptor{
 					&scte35.SegmentationDescriptor{
+						SegmentationEventIDComplianceIndicator: true,
 						DeliveryRestrictions: &scte35.DeliveryRestrictions{
 							NoRegionalBlackoutFlag: true,
 							ArchiveAllowedFlag:     true,
@@ -155,6 +158,7 @@ func TestDecodeBase64(t *testing.T) {
 						},
 					},
 					&scte35.SegmentationDescriptor{
+						SegmentationEventIDComplianceIndicator: true,
 						DeliveryRestrictions: &scte35.DeliveryRestrictions{
 							NoRegionalBlackoutFlag: true,
 							ArchiveAllowedFlag:     true,
@@ -183,6 +187,7 @@ func TestDecodeBase64(t *testing.T) {
 				},
 				SpliceDescriptors: []scte35.SpliceDescriptor{
 					&scte35.SegmentationDescriptor{
+						SegmentationEventIDComplianceIndicator: true,
 						DeliveryRestrictions: &scte35.DeliveryRestrictions{
 							NoRegionalBlackoutFlag: true,
 							ArchiveAllowedFlag:     true,
@@ -211,6 +216,7 @@ func TestDecodeBase64(t *testing.T) {
 				},
 				SpliceDescriptors: []scte35.SpliceDescriptor{
 					&scte35.SegmentationDescriptor{
+						SegmentationEventIDComplianceIndicator: true,
 						DeliveryRestrictions: &scte35.DeliveryRestrictions{
 							NoRegionalBlackoutFlag: true,
 							ArchiveAllowedFlag:     true,
@@ -224,6 +230,7 @@ func TestDecodeBase64(t *testing.T) {
 						},
 					},
 					&scte35.SegmentationDescriptor{
+						SegmentationEventIDComplianceIndicator: true,
 						DeliveryRestrictions: &scte35.DeliveryRestrictions{
 							NoRegionalBlackoutFlag: true,
 							ArchiveAllowedFlag:     true,
@@ -252,6 +259,7 @@ func TestDecodeBase64(t *testing.T) {
 				},
 				SpliceDescriptors: []scte35.SpliceDescriptor{
 					&scte35.SegmentationDescriptor{
+						SegmentationEventIDComplianceIndicator: true,
 						DeliveryRestrictions: &scte35.DeliveryRestrictions{
 							NoRegionalBlackoutFlag: true,
 							ArchiveAllowedFlag:     true,
@@ -280,6 +288,7 @@ func TestDecodeBase64(t *testing.T) {
 				},
 				SpliceDescriptors: []scte35.SpliceDescriptor{
 					&scte35.SegmentationDescriptor{
+						SegmentationEventIDComplianceIndicator: true,
 						DeliveryRestrictions: &scte35.DeliveryRestrictions{
 							NoRegionalBlackoutFlag: true,
 							ArchiveAllowedFlag:     true,
@@ -294,6 +303,7 @@ func TestDecodeBase64(t *testing.T) {
 						SegmentNum: 2,
 					},
 					&scte35.SegmentationDescriptor{
+						SegmentationEventIDComplianceIndicator: true,
 						DeliveryRestrictions: &scte35.DeliveryRestrictions{
 							NoRegionalBlackoutFlag: true,
 							ArchiveAllowedFlag:     true,
@@ -307,6 +317,7 @@ func TestDecodeBase64(t *testing.T) {
 						},
 					},
 					&scte35.SegmentationDescriptor{
+						SegmentationEventIDComplianceIndicator: true,
 						DeliveryRestrictions: &scte35.DeliveryRestrictions{
 							NoRegionalBlackoutFlag: true,
 							ArchiveAllowedFlag:     true,
@@ -354,6 +365,7 @@ func TestDecodeBase64(t *testing.T) {
 				SpliceCommand: scte35.NewTimeSignal(7316880262),
 				SpliceDescriptors: []scte35.SpliceDescriptor{
 					&scte35.SegmentationDescriptor{
+						SegmentationEventIDComplianceIndicator: true,
 						DeliveryRestrictions: &scte35.DeliveryRestrictions{
 							ArchiveAllowedFlag:     true,
 							WebDeliveryAllowedFlag: true,
@@ -371,6 +383,7 @@ func TestDecodeBase64(t *testing.T) {
 						SegmentationEventID: 1073742098,
 					},
 					&scte35.SegmentationDescriptor{
+						SegmentationEventIDComplianceIndicator: true,
 						DeliveryRestrictions: &scte35.DeliveryRestrictions{
 							ArchiveAllowedFlag:     true,
 							WebDeliveryAllowedFlag: true,
@@ -423,6 +436,7 @@ func TestDecodeBase64(t *testing.T) {
 				SpliceCommand: scte35.NewTimeSignal(4294967296),
 				SpliceDescriptors: []scte35.SpliceDescriptor{
 					&scte35.SegmentationDescriptor{
+						SegmentationEventIDComplianceIndicator: true,
 						SegmentationUPIDs: []scte35.SegmentationUPID{
 							{
 								Type:   scte35.SegmentationUPIDTypeEIDR,
@@ -456,6 +470,7 @@ func TestDecodeBase64(t *testing.T) {
 				SpliceCommand: scte35.NewTimeSignal(3550479013),
 				SpliceDescriptors: []scte35.SpliceDescriptor{
 					&scte35.SegmentationDescriptor{
+						SegmentationEventIDComplianceIndicator: true,
 						SegmentationUPIDs: []scte35.SegmentationUPID{
 							{
 								Type:             scte35.SegmentationUPIDTypeMPU,
@@ -497,11 +512,12 @@ func TestDecodeBase64(t *testing.T) {
 								Value:  "urn:nbcuni.com:brc:499866434",
 							},
 						},
-						SegmentationDuration: ptr(uint64(1347087)),
-						SegmentationEventID:  4294967295,
-						SegmentationTypeID:   scte35.SegmentationTypeProviderAdEnd,
-						SegmentNum:           10,
-						SegmentsExpected:     1,
+						SegmentationDuration:                   ptr(uint64(1347087)),
+						SegmentationEventID:                    4294967295,
+						SegmentationEventIDComplianceIndicator: true,
+						SegmentationTypeID:                     scte35.SegmentationTypeProviderAdEnd,
+						SegmentNum:                             10,
+						SegmentsExpected:                       1,
 					},
 				},
 				Tier:    4095,
@@ -546,22 +562,24 @@ func TestDecodeBase64(t *testing.T) {
 				},
 				SpliceDescriptors: scte35.SpliceDescriptors{
 					&scte35.SegmentationDescriptor{
-						SegmentationEventID: uint32(156),
-						SegmentationTypeID:  scte35.SegmentationTypeProviderAdEnd,
-						SegmentNum:          7,
-						SegmentsExpected:    10,
+						SegmentationEventID:                    uint32(156),
+						SegmentationTypeID:                     scte35.SegmentationTypeProviderAdEnd,
+						SegmentNum:                             7,
+						SegmentsExpected:                       10,
+						SegmentationEventIDComplianceIndicator: true,
 						SegmentationUPIDs: []scte35.SegmentationUPID{
 							{Type: scte35.SegmentationUPIDTypeADS, Format: scte35.SegmentationUPIDFormatText, Value: "availid=914866065\u0026bitmap=\u0026inactivity=3120"},
 						},
 					},
 					&scte35.SegmentationDescriptor{
-						SegmentationEventID:  uint32(157),
-						SegmentationTypeID:   scte35.SegmentationTypeProviderAdStart,
-						SegmentationDuration: ptr(uint64(3600000)),
-						SegmentNum:           8,
-						SegmentsExpected:     10,
-						SubSegmentNum:        ptr(uint32(0)),
-						SubSegmentsExpected:  ptr(uint32(0)),
+						SegmentationEventID:                    uint32(157),
+						SegmentationTypeID:                     scte35.SegmentationTypeProviderAdStart,
+						SegmentationEventIDComplianceIndicator: true,
+						SegmentationDuration:                   ptr(uint64(3600000)),
+						SegmentNum:                             8,
+						SegmentsExpected:                       10,
+						SubSegmentNum:                          ptr(uint32(0)),
+						SubSegmentsExpected:                    ptr(uint32(0)),
 						SegmentationUPIDs: []scte35.SegmentationUPID{
 							{Type: scte35.SegmentationUPIDTypeADS, Format: scte35.SegmentationUPIDFormatText, Value: "availid=910901389\u0026bitmap=\u0026inactivity=3120"},
 						},
@@ -579,8 +597,9 @@ func TestDecodeBase64(t *testing.T) {
 				},
 				SpliceDescriptors: scte35.SpliceDescriptors{
 					&scte35.SegmentationDescriptor{
-						SegmentationEventID: uint32(1074667968),
-						SegmentationTypeID:  scte35.SegmentationTypeBreakEnd,
+						SegmentationEventID:                    uint32(1074667968),
+						SegmentationTypeID:                     scte35.SegmentationTypeBreakEnd,
+						SegmentationEventIDComplianceIndicator: true,
 						DeliveryRestrictions: &scte35.DeliveryRestrictions{
 							ArchiveAllowedFlag:     true,
 							WebDeliveryAllowedFlag: true,
@@ -592,8 +611,9 @@ func TestDecodeBase64(t *testing.T) {
 						},
 					},
 					&scte35.SegmentationDescriptor{
-						SegmentationEventID: uint32(1074668380),
-						SegmentationTypeID:  scte35.SegmentationTypeProgramEnd,
+						SegmentationEventID:                    uint32(1074668380),
+						SegmentationTypeID:                     scte35.SegmentationTypeProgramEnd,
+						SegmentationEventIDComplianceIndicator: true,
 						DeliveryRestrictions: &scte35.DeliveryRestrictions{
 							ArchiveAllowedFlag:     true,
 							WebDeliveryAllowedFlag: true,
@@ -605,8 +625,9 @@ func TestDecodeBase64(t *testing.T) {
 						},
 					},
 					&scte35.SegmentationDescriptor{
-						SegmentationEventID: uint32(1074668000),
-						SegmentationTypeID:  scte35.SegmentationTypeProgramStart,
+						SegmentationEventID:                    uint32(1074668000),
+						SegmentationTypeID:                     scte35.SegmentationTypeProgramStart,
+						SegmentationEventIDComplianceIndicator: true,
 						DeliveryRestrictions: &scte35.DeliveryRestrictions{
 							ArchiveAllowedFlag:     true,
 							WebDeliveryAllowedFlag: true,
@@ -618,9 +639,10 @@ func TestDecodeBase64(t *testing.T) {
 						},
 					},
 					&scte35.SegmentationDescriptor{
-						SegmentationEventID:  uint32(1074667978),
-						SegmentationDuration: ptr(uint64(5412012)),
-						SegmentationTypeID:   scte35.SegmentationTypeBreakStart,
+						SegmentationEventID:                    uint32(1074667978),
+						SegmentationEventIDComplianceIndicator: true,
+						SegmentationDuration:                   ptr(uint64(5412012)),
+						SegmentationTypeID:                     scte35.SegmentationTypeBreakStart,
 						DeliveryRestrictions: &scte35.DeliveryRestrictions{
 							ArchiveAllowedFlag:     true,
 							WebDeliveryAllowedFlag: true,
@@ -632,11 +654,12 @@ func TestDecodeBase64(t *testing.T) {
 						},
 					},
 					&scte35.SegmentationDescriptor{
-						SegmentationEventID:  uint32(1074667990),
-						SegmentationTypeID:   0x05,
-						SegmentationDuration: ptr(uint64(5412012)),
-						SegmentNum:           6,
-						SegmentsExpected:     255,
+						SegmentationEventID:                    uint32(1074667990),
+						SegmentationEventIDComplianceIndicator: true,
+						SegmentationTypeID:                     0x05,
+						SegmentationDuration:                   ptr(uint64(5412012)),
+						SegmentNum:                             6,
+						SegmentsExpected:                       255,
 						DeliveryRestrictions: &scte35.DeliveryRestrictions{
 							ArchiveAllowedFlag:     true,
 							WebDeliveryAllowedFlag: false,
@@ -718,6 +741,7 @@ func TestDecodeHex(t *testing.T) {
 				},
 				SpliceDescriptors: []scte35.SpliceDescriptor{
 					&scte35.SegmentationDescriptor{
+						SegmentationEventIDComplianceIndicator: true,
 						DeliveryRestrictions: &scte35.DeliveryRestrictions{
 							NoRegionalBlackoutFlag: true,
 							ArchiveAllowedFlag:     true,

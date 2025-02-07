@@ -1,0 +1,30 @@
+---
+version: "3"
+
+vars:
+  VERSION: "v1.5.0"
+
+tasks:
+  clean:
+    desc: "Clean build artifacts"
+    dir: "{{.ROOT_DIR}}"
+    silent: true
+    cmds:
+      - go clean -cache -testcache
+
+  test:
+    desc: "Run test suite"
+    dir: "{{.ROOT_DIR}}"
+    silent: true
+    cmds:
+      - go test -cover --race ./...
+
+  release:
+    desc: "Create a release for the current version."
+    silent: true
+    preconditions:
+      - sh: git diff --exit-code
+        msg: please commit changes before releasing
+    cmds:
+      - git diff --exit-code && git tag -a "v{{.VERSION}}" -m "Tagged v{{.VERSION}}"
+      - git push origin main --atomic --follow-tags

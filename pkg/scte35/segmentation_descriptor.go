@@ -74,15 +74,19 @@ const (
 	SegmentationTypeBreakEnd = 0x23
 	// SegmentationTypeOpeningCreditStart is the segmentation_type_id for
 	// Opening Credit Start. Added in ANSI/SCTE 2020.
+	// Deprecated.
 	SegmentationTypeOpeningCreditStart = 0x24
 	// SegmentationTypeOpeningCreditEnd is the segmentation_type_id for
 	// Opening Credit End. Added in ANSI/SCTE 2020.
+	// Deprecated.
 	SegmentationTypeOpeningCreditEnd = 0x25
 	// SegmentationTypeClosingCreditStart is the segmentation_type_id for
 	// Closing Credit Start. Added in ANSI/SCTE 2020.
+	// Deprecated.
 	SegmentationTypeClosingCreditStart = 0x26
 	// SegmentationTypeClosingCreditEnd is the segmentation_type_id for
 	// Closing Credit End. Added in ANSI/SCTE 2020.
+	// Deprecated.
 	SegmentationTypeClosingCreditEnd = 0x27
 	// SegmentationTypeProviderAdStart is the segmentation_type_id for Provider
 	// Ad Start.
@@ -171,19 +175,21 @@ const (
 // in advance of the signaled splice_time() to permit the insertion device to
 // place the splice_info_section( ) accurately.
 type SegmentationDescriptor struct {
-	XMLName                          xml.Name                          `xml:"http://www.scte.org/schemas/35 SegmentationDescriptor" json:"-"`
-	JSONType                         uint32                            `xml:"-" json:"type"`
-	DeliveryRestrictions             *DeliveryRestrictions             `xml:"http://www.scte.org/schemas/35 DeliveryRestrictions" json:"deliveryRestrictions,omitempty"`
-	SegmentationUPIDs                []SegmentationUPID                `xml:"http://www.scte.org/schemas/35 SegmentationUpid" json:"segmentationUpids,omitempty"`
-	Components                       []SegmentationDescriptorComponent `xml:"http://www.scte.org/schemas/35 Component" json:"components,omitempty"`
-	SegmentationEventID              uint32                            `xml:"segmentationEventId,attr,omitempty" json:"segmentationEventId,omitempty"`
-	SegmentationEventCancelIndicator bool                              `xml:"segmentationEventCancelIndicator,attr,omitempty" json:"segmentationEventCancelIndicator,omitempty"`
-	SegmentationDuration             *uint64                           `xml:"segmentationDuration,attr" json:"segmentationDuration,omitempty"`
-	SegmentationTypeID               uint32                            `xml:"segmentationTypeId,attr,omitempty" json:"segmentationTypeId,omitempty"`
-	SegmentNum                       uint32                            `xml:"segmentNum,attr,omitempty" json:"segmentNum,omitempty"`
-	SegmentsExpected                 uint32                            `xml:"segmentsExpected,attr,omitempty" json:"segmentsExpected,omitempty"`
-	SubSegmentNum                    *uint32                           `xml:"subSegmentNum,attr" json:"subSegmentNum,omitempty"`
-	SubSegmentsExpected              *uint32                           `xml:"subSegmentsExpected,attr" json:"subSegmentsExpected,omitempty"`
+	XMLName              xml.Name              `xml:"http://www.scte.org/schemas/35 SegmentationDescriptor" json:"-"`
+	JSONType             uint32                `xml:"-" json:"type"`
+	DeliveryRestrictions *DeliveryRestrictions `xml:"http://www.scte.org/schemas/35 DeliveryRestrictions" json:"deliveryRestrictions,omitempty"`
+	SegmentationUPIDs    []SegmentationUPID    `xml:"http://www.scte.org/schemas/35 SegmentationUpid" json:"segmentationUpids,omitempty"`
+	// Deprecated.
+	Components                             []SegmentationDescriptorComponent `xml:"http://www.scte.org/schemas/35 Component" json:"components,omitempty"`
+	SegmentationEventID                    uint32                            `xml:"segmentationEventId,attr,omitempty" json:"segmentationEventId,omitempty"`
+	SegmentationEventCancelIndicator       bool                              `xml:"segmentationEventCancelIndicator,attr,omitempty" json:"segmentationEventCancelIndicator,omitempty"`
+	SegmentationEventIDComplianceIndicator bool                              `xml:"segmentationEventIdComplianceIndicator,attr,omitempty" json:"segmentationEventIdComplianceIndicator,omitempty"`
+	SegmentationDuration                   *uint64                           `xml:"segmentationDuration,attr" json:"segmentationDuration,omitempty"`
+	SegmentationTypeID                     uint32                            `xml:"segmentationTypeId,attr,omitempty" json:"segmentationTypeId,omitempty"`
+	SegmentNum                             uint32                            `xml:"segmentNum,attr,omitempty" json:"segmentNum,omitempty"`
+	SegmentsExpected                       uint32                            `xml:"segmentsExpected,attr,omitempty" json:"segmentsExpected,omitempty"`
+	SubSegmentNum                          *uint32                           `xml:"subSegmentNum,attr" json:"subSegmentNum,omitempty"`
+	SubSegmentsExpected                    *uint32                           `xml:"subSegmentsExpected,attr" json:"subSegmentsExpected,omitempty"`
 }
 
 // Name returns the human-readable string for the segmentation_type_id.
@@ -332,7 +338,8 @@ func (sd *SegmentationDescriptor) decode(b []byte) error {
 	r.Skip(32) // identifier
 	sd.SegmentationEventID = r.Uint32(32)
 	sd.SegmentationEventCancelIndicator = r.Bit()
-	r.Skip(7) // reserved
+	sd.SegmentationEventIDComplianceIndicator = r.Bit()
+	r.Skip(6) // reserved
 
 	if !sd.SegmentationEventCancelIndicator {
 		programSegmentationFlag := r.Bit()
@@ -397,12 +404,22 @@ func (sd *SegmentationDescriptor) decode(b []byte) error {
 		sd.SegmentNum = r.Uint32(8)
 		sd.SegmentsExpected = r.Uint32(8)
 
-		// If exactly 2 bytes remain, these are subsegment indicators.
+		// sub-segment indicators
 		if r.LeftBits() == 16 {
-			n := r.Uint32(8)
-			e := r.Uint32(8)
-			sd.SubSegmentNum = &n
-			sd.SubSegmentsExpected = &e
+			switch sd.SegmentationTypeID {
+			case SegmentationTypeProviderAdStart,
+				SegmentationTypeDistributorAdStart,
+				SegmentationTypeProviderPOStart,
+				SegmentationTypeDistributorPOStart,
+				SegmentationTypeProviderOverlayPOStart,
+				SegmentationTypeDistributorOverlayPOStart,
+				SegmentationTypeProviderAdBlockStart,
+				SegmentationTypeDistributorAdBlockStart:
+				n := r.Uint32(8)
+				e := r.Uint32(8)
+				sd.SubSegmentNum = &n
+				sd.SubSegmentsExpected = &e
+			}
 		}
 	}
 
@@ -424,7 +441,8 @@ func (sd *SegmentationDescriptor) encode() ([]byte, error) {
 	iow.PutUint32(32, CUEIdentifier)
 	iow.PutUint32(32, sd.SegmentationEventID)
 	iow.PutBit(sd.SegmentationEventCancelIndicator)
-	iow.PutUint32(7, Reserved)
+	iow.PutBit(sd.SegmentationEventIDComplianceIndicator)
+	iow.PutUint32(6, Reserved)
 
 	if !sd.SegmentationEventCancelIndicator {
 		iow.PutBit(sd.ProgramSegmentationFlag())
@@ -494,7 +512,8 @@ func (sd *SegmentationDescriptor) length() int {
 	length := 32 // identifier
 	length += 32 // segmentation_event_id
 	length++     // segmentation_event_cancel_indicator
-	length += 7  // reserved
+	length++     // segmentation_event_id_compliance_indicator
+	length += 6  // reserved
 
 	// if segmentation_event_cancel_indicator == 0
 	if !sd.SegmentationEventCancelIndicator {
@@ -543,6 +562,7 @@ func (sd *SegmentationDescriptor) writeTo(t *table) {
 	t.row(1, "identifier", fmt.Sprintf("%#08x (%s)", CUEIdentifier, CUEIASCII))
 	t.row(1, "segmentation_event_id", sd.SegmentationEventID)
 	t.row(1, "segmentation_event_cancel_indicator", sd.SegmentationEventCancelIndicator)
+	t.row(1, "segmentation_event_id_compliance_indicator", sd.SegmentationEventIDComplianceIndicator)
 	if !sd.SegmentationEventCancelIndicator {
 		t.row(1, "program_segmentation_flag", sd.ProgramSegmentationFlag())
 		t.row(1, "segmentation_duration_flag", sd.SegmentationDurationFlag())
@@ -598,6 +618,7 @@ func (sd *SegmentationDescriptor) writeTo(t *table) {
 
 // SegmentationDescriptorComponent describes the Component element contained
 // within the SegmentationDescriptorType XML schema definition.
+// Deprecated.
 type SegmentationDescriptorComponent struct {
 	Tag       uint32 `xml:"componentTag,attr" json:"componentTag"`
 	PTSOffset uint64 `xml:"ptsOffset,attr" json:"ptsOffset"`

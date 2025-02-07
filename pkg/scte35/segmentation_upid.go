@@ -34,15 +34,18 @@ const (
 	SegmentationUPIDTypeNotUsed = 0x00
 	// SegmentationUPIDTypeUserDefined is the segmentation_upid_type for User
 	// Defined.
+	// Deprecated.
 	SegmentationUPIDTypeUserDefined = 0x01
 	// SegmentationUPIDTypeISCI is the segmentation_upid_type for ISCI
+	// Deprecated.
 	SegmentationUPIDTypeISCI = 0x02
 	// SegmentationUPIDTypeAdID is the segmentation_upid_type for Ad-ID
 	SegmentationUPIDTypeAdID = 0x03
 	// SegmentationUPIDTypeUMID is the segmentation_upid_type for UMID
 	SegmentationUPIDTypeUMID = 0x04
 	// SegmentationUPIDTypeISANDeprecated is the segmentation_upid_type for
-	// ISAN Deprecated.
+	// ISAN.
+	// Deprecated.
 	SegmentationUPIDTypeISANDeprecated = 0x05
 	// SegmentationUPIDTypeISAN is the segmentation_upid_type for ISAN.
 	SegmentationUPIDTypeISAN = 0x06
