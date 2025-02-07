@@ -338,8 +338,8 @@ func (sd *SegmentationDescriptor) decode(b []byte) error {
 	r.Skip(32) // identifier
 	sd.SegmentationEventID = r.Uint32(32)
 	sd.SegmentationEventCancelIndicator = r.Bit()
-	sd.SegmentationEventIDComplianceIndicator = r.Bit()
-	r.Skip(6) // reserved
+	sd.SegmentationEventIDComplianceIndicator = !r.Bit() // segmentation_event_id_compliance_indicator has inverted semantics
+	r.Skip(6)                                            // reserved
 
 	if !sd.SegmentationEventCancelIndicator {
 		programSegmentationFlag := r.Bit()
@@ -441,7 +441,7 @@ func (sd *SegmentationDescriptor) encode() ([]byte, error) {
 	iow.PutUint32(32, CUEIdentifier)
 	iow.PutUint32(32, sd.SegmentationEventID)
 	iow.PutBit(sd.SegmentationEventCancelIndicator)
-	iow.PutBit(sd.SegmentationEventIDComplianceIndicator)
+	iow.PutBit(!sd.SegmentationEventIDComplianceIndicator) // segmentation_event_id_compliance_indicator has inverted semantics
 	iow.PutUint32(6, Reserved)
 
 	if !sd.SegmentationEventCancelIndicator {
