@@ -26,5 +26,5 @@ tasks:
       - sh: git diff --exit-code
         msg: please commit changes before releasing
     cmds:
-      - git diff --exit-code && git tag -a "v{{.VERSION}}" -m "Tagged v{{.VERSION}}"
+      - git diff --exit-code && git tag -a "{{.VERSION}}" -m "Tagged {{.VERSION}}"
       - git push origin main --atomic --follow-tags
