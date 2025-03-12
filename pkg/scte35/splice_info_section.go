@@ -145,6 +145,12 @@ func (sis *SpliceInfoSection) Decode(b []byte) (err error) {
 }
 
 // DurationTicks attempts to return the duration of the signal in ticks.
+//
+// This method returns the splice insert's break_duration or the first valid
+// segmentation_duration found among the available splice descriptors.
+//
+// This method is not recommended for cases where segmentation_descriptors
+// contain conflicting segmentation_durations.
 func (sis *SpliceInfoSection) DurationTicks() uint64 {
 	// if this is a splice insert with a duration, use it
 	if sc, ok := sis.SpliceCommand.(*SpliceInsert); ok {
@@ -165,6 +171,12 @@ func (sis *SpliceInfoSection) DurationTicks() uint64 {
 }
 
 // Duration attempts to return the duration of the signal.
+//
+// This method returns the splice insert's break_duration or the first valid
+// segmentation_duration found among the available splice descriptors.
+//
+// This method is not recommended for cases where segmentation_descriptors
+// contain conflicting segmentation_durations.
 func (sis *SpliceInfoSection) Duration() time.Duration {
 	return TicksToDuration(sis.DurationTicks())
 }
