@@ -153,15 +153,15 @@ func (sis *SpliceInfoSection) Duration() time.Duration {
 		}
 	}
 
-	ticks := uint64(0)
+	// otherwise return the first segmentation duration found
 	for _, sd := range sis.SpliceDescriptors {
 		if sdt, ok := sd.(*SegmentationDescriptor); ok {
 			if sdt.SegmentationDuration != nil {
-				ticks += *sdt.SegmentationDuration
+				return TicksToDuration(*sdt.SegmentationDuration)
 			}
 		}
 	}
-	return TicksToDuration(ticks)
+	return time.Duration(0)
 }
 
 // Encode returns the binary representation of this SpliceInfoSection as a
