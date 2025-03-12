@@ -23,6 +23,7 @@ import (
 	"io"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/Comcast/scte35-go/pkg/scte35"
 	"github.com/stretchr/testify/assert"
@@ -817,6 +818,34 @@ func TestTicksToDuration(t *testing.T) {
 	for i := min; i < max; i++ {
 		d := scte35.TicksToDuration(uint64(i))
 		require.Equal(t, i, int(scte35.DurationToTicks(d)))
+
+		// detect for rounding errors. If the tick is a multiple of 90,
+		// we should get a value that is a multiple of full milliseconds
+		if i%90 == 0 {
+			require.Zero(t, d.Nanoseconds()%int64(time.Millisecond))
+			require.Equal(t, int64(i/90), d.Milliseconds())
+		}
+	}
+}
+
+func TestDurationToTicks(t *testing.T) {
+	// Test for usual framerates
+	frameRates := []float64{
+		24, 25, 30000.0 / 1001, 30, 50, 60,
+	}
+	frameTicks := []int{
+		3750, 3600, 3003, 3000, 1800, 1500,
+	}
+
+	for idx, fps := range frameRates {
+		timePerFrame := time.Duration(float64(time.Second) / fps)
+		ticksPerFrame := frameTicks[idx]
+
+		// try for durations up to 90 seconds
+		for framenum := 0; framenum < int(fps*90); framenum++ {
+			ticks := scte35.DurationToTicks(timePerFrame * time.Duration(framenum))
+			require.Equal(t, framenum*ticksPerFrame, int(ticks))
+		}
 	}
 }
 

@@ -35,6 +35,8 @@ const (
 	Reserved = 0xFF
 	// TicksPerSecond is the number of 90KHz ticks per second
 	TicksPerSecond = 90000
+	// TicksPerNanosecond is the number of 90KHz ticks per nanosecond
+	TicksPerNanosecond = 0.00009
 	// unixEpochToGPSEpoch is the number of seconds between 1970-01-01T00:00:00Z
 	// (Unix Epoch) and 1980-01-06T00:00:00Z (GPS Epoch).
 	unixEpochToGPSEpoch = uint32(315964800)
@@ -83,15 +85,14 @@ func DecodeHex(s string) (*SpliceInfoSection, error) {
 	return sis, err
 }
 
-// DurationToTicks converts a duration to 90MhZ ticks.
+// DurationToTicks converts a duration to 90kHz ticks.
 func DurationToTicks(d time.Duration) uint64 {
-	return uint64(math.Ceil(float64(d) * TicksPerSecond / float64(time.Second)))
+	return uint64(math.Round(float64(d.Nanoseconds()) * TicksPerNanosecond))
 }
 
-// TicksToDuration converts 90MhZ ticks to a duration.
+// TicksToDuration converts 90kHz ticks to a duration.
 func TicksToDuration(ticks uint64) time.Duration {
-	s := float64(ticks) / float64(TicksPerSecond)
-	return time.Duration(int64(s * float64(time.Second)))
+	return time.Duration(math.Round((float64(ticks) / TicksPerNanosecond)))
 }
 
 // BreakDuration specifies the duration of the commercial break(s). It may be
