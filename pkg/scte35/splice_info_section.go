@@ -144,12 +144,12 @@ func (sis *SpliceInfoSection) Decode(b []byte) (err error) {
 	return nil
 }
 
-// Duration attempts to return the duration of the signal.
-func (sis *SpliceInfoSection) Duration() time.Duration {
+// DurationTicks attempts to return the duration of the signal in ticks.
+func (sis *SpliceInfoSection) DurationTicks() uint64 {
 	// if this is a splice insert with a duration, use it
 	if sc, ok := sis.SpliceCommand.(*SpliceInsert); ok {
 		if sc.BreakDuration != nil {
-			return TicksToDuration(sc.BreakDuration.Duration)
+			return sc.BreakDuration.Duration
 		}
 	}
 
@@ -157,11 +157,16 @@ func (sis *SpliceInfoSection) Duration() time.Duration {
 	for _, sd := range sis.SpliceDescriptors {
 		if sdt, ok := sd.(*SegmentationDescriptor); ok {
 			if sdt.SegmentationDuration != nil {
-				return TicksToDuration(*sdt.SegmentationDuration)
+				return *sdt.SegmentationDuration
 			}
 		}
 	}
-	return time.Duration(0)
+	return 0
+}
+
+// Duration attempts to return the duration of the signal.
+func (sis *SpliceInfoSection) Duration() time.Duration {
+	return TicksToDuration(sis.DurationTicks())
 }
 
 // Encode returns the binary representation of this SpliceInfoSection as a
