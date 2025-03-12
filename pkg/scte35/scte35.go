@@ -92,7 +92,7 @@ func DurationToTicks(d time.Duration) uint64 {
 
 // TicksToDuration converts 90kHz ticks to a duration.
 func TicksToDuration(ticks uint64) time.Duration {
-	return time.Duration(math.Round((float64(ticks) / TicksPerNanosecond)))
+	return time.Duration(math.Round(float64(ticks) / TicksPerNanosecond))
 }
 
 // BreakDuration specifies the duration of the commercial break(s). It may be
