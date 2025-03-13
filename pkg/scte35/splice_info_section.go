@@ -181,6 +181,35 @@ func (sis *SpliceInfoSection) Duration() time.Duration {
 	return TicksToDuration(sis.DurationTicks())
 }
 
+// Durations returns all durations associated with a SpliceInfoSection.
+// The result is a sloce of interface type Duration. Its members are either
+// of type SpliceInsertDuration or SegmentationDuration.
+func (sis *SpliceInfoSection) Durations() []Duration {
+	durations := []Duration{}
+
+	if sc, ok := sis.SpliceCommand.(*SpliceInsert); ok {
+		if sc.BreakDuration != nil {
+			durations = append(durations, &SpliceInsertDuration{
+				OutOfNetworkIndicator: sc.OutOfNetworkIndicator,
+				ticks:                 sc.BreakDuration.Duration,
+			})
+		}
+	}
+
+	for _, sd := range sis.SpliceDescriptors {
+		if sdt, ok := sd.(*SegmentationDescriptor); ok {
+			if sdt.SegmentationDuration != nil {
+				durations = append(durations, &SegmentationDuration{
+					SegmentationTypeID: sdt.SegmentationTypeID,
+					ticks:              *sdt.SegmentationDuration,
+				})
+			}
+		}
+	}
+
+	return durations
+}
+
 // Encode returns the binary representation of this SpliceInfoSection as a
 // byte array.
 func (sis *SpliceInfoSection) Encode() ([]byte, error) {
@@ -479,4 +508,45 @@ func (i *iSIS) SpliceCommand() SpliceCommand {
 	}
 
 	return sc
+}
+
+// Duration represents a splice duration.
+// It provides methods to get the value either as is or as a time.Duration
+type Duration interface {
+	Ticks() uint64
+	Duration() time.Duration
+}
+
+// SpliceInsertDuration represents the duration of a splice insert.
+// It implements the Duration interface.
+type SpliceInsertDuration struct {
+	OutOfNetworkIndicator bool
+	ticks                 uint64
+}
+
+// Ticks returns the duration in 90kHz ticks.
+func (sid *SpliceInsertDuration) Ticks() uint64 {
+	return sid.ticks
+}
+
+// Duration returns the duration as a time.Duration.
+func (sid *SpliceInsertDuration) Duration() time.Duration {
+	return TicksToDuration(sid.ticks)
+}
+
+// SegmentationDuration represents the duration of a segmentation descriptor.
+// It implements the Duration interface.
+type SegmentationDuration struct {
+	SegmentationTypeID uint32
+	ticks              uint64
+}
+
+// Ticks returns the duration in 90kHz ticks.
+func (sd *SegmentationDuration) Ticks() uint64 {
+	return sd.ticks
+}
+
+// Duration returns the duration as a time.Duration.
+func (sd *SegmentationDuration) Duration() time.Duration {
+	return TicksToDuration(sd.ticks)
 }

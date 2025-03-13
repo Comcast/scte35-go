@@ -251,3 +251,143 @@ func TestSpliceInfoSection_UnmarshalJSON(t *testing.T) {
 		})
 	}
 }
+
+type testDurationExpectation struct {
+	durationType          scte35.Duration
+	ticks                 uint64
+	outOfNetworkIndicator bool
+	segmentationTypeID    uint32
+}
+
+func TestDurations(t *testing.T) {
+	cases := map[string]struct {
+		sis      scte35.SpliceInfoSection
+		expected []testDurationExpectation
+	}{
+		"SimpleSpliceInsertCueOut": {
+			sis: scte35.SpliceInfoSection{
+				SpliceCommand: &scte35.SpliceInsert{
+					OutOfNetworkIndicator: true,
+					BreakDuration: &scte35.BreakDuration{
+						Duration: 2700000,
+					},
+				},
+			},
+			expected: []testDurationExpectation{
+				{
+					durationType:          &scte35.SpliceInsertDuration{},
+					ticks:                 2700000,
+					outOfNetworkIndicator: true,
+				},
+			},
+		},
+		"SimpleSpliceInsertCueIn": {
+			sis: scte35.SpliceInfoSection{
+				SpliceCommand: &scte35.SpliceInsert{
+					OutOfNetworkIndicator: false,
+					BreakDuration: &scte35.BreakDuration{
+						Duration: 2700000,
+					},
+				},
+			},
+			expected: []testDurationExpectation{
+				{
+					durationType:          &scte35.SpliceInsertDuration{},
+					ticks:                 2700000,
+					outOfNetworkIndicator: false,
+				},
+			},
+		},
+		"SpliceInsertCueOutWithoutDuration": {
+			sis: scte35.SpliceInfoSection{
+				SpliceCommand: &scte35.SpliceInsert{
+					OutOfNetworkIndicator: true,
+				},
+			},
+			expected: []testDurationExpectation{},
+		},
+		"SpliceInsertCueOutPlusSegmentationDescriptors": {
+			sis: scte35.SpliceInfoSection{
+				SpliceCommand: &scte35.SpliceInsert{
+					OutOfNetworkIndicator: true,
+					BreakDuration: &scte35.BreakDuration{
+						Duration: 2700000,
+					},
+				},
+				SpliceDescriptors: scte35.SpliceDescriptors{
+					&scte35.SegmentationDescriptor{
+						SegmentationTypeID:   scte35.SegmentationTypeProviderPOStart,
+						SegmentationDuration: ptr(uint64(2790000)),
+					},
+					&scte35.SegmentationDescriptor{
+						SegmentationTypeID:   scte35.SegmentationTypeDistributorPOStart,
+						SegmentationDuration: ptr(uint64(2880000)),
+					},
+				},
+			},
+			expected: []testDurationExpectation{
+				{
+					durationType:          &scte35.SpliceInsertDuration{},
+					ticks:                 2700000,
+					outOfNetworkIndicator: true,
+				},
+				{
+					durationType:       &scte35.SegmentationDuration{},
+					ticks:              2790000,
+					segmentationTypeID: scte35.SegmentationTypeProviderPOStart,
+				},
+				{
+					durationType:       &scte35.SegmentationDuration{},
+					ticks:              2880000,
+					segmentationTypeID: scte35.SegmentationTypeDistributorPOStart,
+				},
+			},
+		},
+		"TimeSignal": {
+			sis: scte35.SpliceInfoSection{
+				SpliceCommand: &scte35.TimeSignal{},
+				SpliceDescriptors: scte35.SpliceDescriptors{
+					&scte35.SegmentationDescriptor{
+						SegmentationTypeID:   scte35.SegmentationTypeProviderPOStart,
+						SegmentationDuration: ptr(uint64(2790000)),
+					},
+					&scte35.SegmentationDescriptor{
+						SegmentationTypeID:   scte35.SegmentationTypeDistributorPOStart,
+						SegmentationDuration: ptr(uint64(2880000)),
+					},
+				},
+			},
+			expected: []testDurationExpectation{
+				{
+					durationType:       &scte35.SegmentationDuration{},
+					ticks:              2790000,
+					segmentationTypeID: scte35.SegmentationTypeProviderPOStart,
+				},
+				{
+					durationType:       &scte35.SegmentationDuration{},
+					ticks:              2880000,
+					segmentationTypeID: scte35.SegmentationTypeDistributorPOStart,
+				},
+			},
+		},
+	}
+
+	for k, c := range cases {
+		t.Run(k, func(t *testing.T) {
+			durations := c.sis.Durations()
+
+			require.Equal(t, len(c.expected), len(durations))
+
+			for i, d := range durations {
+				require.IsType(t, c.expected[i].durationType, d)
+				if sd, ok := d.(*scte35.SegmentationDuration); ok {
+					require.Equal(t, c.expected[i].ticks, sd.Ticks())
+					require.Equal(t, c.expected[i].segmentationTypeID, sd.SegmentationTypeID)
+				} else if si, ok := d.(*scte35.SpliceInsertDuration); ok {
+					require.Equal(t, c.expected[i].ticks, si.Ticks())
+					require.Equal(t, c.expected[i].outOfNetworkIndicator, si.OutOfNetworkIndicator)
+				}
+			}
+		})
+	}
+}
