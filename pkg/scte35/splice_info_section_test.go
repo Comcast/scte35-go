@@ -391,3 +391,163 @@ func TestDurations(t *testing.T) {
 		})
 	}
 }
+
+func Test_TimeSpecifiedFlag(t *testing.T) {
+	cases := map[string]struct {
+		sis      scte35.SpliceInfoSection
+		expected bool
+	}{
+		"SpliceInsert": {
+			sis: scte35.SpliceInfoSection{
+				SpliceCommand: &scte35.SpliceInsert{
+					Program: &scte35.SpliceInsertProgram{
+						SpliceTime: scte35.SpliceTime{
+							PTSTime: ptr(uint64(90000)),
+						},
+					},
+				},
+			},
+			expected: true,
+		},
+		"SpliceInsertNoProgramSplice": {
+			sis: scte35.SpliceInfoSection{
+				SpliceCommand: &scte35.SpliceInsert{},
+			},
+			expected: false,
+		},
+		"SpliceInsertNoSpliceTime": {
+			sis: scte35.SpliceInfoSection{
+				SpliceCommand: &scte35.SpliceInsert{
+					Program: &scte35.SpliceInsertProgram{},
+				},
+			},
+			expected: false,
+		},
+		"TimeSignal": {
+			sis: scte35.SpliceInfoSection{
+				SpliceCommand: &scte35.TimeSignal{
+					SpliceTime: scte35.SpliceTime{PTSTime: ptr(uint64(90000))},
+				},
+			},
+			expected: true,
+		},
+		"TimeSignalNoSpliceTime": {
+			sis: scte35.SpliceInfoSection{
+				SpliceCommand: &scte35.TimeSignal{
+					SpliceTime: scte35.SpliceTime{},
+				},
+			},
+			expected: false,
+		},
+	}
+
+	for k, c := range cases {
+		t.Run(k, func(t *testing.T) {
+			require.Equal(t, c.expected, c.sis.TimeSpecifiedFlag())
+		})
+	}
+}
+
+func Test_SpliceTimePTS(t *testing.T) {
+	cases := map[string]struct {
+		sis      scte35.SpliceInfoSection
+		expected uint64
+	}{
+		"SpliceInsert": {
+			sis: scte35.SpliceInfoSection{
+				SpliceCommand: &scte35.SpliceInsert{
+					Program: &scte35.SpliceInsertProgram{
+						SpliceTime: scte35.SpliceTime{
+							PTSTime: ptr(uint64(90000)),
+						},
+					},
+				},
+			},
+			expected: 90000,
+		},
+		"SpliceInsertPtsAdjustment": {
+			sis: scte35.SpliceInfoSection{
+				SpliceCommand: &scte35.SpliceInsert{
+					Program: &scte35.SpliceInsertProgram{
+						SpliceTime: scte35.SpliceTime{
+							PTSTime: ptr(uint64(90000)),
+						},
+					},
+				},
+				PTSAdjustment: 90000,
+			},
+			expected: 180000,
+		},
+		"SpliceInsertPtsAdjustmentWrapping": {
+			sis: scte35.SpliceInfoSection{
+				SpliceCommand: &scte35.SpliceInsert{
+					Program: &scte35.SpliceInsertProgram{
+						SpliceTime: scte35.SpliceTime{
+							PTSTime: ptr(uint64(8589844592)),
+						},
+					},
+				},
+				PTSAdjustment: 180000,
+			},
+			expected: 90000,
+		},
+		"SpliceInsertNoProgramSplice": {
+			sis: scte35.SpliceInfoSection{
+				SpliceCommand: &scte35.SpliceInsert{},
+			},
+			expected: 0,
+		},
+		"SpliceInsertNoSpliceTime": {
+			sis: scte35.SpliceInfoSection{
+				SpliceCommand: &scte35.SpliceInsert{
+					Program: &scte35.SpliceInsertProgram{},
+				},
+			},
+			expected: 0,
+		},
+		"TimeSignal": {
+			sis: scte35.SpliceInfoSection{
+				SpliceCommand: &scte35.TimeSignal{
+					SpliceTime: scte35.SpliceTime{PTSTime: ptr(uint64(90000))},
+				},
+			},
+			expected: 90000,
+		},
+		"TimeSingalPtsAdjustment": {
+			sis: scte35.SpliceInfoSection{
+				SpliceCommand: &scte35.TimeSignal{
+					SpliceTime: scte35.SpliceTime{
+						PTSTime: ptr(uint64(90000)),
+					},
+				},
+				PTSAdjustment: 90000,
+			},
+			expected: 180000,
+		},
+		"TimeSignalPtsAdjustmentWrapping": {
+			sis: scte35.SpliceInfoSection{
+				SpliceCommand: &scte35.TimeSignal{
+					SpliceTime: scte35.SpliceTime{
+						PTSTime: ptr(uint64(8589844592)),
+					},
+				},
+				PTSAdjustment: 180000,
+			},
+			expected: 90000,
+		},
+		"TimeSignalNoSpliceTime": {
+			sis: scte35.SpliceInfoSection{
+				SpliceCommand: &scte35.TimeSignal{
+					SpliceTime: scte35.SpliceTime{},
+				},
+			},
+			expected: 0,
+		},
+	}
+
+	for k, c := range cases {
+		t.Run(k, func(t *testing.T) {
+			require.Equal(t, c.expected, c.sis.SpliceTimePTS())
+		})
+	}
+}

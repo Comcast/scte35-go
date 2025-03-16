@@ -44,6 +44,9 @@ const (
 	SAPType3 = uint32(0x2)
 	// SAPTypeNotSpecified indicates the type of SAP, if any, is not signaled.
 	SAPTypeNotSpecified = uint32(0x3)
+
+	// MaxPTS is the maximum value for a 33-bit PTS value.
+	MaxPTS = 1<<33 - 1
 )
 
 // SpliceInfoSection shall be carried in transport packets whereby only one
@@ -208,6 +211,40 @@ func (sis *SpliceInfoSection) Durations() []Duration {
 	}
 
 	return durations
+}
+
+// TimeSpecifiedFlag returns true if the SpliceInfoSection contains a splice
+// command for a splice event for which the splice time is specified.
+func (sis *SpliceInfoSection) TimeSpecifiedFlag() bool {
+	switch sc := sis.SpliceCommand.(type) {
+	case *SpliceInsert:
+		return sc.TimeSpecifiedFlag()
+	case *TimeSignal:
+		return sc.SpliceTime.TimeSpecifiedFlag()
+	default:
+		return false
+	}
+}
+
+// SpliceTimePTS returns the final PTS time of the splice event, i.e. the
+// splice time of the command adjusted by the PTS adjustment. If the splice
+// command does not have a splice even for which splice time is specified,
+// this method returns 0.
+func (sis *SpliceInfoSection) SpliceTimePTS() uint64 {
+	switch sc := sis.SpliceCommand.(type) {
+	case *SpliceInsert:
+		if !sc.TimeSpecifiedFlag() {
+			return 0
+		}
+		return (*sc.Program.SpliceTime.PTSTime + sis.PTSAdjustment) & MaxPTS
+	case *TimeSignal:
+		if !sc.SpliceTime.TimeSpecifiedFlag() {
+			return 0
+		}
+		return (*sc.SpliceTime.PTSTime + sis.PTSAdjustment) & MaxPTS
+	default:
+		return 0
+	}
 }
 
 // Encode returns the binary representation of this SpliceInfoSection as a
