@@ -39,7 +39,7 @@ const (
 	TicksPerNanosecond = 0.00009
 	// unixEpochToGPSEpoch is the number of seconds between 1970-01-01T00:00:00Z
 	// (Unix Epoch) and 1980-01-06T00:00:00Z (GPS Epoch).
-	unixEpochToGPSEpoch = uint32(315964800)
+	unixEpochToGPSEpoch = 315964800
 )
 
 var (
@@ -123,10 +123,10 @@ func (bb *Bytes) UnmarshalText(b []byte) error {
 }
 
 // NewUTCSpliceTime creates a UTCSpliceTime representing the number of seconds
-// from GPS Epoch (01 Jan 1980, 00:00:00 UTC)
+// from GPS Epoch (06 Jan 1980, 00:00:00 UTC)
 func NewUTCSpliceTime(sec uint32) UTCSpliceTime {
 	return UTCSpliceTime{
-		time.Unix(int64(sec+unixEpochToGPSEpoch), 0),
+		time.Unix(int64(sec)+unixEpochToGPSEpoch, 0).UTC(),
 	}
 }
 
@@ -137,7 +137,7 @@ type UTCSpliceTime struct {
 
 // GPSSeconds returns the seconds since GPS Epoch
 func (t UTCSpliceTime) GPSSeconds() uint32 {
-	return uint32(t.Time.Unix()) - unixEpochToGPSEpoch
+	return uint32(t.Time.Unix() - unixEpochToGPSEpoch)
 }
 
 // readerError returns the readers error state, if any.
