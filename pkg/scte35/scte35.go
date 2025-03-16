@@ -85,6 +85,15 @@ func DecodeHex(s string) (*SpliceInfoSection, error) {
 	return sis, err
 }
 
+// DecodeBytes is a convenience function for decoding a byte array into a
+// SpliceInfoSection. If an error occurs, the returned SpliceInfoSection will
+// contain the results of decoding up until the error condition was encountered.
+func DecodeBytes(b []byte) (*SpliceInfoSection, error) {
+	sis := &SpliceInfoSection{}
+	err := sis.Decode(b)
+	return sis, err
+}
+
 // DurationToTicks converts a duration to 90kHz ticks.
 func DurationToTicks(d time.Duration) uint64 {
 	return uint64(math.Round(float64(d.Nanoseconds()) * TicksPerNanosecond))
