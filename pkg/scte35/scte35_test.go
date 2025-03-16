@@ -849,6 +849,57 @@ func TestDurationToTicks(t *testing.T) {
 	}
 }
 
+var commonGPSTimeTestCases = map[string]struct {
+	gpsSeconds    uint32
+	utcSpliceTime scte35.UTCSpliceTime
+}{
+	"GPS Second 0": {
+		gpsSeconds: 0,
+		utcSpliceTime: scte35.UTCSpliceTime{
+			Time: time.Date(1980, time.January, 6, 0, 0, 0, 0, time.UTC),
+		},
+	},
+	// last value before a uint32 based calculation would overflow
+	"GPS Second 3979002495": {
+		gpsSeconds: 3979002495,
+		utcSpliceTime: scte35.UTCSpliceTime{
+			Time: time.Date(2106, time.February, 7, 6, 28, 15, 0, time.UTC),
+		},
+	},
+	// in a uint32 based calculation this would overflow
+	"GPS Second 3979002496": {
+		gpsSeconds: 3979002496,
+		utcSpliceTime: scte35.UTCSpliceTime{
+			Time: time.Date(2106, time.February, 7, 6, 28, 16, 0, time.UTC),
+		},
+	},
+	// highest possible value
+	"GPS Second 4294967295": {
+		gpsSeconds: 4294967295,
+		utcSpliceTime: scte35.UTCSpliceTime{
+			Time: time.Date(2116, time.February, 12, 6, 28, 15, 0, time.UTC),
+		},
+	},
+}
+
+func TestNewUTCSpliceTime(t *testing.T) {
+	for k, c := range commonGPSTimeTestCases {
+		t.Run(k, func(t *testing.T) {
+			utcSpliceTime := scte35.NewUTCSpliceTime(c.gpsSeconds)
+			assert.Equal(t, c.utcSpliceTime.Time, utcSpliceTime.Time)
+		})
+	}
+}
+
+func TestUTCSpliceTimeGPSSeconds(t *testing.T) {
+	for k, c := range commonGPSTimeTestCases {
+		t.Run(k, func(t *testing.T) {
+			gpsSeconds := c.utcSpliceTime.GPSSeconds()
+			assert.Equal(t, c.gpsSeconds, gpsSeconds)
+		})
+	}
+}
+
 // helper func to make test life a bit easier
 
 func toBytes(i uint64) []byte {
