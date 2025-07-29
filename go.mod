@@ -2,7 +2,7 @@ module github.com/Comcast/scte35-go
 
 go 1.23.0
 
-toolchain go1.24.1
+toolchain go1.24.5
 
 require (
 	github.com/bamiaux/iobit v0.0.0-20170418073505-498159a04883
