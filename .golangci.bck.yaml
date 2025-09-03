@@ -1,0 +1,42 @@
+---
+run:
+  tests: false
+
+linters-settings:
+  errcheck:
+    check-type-assertions: true
+  gosec:
+    excludes:
+      - G115
+
+linters:
+  enable:
+    - bodyclose
+    - containedctx
+    - contextcheck
+    - copyloopvar
+    - errname
+    - errorlint
+    - exhaustive
+    - gci
+    - gochecknoinits
+    - gocritic
+    - godox
+    - gofmt
+    - goimports
+    - gosec
+    - misspell
+    - noctx
+    - revive
+    - stylecheck
+    - sqlclosecheck
+    - testpackage
+    - unparam
+    - unused
+
+issues:
+  include:
+    - EXC0012
+    - EXC0013
+    - EXC0014
+    - EXC0015
