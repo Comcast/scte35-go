@@ -146,7 +146,7 @@ type UTCSpliceTime struct {
 
 // GPSSeconds returns the seconds since GPS Epoch
 func (t UTCSpliceTime) GPSSeconds() uint32 {
-	return uint32(t.Time.Unix() - unixEpochToGPSEpoch)
+	return uint32(t.Unix() - unixEpochToGPSEpoch)
 }
 
 // readerError returns the readers error state, if any.
