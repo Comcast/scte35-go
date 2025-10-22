@@ -81,7 +81,7 @@ func (sd *AudioDescriptor) encode() ([]byte, error) {
 	iow.PutUint32(8, AudioDescriptorTag)
 	iow.PutUint32(8, uint32(length))
 	iow.PutUint32(32, CUEIdentifier)
-	iow.PutUint32(8, uint32(len(sd.AudioChannels)))
+	iow.PutUint32(4, uint32(len(sd.AudioChannels)))
 	iow.PutUint32(4, Reserved)
 	for _, ad := range sd.AudioChannels {
 		iow.PutUint32(8, ad.ComponentTag)
@@ -90,7 +90,9 @@ func (sd *AudioDescriptor) encode() ([]byte, error) {
 		iow.PutUint32(4, ad.NumChannels)
 		iow.PutBit(ad.FullSrvcAudio)
 	}
-	return buf, nil
+
+	err := iow.Flush()
+	return buf, err
 }
 
 // descriptorLength returns the descriptor_length
