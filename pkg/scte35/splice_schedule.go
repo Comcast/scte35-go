@@ -131,7 +131,6 @@ func (cmd *SpliceSchedule) encode() ([]byte, error) {
 	}
 
 	err := iow.Flush()
-
 	return buf, err
 }
 
