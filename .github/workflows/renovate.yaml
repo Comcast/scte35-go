@@ -10,12 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run renovate
-        uses: renovatebot/github-action@v41.0.16
+        uses: renovatebot/github-action@v44.0.2
         continue-on-error: true
         env:
+          LOG_LEVEL: "debug"
           RENOVATE_REPOSITORIES: "Comcast/scte35-go"
         with:
           configurationFile: ./.github/renovate.json
