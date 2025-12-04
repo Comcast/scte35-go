@@ -5,7 +5,9 @@
     ":semanticCommitTypeAll(chore)"
   ],
   "automergeType": "branch",
-  "baseBranches": ["main"],
+  "baseBranchPatterns": [
+    "main"
+  ],
   "enabledManagers": [
     "gomod",
     "github-actions",
