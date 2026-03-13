@@ -374,7 +374,7 @@ func (sis *SpliceInfoSection) MarshalJSON() ([]byte, error) {
 		sis.SpliceDescriptors[i].Tag()
 	}
 
-	m := map[string]interface{}{
+	m := map[string]any{
 		"encryptedPacket": sis.EncryptedPacket,
 		"spliceCommand":   sis.SpliceCommand,
 		"sapType":         sis.SAPType,
@@ -486,7 +486,7 @@ func (sis *SpliceInfoSection) descriptorLoopLength() int {
 // iSIS is an internal SpliceInfoSection used to support (un)marshalling
 // polymorphic fields.
 type iSIS struct {
-	EncryptedPacket      EncryptedPacket       `xml:"http://www.scte.org/schemas/35 EncryptedPacket,omitempty" json:"encryptedPacket,omitempty"`
+	EncryptedPacket      EncryptedPacket       `xml:"http://www.scte.org/schemas/35 EncryptedPacket,omitempty" json:"encryptedPacket"`
 	SpliceCommandRaw     json.RawMessage       `xml:"-" json:"spliceCommand"`
 	SpliceNull           *SpliceNull           `xml:"http://www.scte.org/schemas/35 SpliceNull" json:"-"`
 	SpliceSchedule       *SpliceSchedule       `xml:"http://www.scte.org/schemas/35 SpliceSchedule" json:"-"`

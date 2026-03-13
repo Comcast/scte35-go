@@ -64,7 +64,7 @@ var (
 				EncryptedPacket: scte35.EncryptedPacket{EncryptionAlgorithm: scte35.EncryptionAlgorithmNone, CWIndex: 255},
 				SpliceCommand: &scte35.TimeSignal{
 					SpliceTime: scte35.SpliceTime{
-						PTSTime: ptr(uint64(0x072bd0050)),
+						PTSTime: new(uint64(0x072bd0050)),
 					},
 				},
 				SpliceDescriptors: []scte35.SpliceDescriptor{
@@ -76,7 +76,7 @@ var (
 						},
 						SegmentationEventID:  uint32(0x4800008e),
 						SegmentationTypeID:   scte35.SegmentationTypeProviderPOStart,
-						SegmentationDuration: ptr(uint64(0x0001a599b0)),
+						SegmentationDuration: new(uint64(0x0001a599b0)),
 						SegmentationUPIDs: []scte35.SegmentationUPID{
 							scte35.NewSegmentationUPID(scte35.SegmentationUPIDTypeTI, toBytes(0x000000002ca0a18a)),
 						},
@@ -107,7 +107,7 @@ var (
 					OutOfNetworkIndicator: true,
 					Program: &scte35.SpliceInsertProgram{
 						SpliceTime: scte35.SpliceTime{
-							PTSTime: ptr(uint64(0x07369c02e)),
+							PTSTime: new(uint64(0x07369c02e)),
 						},
 					},
 				},
@@ -133,7 +133,7 @@ var (
 				EncryptedPacket: scte35.EncryptedPacket{EncryptionAlgorithm: scte35.EncryptionAlgorithmNone, CWIndex: 255},
 				SpliceCommand: &scte35.TimeSignal{
 					SpliceTime: scte35.SpliceTime{
-						PTSTime: ptr(uint64(0x0746290a0)),
+						PTSTime: new(uint64(0x0746290a0)),
 					},
 				},
 				SpliceDescriptors: []scte35.SpliceDescriptor{
@@ -170,7 +170,7 @@ var (
 				EncryptedPacket: scte35.EncryptedPacket{EncryptionAlgorithm: scte35.EncryptionAlgorithmNone, CWIndex: 255},
 				SpliceCommand: &scte35.TimeSignal{
 					SpliceTime: scte35.SpliceTime{
-						PTSTime: ptr(uint64(0x07a4d88b6)),
+						PTSTime: new(uint64(0x07a4d88b6)),
 					},
 				},
 				SpliceDescriptors: []scte35.SpliceDescriptor{
@@ -218,7 +218,7 @@ var (
 				EncryptedPacket: scte35.EncryptedPacket{EncryptionAlgorithm: scte35.EncryptionAlgorithmNone, CWIndex: 255},
 				SpliceCommand: &scte35.TimeSignal{
 					SpliceTime: scte35.SpliceTime{
-						PTSTime: ptr(uint64(0x0aebfff64)),
+						PTSTime: new(uint64(0x0aebfff64)),
 					},
 				},
 				SpliceDescriptors: []scte35.SpliceDescriptor{
@@ -254,7 +254,7 @@ var (
 				EncryptedPacket: scte35.EncryptedPacket{EncryptionAlgorithm: scte35.EncryptionAlgorithmNone, CWIndex: 255},
 				SpliceCommand: &scte35.TimeSignal{
 					SpliceTime: scte35.SpliceTime{
-						PTSTime: ptr(uint64(0x0932e380b)),
+						PTSTime: new(uint64(0x0932e380b)),
 					},
 				},
 				SpliceDescriptors: []scte35.SpliceDescriptor{
@@ -302,7 +302,7 @@ var (
 				EncryptedPacket: scte35.EncryptedPacket{EncryptionAlgorithm: scte35.EncryptionAlgorithmNone, CWIndex: 255},
 				SpliceCommand: &scte35.TimeSignal{
 					SpliceTime: scte35.SpliceTime{
-						PTSTime: ptr(uint64(0x0aef17c4c)),
+						PTSTime: new(uint64(0x0aef17c4c)),
 					},
 				},
 				SpliceDescriptors: []scte35.SpliceDescriptor{
@@ -340,7 +340,7 @@ var (
 				EncryptedPacket: scte35.EncryptedPacket{EncryptionAlgorithm: scte35.EncryptionAlgorithmNone, CWIndex: 255},
 				SpliceCommand: &scte35.TimeSignal{
 					SpliceTime: scte35.SpliceTime{
-						PTSTime: ptr(uint64(0x0a8cd44ed)),
+						PTSTime: new(uint64(0x0a8cd44ed)),
 					},
 				},
 				SpliceDescriptors: []scte35.SpliceDescriptor{
@@ -566,11 +566,11 @@ var (
 							{
 								Type:             scte35.SegmentationUPIDTypeMPU,
 								Format:           scte35.SegmentationUPIDFormatBase64,
-								FormatIdentifier: ptr(uint32(1145656131)),
+								FormatIdentifier: new(uint32(1145656131)),
 								Value:            "WU1XRjA0NTIwMDBI",
 							},
 						},
-						SegmentationDuration: ptr(uint64(10800000)),
+						SegmentationDuration: new(uint64(10800000)),
 						SegmentationEventID:  39965,
 						SegmentationTypeID:   scte35.SegmentationTypeProviderAdEnd,
 						SegmentNum:           1,
@@ -627,7 +627,7 @@ var (
 								Value:  "urn:nbcuni.com:brc:499866434",
 							},
 						},
-						SegmentationDuration: ptr(uint64(1347087)),
+						SegmentationDuration: new(uint64(1347087)),
 						SegmentationEventID:  4294967295,
 						SegmentationTypeID:   scte35.SegmentationTypeProviderAdEnd,
 						SegmentNum:           10,
@@ -702,7 +702,7 @@ var (
 				Tier:    4095,
 				SpliceCommand: &scte35.TimeSignal{
 					SpliceTime: scte35.SpliceTime{
-						PTSTime: ptr(uint64(8432094736)),
+						PTSTime: new(uint64(8432094736)),
 					},
 				},
 				SpliceDescriptors: scte35.SpliceDescriptors{
@@ -718,11 +718,11 @@ var (
 					&scte35.SegmentationDescriptor{
 						SegmentationEventID:  uint32(157),
 						SegmentationTypeID:   scte35.SegmentationTypeProviderAdStart,
-						SegmentationDuration: ptr(uint64(3600000)),
+						SegmentationDuration: new(uint64(3600000)),
 						SegmentNum:           8,
 						SegmentsExpected:     10,
-						SubSegmentNum:        ptr(uint32(0)),
-						SubSegmentsExpected:  ptr(uint32(0)),
+						SubSegmentNum:        new(uint32(0)),
+						SubSegmentsExpected:  new(uint32(0)),
 						SegmentationUPIDs: []scte35.SegmentationUPID{
 							{Type: scte35.SegmentationUPIDTypeADS, Format: scte35.SegmentationUPIDFormatText, Value: "availid=910901389\u0026bitmap=\u0026inactivity=3120"},
 						},
@@ -751,7 +751,7 @@ var (
 			expected: scte35.SpliceInfoSection{
 				SpliceCommand: &scte35.TimeSignal{
 					SpliceTime: scte35.SpliceTime{
-						PTSTime: ptr(uint64(7337557610)),
+						PTSTime: new(uint64(7337557610)),
 					},
 				},
 				SpliceDescriptors: scte35.SpliceDescriptors{
@@ -796,7 +796,7 @@ var (
 					},
 					&scte35.SegmentationDescriptor{
 						SegmentationEventID:  uint32(1074667978),
-						SegmentationDuration: ptr(uint64(5412012)),
+						SegmentationDuration: new(uint64(5412012)),
 						SegmentationTypeID:   scte35.SegmentationTypeBreakStart,
 						DeliveryRestrictions: &scte35.DeliveryRestrictions{
 							ArchiveAllowedFlag:     true,
@@ -811,7 +811,7 @@ var (
 					&scte35.SegmentationDescriptor{
 						SegmentationEventID:  uint32(1074667990),
 						SegmentationTypeID:   0x05,
-						SegmentationDuration: ptr(uint64(5412012)),
+						SegmentationDuration: new(uint64(5412012)),
 						SegmentNum:           6,
 						SegmentsExpected:     255,
 						DeliveryRestrictions: &scte35.DeliveryRestrictions{
@@ -848,7 +848,7 @@ var (
 			expected: scte35.SpliceInfoSection{
 				SpliceCommand: &scte35.TimeSignal{
 					SpliceTime: scte35.SpliceTime{
-						PTSTime: ptr(uint64(7337557610)),
+						PTSTime: new(uint64(7337557610)),
 					},
 				},
 				SpliceDescriptors: scte35.SpliceDescriptors{
@@ -1095,15 +1095,11 @@ func toXML(sis *scte35.SpliceInfoSection) string {
 	return string(b)
 }
 
-func ptr[T any](i T) *T {
-	return &i
-}
-
 func Test(t *testing.T) {
 	fmt.Println((&scte35.SpliceInfoSection{
 		SpliceCommand: &scte35.TimeSignal{
 			SpliceTime: scte35.SpliceTime{
-				PTSTime: ptr(uint64(7337557610)),
+				PTSTime: new(uint64(7337557610)),
 			},
 		},
 		SpliceDescriptors: scte35.SpliceDescriptors{
