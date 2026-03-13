@@ -31,7 +31,7 @@ func TestSpliceInfoSection_UnmarshalXML(t *testing.T) {
 				SAPType:         scte35.SAPTypeNotSpecified,
 				EncryptedPacket: scte35.EncryptedPacket{CWIndex: 255},
 				SpliceCommand: &scte35.TimeSignal{
-					SpliceTime: scte35.SpliceTime{PTSTime: ptr(uint64(1924989008))},
+					SpliceTime: scte35.SpliceTime{PTSTime: new(uint64(1924989008))},
 				},
 				SpliceDescriptors: scte35.SpliceDescriptors{
 					&scte35.SegmentationDescriptor{
@@ -48,7 +48,7 @@ func TestSpliceInfoSection_UnmarshalXML(t *testing.T) {
 							},
 						},
 						SegmentationEventID:  uint32(1207959694),
-						SegmentationDuration: ptr(uint64(27630000)),
+						SegmentationDuration: new(uint64(27630000)),
 						SegmentationTypeID:   scte35.SegmentationTypeProviderPOStart,
 						SegmentNum:           2,
 					},
@@ -72,7 +72,7 @@ func TestSpliceInfoSection_UnmarshalXML(t *testing.T) {
 				SAPType:         scte35.SAPType1,
 				EncryptedPacket: scte35.EncryptedPacket{CWIndex: 255},
 				SpliceCommand: &scte35.TimeSignal{
-					SpliceTime: scte35.SpliceTime{PTSTime: ptr(uint64(1924989008))},
+					SpliceTime: scte35.SpliceTime{PTSTime: new(uint64(1924989008))},
 				},
 				SpliceDescriptors: scte35.SpliceDescriptors{
 					&scte35.SegmentationDescriptor{
@@ -89,7 +89,7 @@ func TestSpliceInfoSection_UnmarshalXML(t *testing.T) {
 							},
 						},
 						SegmentationEventID:  uint32(1207959694),
-						SegmentationDuration: ptr(uint64(27630000)),
+						SegmentationDuration: new(uint64(27630000)),
 						SegmentationTypeID:   scte35.SegmentationTypeProviderPOStart,
 						SegmentNum:           2,
 					},
@@ -152,7 +152,7 @@ func TestSpliceInfoSection_UnmarshalJSON(t *testing.T) {
 				SAPType:         scte35.SAPTypeNotSpecified,
 				EncryptedPacket: scte35.EncryptedPacket{CWIndex: 255},
 				SpliceCommand: &scte35.TimeSignal{
-					SpliceTime: scte35.SpliceTime{PTSTime: ptr(uint64(1924989008))},
+					SpliceTime: scte35.SpliceTime{PTSTime: new(uint64(1924989008))},
 				},
 				SpliceDescriptors: scte35.SpliceDescriptors{
 					&scte35.SegmentationDescriptor{
@@ -169,7 +169,7 @@ func TestSpliceInfoSection_UnmarshalJSON(t *testing.T) {
 							},
 						},
 						SegmentationEventID:  uint32(1207959694),
-						SegmentationDuration: ptr(uint64(27630000)),
+						SegmentationDuration: new(uint64(27630000)),
 						SegmentationTypeID:   scte35.SegmentationTypeProviderPOStart,
 						SegmentNum:           2,
 					},
@@ -217,7 +217,7 @@ func TestSpliceInfoSection_UnmarshalJSON(t *testing.T) {
 				SAPType:         scte35.SAPType1,
 				EncryptedPacket: scte35.EncryptedPacket{CWIndex: 255},
 				SpliceCommand: &scte35.TimeSignal{
-					SpliceTime: scte35.SpliceTime{PTSTime: ptr(uint64(1924989008))},
+					SpliceTime: scte35.SpliceTime{PTSTime: new(uint64(1924989008))},
 				},
 				SpliceDescriptors: scte35.SpliceDescriptors{
 					&scte35.SegmentationDescriptor{
@@ -234,7 +234,7 @@ func TestSpliceInfoSection_UnmarshalJSON(t *testing.T) {
 							},
 						},
 						SegmentationEventID:  uint32(1207959694),
-						SegmentationDuration: ptr(uint64(27630000)),
+						SegmentationDuration: new(uint64(27630000)),
 						SegmentationTypeID:   scte35.SegmentationTypeProviderPOStart,
 						SegmentNum:           2,
 					},
@@ -317,11 +317,11 @@ func TestDurations(t *testing.T) {
 				SpliceDescriptors: scte35.SpliceDescriptors{
 					&scte35.SegmentationDescriptor{
 						SegmentationTypeID:   scte35.SegmentationTypeProviderPOStart,
-						SegmentationDuration: ptr(uint64(2790000)),
+						SegmentationDuration: new(uint64(2790000)),
 					},
 					&scte35.SegmentationDescriptor{
 						SegmentationTypeID:   scte35.SegmentationTypeDistributorPOStart,
-						SegmentationDuration: ptr(uint64(2880000)),
+						SegmentationDuration: new(uint64(2880000)),
 					},
 				},
 			},
@@ -349,11 +349,11 @@ func TestDurations(t *testing.T) {
 				SpliceDescriptors: scte35.SpliceDescriptors{
 					&scte35.SegmentationDescriptor{
 						SegmentationTypeID:   scte35.SegmentationTypeProviderPOStart,
-						SegmentationDuration: ptr(uint64(2790000)),
+						SegmentationDuration: new(uint64(2790000)),
 					},
 					&scte35.SegmentationDescriptor{
 						SegmentationTypeID:   scte35.SegmentationTypeDistributorPOStart,
-						SegmentationDuration: ptr(uint64(2880000)),
+						SegmentationDuration: new(uint64(2880000)),
 					},
 				},
 			},
@@ -402,7 +402,7 @@ func Test_TimeSpecifiedFlag(t *testing.T) {
 				SpliceCommand: &scte35.SpliceInsert{
 					Program: &scte35.SpliceInsertProgram{
 						SpliceTime: scte35.SpliceTime{
-							PTSTime: ptr(uint64(90000)),
+							PTSTime: new(uint64(90000)),
 						},
 					},
 				},
@@ -426,7 +426,7 @@ func Test_TimeSpecifiedFlag(t *testing.T) {
 		"TimeSignal": {
 			sis: scte35.SpliceInfoSection{
 				SpliceCommand: &scte35.TimeSignal{
-					SpliceTime: scte35.SpliceTime{PTSTime: ptr(uint64(90000))},
+					SpliceTime: scte35.SpliceTime{PTSTime: new(uint64(90000))},
 				},
 			},
 			expected: true,
@@ -458,7 +458,7 @@ func Test_SpliceTimePTS(t *testing.T) {
 				SpliceCommand: &scte35.SpliceInsert{
 					Program: &scte35.SpliceInsertProgram{
 						SpliceTime: scte35.SpliceTime{
-							PTSTime: ptr(uint64(90000)),
+							PTSTime: new(uint64(90000)),
 						},
 					},
 				},
@@ -470,7 +470,7 @@ func Test_SpliceTimePTS(t *testing.T) {
 				SpliceCommand: &scte35.SpliceInsert{
 					Program: &scte35.SpliceInsertProgram{
 						SpliceTime: scte35.SpliceTime{
-							PTSTime: ptr(uint64(90000)),
+							PTSTime: new(uint64(90000)),
 						},
 					},
 				},
@@ -483,7 +483,7 @@ func Test_SpliceTimePTS(t *testing.T) {
 				SpliceCommand: &scte35.SpliceInsert{
 					Program: &scte35.SpliceInsertProgram{
 						SpliceTime: scte35.SpliceTime{
-							PTSTime: ptr(uint64(8589844592)),
+							PTSTime: new(uint64(8589844592)),
 						},
 					},
 				},
@@ -508,7 +508,7 @@ func Test_SpliceTimePTS(t *testing.T) {
 		"TimeSignal": {
 			sis: scte35.SpliceInfoSection{
 				SpliceCommand: &scte35.TimeSignal{
-					SpliceTime: scte35.SpliceTime{PTSTime: ptr(uint64(90000))},
+					SpliceTime: scte35.SpliceTime{PTSTime: new(uint64(90000))},
 				},
 			},
 			expected: 90000,
@@ -517,7 +517,7 @@ func Test_SpliceTimePTS(t *testing.T) {
 			sis: scte35.SpliceInfoSection{
 				SpliceCommand: &scte35.TimeSignal{
 					SpliceTime: scte35.SpliceTime{
-						PTSTime: ptr(uint64(90000)),
+						PTSTime: new(uint64(90000)),
 					},
 				},
 				PTSAdjustment: 90000,
@@ -528,7 +528,7 @@ func Test_SpliceTimePTS(t *testing.T) {
 			sis: scte35.SpliceInfoSection{
 				SpliceCommand: &scte35.TimeSignal{
 					SpliceTime: scte35.SpliceTime{
-						PTSTime: ptr(uint64(8589844592)),
+						PTSTime: new(uint64(8589844592)),
 					},
 				},
 				PTSAdjustment: 180000,
